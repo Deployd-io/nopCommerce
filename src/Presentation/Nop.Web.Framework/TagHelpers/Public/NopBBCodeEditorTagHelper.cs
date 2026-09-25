@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Public;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.TagHelpers.Public;
 [HtmlTargetElement("nop-bb-code-editor", Attributes = FOR_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopBBCodeEditorTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -27,7 +29,10 @@ public partial class NopBBCodeEditorTagHelper : TagHelper
 
     public NopBBCodeEditorTagHelper(IWebHelper webHelper)
     {
+		_logger.LogError(">>> Entering NopBBCodeEditorTagHelper(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("NopBBCodeEditorTagHelper(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
+    _logger.LogWarning("<<< Exiting NopBBCodeEditorTagHelper(webHelper={WebHelper})", webHelper);
     }
 
     #endregion
@@ -42,28 +47,36 @@ public partial class NopBBCodeEditorTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
 
         output.TagName = "div";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
         output.TagMode = TagMode.StartTagAndEndTag;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.Attributes.Add("class", "bb-code-editor-wrapper");
 
         var storeLocation = _webHelper.GetStoreLocation();
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): storeLocation → {StoreLocation}", context, output, storeLocation);
 
         var bbEditorWebRoot = $"{storeLocation}js/";
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): bbEditorWebRoot → {BbEditorWebRoot}", context, output, bbEditorWebRoot);
 
         var script1 = new TagBuilder("script");
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): script1 → {Script1}", context, output, script1);
         script1.Attributes.Add("src", $"{storeLocation}js/bbeditor/ed.js");
 
         var script2 = new TagBuilder("script");
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): script2 → {Script2}", context, output, script2);
         script2.Attributes.Add("language", "javascript");
         script2.InnerHtml.AppendHtml($"edToolbar('{For.Name}','{bbEditorWebRoot}');");
 
         output.Content.AppendHtml(script1);
         output.Content.AppendHtml(script2);
 
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

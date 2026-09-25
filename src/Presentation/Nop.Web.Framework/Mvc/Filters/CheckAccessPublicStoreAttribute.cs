@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Data;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -18,8 +20,11 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public CheckAccessPublicStoreAttribute(bool ignore = false) : base(typeof(CheckAccessPublicStoreFilter))
     {
+		_logger.LogError(">>> Entering CheckAccessPublicStoreAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		_logger.LogDebug("CheckAccessPublicStoreAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
+    _logger.LogWarning("<<< Exiting CheckAccessPublicStoreAttribute(ignore={Ignore})", ignore);
     }
 
     #endregion
@@ -40,6 +45,7 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
     /// </summary>
     private class CheckAccessPublicStoreFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly bool _ignoreFilter;
@@ -51,8 +57,10 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
 
         public CheckAccessPublicStoreFilter(bool ignoreFilter, IPermissionService permissionService)
         {
+			_logger.LogError(">>> Entering CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
             _ignoreFilter = ignoreFilter;
             _permissionService = permissionService;
+			_logger.LogDebug("CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _permissionService → {_permissionService}", ignoreFilter, permissionService, _permissionService);
         }
 
         #endregion
@@ -66,6 +74,7 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAccessPublicStoreAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering CheckAccessPublicStoreAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -83,8 +92,10 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
                 return;
 
             //check whether current customer has access to a public store
-            if (await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.PUBLIC_STORE_ALLOW_NAVIGATION))
+			_logger.LogWarning("<<< Exiting CheckAccessPublicStoreAsync(context={Context})", context);
+            if (await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.PUBLIC_STORE_ALLOW_NAVIGATION)) {
                 return;
+            }
 
             //customer hasn't access to a public store
             context.Result = new ChallengeResult();
@@ -101,7 +112,9 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await CheckAccessPublicStoreAsync(context);
+			_logger.LogWarning("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

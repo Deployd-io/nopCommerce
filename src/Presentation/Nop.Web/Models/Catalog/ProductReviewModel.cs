@@ -1,10 +1,12 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record ProductReviewOverviewModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public int ProductId { get; set; }
 
     public int RatingSum { get; set; }
@@ -19,12 +21,17 @@ public partial record ProductReviewOverviewModel : BaseNopModel
 
 public partial record ProductReviewsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductReviewsModel()
     {
+		_logger.LogError(">>> Entering ProductReviewsModel()");
         Items = new List<ProductReviewModel>();
         AddProductReview = new AddProductReviewModel();
+		_logger.LogError("ProductReviewsModel(): AddProductReview → {AddProductReview}", AddProductReview);
         ReviewTypeList = new List<ReviewTypeModel>();
+		_logger.LogError("ProductReviewsModel(): ReviewTypeList → {ReviewTypeList}", ReviewTypeList);
         AddAdditionalProductReviewList = new List<AddProductReviewReviewTypeMappingModel>();
+		_logger.LogError("ProductReviewsModel(): AddAdditionalProductReviewList → {AddAdditionalProductReviewList}", AddAdditionalProductReviewList);
     }
 
     public int ProductId { get; set; }
@@ -55,9 +62,14 @@ public partial record ReviewTypeModel : BaseNopEntityModel
 
 public partial record ProductReviewModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductReviewModel()
     {
+		_logger.LogError(">>> Entering ProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		_logger.LogDebug("ProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
+    _logger.LogError("ProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
+    _logger.LogWarning("<<< Exiting ProductReviewModel()");
     }
 
     public int CustomerId { get; set; }

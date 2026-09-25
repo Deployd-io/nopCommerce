@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ProductAttributeModelFactory : IProductAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -31,10 +33,16 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
         IProductAttributeService productAttributeService,
         IProductService productService)
     {
+		_logger.LogError(">>> Entering ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService})", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService);
         _baseAdminModelFactory = baseAdminModelFactory;
         _localizationService = localizationService;
+		_logger.LogDebug("ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService}): _localizationService → {_localizationService}", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService, _localizationService);
+		_logger.LogDebug("ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService, _baseAdminModelFactory);
+    _logger.LogWarning("<<< Exiting ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService})", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService}): _localizedModelFactory → {_localizedModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService, _localizedModelFactory);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("ProductAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productAttributeService={ProductAttributeService},productService={ProductService}): _productAttributeService → {_productAttributeService}", baseAdminModelFactory, localizationService, localizedModelFactory, productAttributeService, productService, _productAttributeService);
         _productService = productService;
     }
 
@@ -51,15 +59,18 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     protected virtual PredefinedProductAttributeValueSearchModel PreparePredefinedProductAttributeValueSearchModel(
         PredefinedProductAttributeValueSearchModel searchModel, ProductAttribute productAttribute)
     {
+		_logger.LogError(">>> Entering PreparePredefinedProductAttributeValueSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productAttribute);
 
         searchModel.ProductAttributeId = productAttribute.Id;
+		_logger.LogDebug("PreparePredefinedProductAttributeValueSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute}): searchModel.ProductAttributeId → {Arg2}", searchModel, productAttribute, searchModel.ProductAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PreparePredefinedProductAttributeValueSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         return searchModel;
     }
 
@@ -72,15 +83,18 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     protected virtual ProductAttributeProductSearchModel PrepareProductAttributeProductSearchModel(ProductAttributeProductSearchModel searchModel,
         ProductAttribute productAttribute)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeProductSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productAttribute);
 
         searchModel.ProductAttributeId = productAttribute.Id;
+		_logger.LogDebug("PrepareProductAttributeProductSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute}): searchModel.ProductAttributeId → {Arg2}", searchModel, productAttribute, searchModel.ProductAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeProductSearchModel(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         return searchModel;
     }
 
@@ -98,11 +112,13 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual Task<ProductAttributeSearchModel> PrepareProductAttributeSearchModelAsync(ProductAttributeSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -116,6 +132,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual async Task<ProductAttributeListModel> PrepareProductAttributeListModelAsync(ProductAttributeSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get product attributes
@@ -128,6 +145,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
         var model = new ProductAttributeListModel().PrepareToGrid(searchModel, productAttributes, () =>
         {
             //fill in model values from the entity
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
             return productAttributes.Select(attribute => attribute.ToModel<ProductAttributeModel>());
 
         });
@@ -148,6 +166,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     public virtual async Task<ProductAttributeModel> PrepareProductAttributeModelAsync(ProductAttributeModel model,
         ProductAttribute productAttribute, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeModelAsync(model={Model},productAttribute={ProductAttribute},excludeProperties={ExcludeProperties})", model, productAttribute, excludeProperties);
         Func<ProductAttributeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (productAttribute != null)
@@ -173,6 +192,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
 
         await _baseAdminModelFactory.PreparePreTranslationSupportModelAsync(model);
 
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeModelAsync(model={Model},productAttribute={ProductAttribute},excludeProperties={ExcludeProperties})", model, productAttribute, excludeProperties);
         return model;
     }
 
@@ -188,12 +208,14 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     public virtual async Task<PredefinedProductAttributeValueListModel> PreparePredefinedProductAttributeValueListModelAsync(
         PredefinedProductAttributeValueSearchModel searchModel, ProductAttribute productAttribute)
     {
+		_logger.LogError(">>> Entering PreparePredefinedProductAttributeValueListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productAttribute);
 
         //get predefined product attribute values
         var values = (await _productAttributeService.GetPredefinedProductAttributeValuesAsync(productAttribute.Id)).ToPagedList(searchModel);
+		_logger.LogError("PreparePredefinedProductAttributeValueListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute}): values → {Values}", searchModel, productAttribute, values);
 
         //prepare list model
         var model = new PredefinedProductAttributeValueListModel().PrepareToGrid(searchModel, values, () =>
@@ -202,16 +224,19 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
             {
                 //fill in model values from the entity
                 var predefinedProductAttributeValueModel = value.ToModel<PredefinedProductAttributeValueModel>();
+				_logger.LogError("PreparePredefinedProductAttributeValueListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute}): predefinedProductAttributeValueModel → {PredefinedProductAttributeValueModel}", searchModel, productAttribute, predefinedProductAttributeValueModel);
 
                 //fill in additional values (not existing in the entity)
                 predefinedProductAttributeValueModel.WeightAdjustmentStr = value.WeightAdjustment.ToString("G29");
                 predefinedProductAttributeValueModel.PriceAdjustmentStr = value.PriceAdjustment
                     .ToString("G29") + (value.PriceAdjustmentUsePercentage ? " %" : string.Empty);
+					_logger.LogDebug("PreparePredefinedProductAttributeValueListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute}): predefinedProductAttributeValueModel.PriceAdjustmentStr → {Arg2}", searchModel, productAttribute, predefinedProductAttributeValueModel.PriceAdjustmentStr);
 
                 return predefinedProductAttributeValueModel;
             });
         });
 
+		_logger.LogWarning("<<< Exiting PreparePredefinedProductAttributeValueListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         return model;
     }
 
@@ -229,6 +254,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     public virtual async Task<PredefinedProductAttributeValueModel> PreparePredefinedProductAttributeValueModelAsync(PredefinedProductAttributeValueModel model,
         ProductAttribute productAttribute, PredefinedProductAttributeValue productAttributeValue, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PreparePredefinedProductAttributeValueModelAsync(model={Model},productAttribute={ProductAttribute},productAttributeValue={ProductAttributeValue},excludeProperties={ExcludeProperties})", model, productAttribute, productAttributeValue, excludeProperties);
         ArgumentNullException.ThrowIfNull(productAttribute);
 
         Func<PredefinedProductAttributeValueLocalizedModel, int, Task> localizedModelConfiguration = null;
@@ -239,6 +265,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
             if (model == null)
             {
                 model = productAttributeValue.ToModel<PredefinedProductAttributeValueModel>();
+				_logger.LogError("PreparePredefinedProductAttributeValueModelAsync(model={Model},productAttribute={ProductAttribute},productAttributeValue={ProductAttributeValue},excludeProperties={ExcludeProperties}): model → {Model1}", model, productAttribute, productAttributeValue, excludeProperties, model);
             }
 
             //define localized model configuration action
@@ -249,11 +276,13 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
         }
 
         model.ProductAttributeId = productAttribute.Id;
+		_logger.LogDebug("PreparePredefinedProductAttributeValueModelAsync(model={Model},productAttribute={ProductAttribute},productAttributeValue={ProductAttributeValue},excludeProperties={ExcludeProperties}): model.ProductAttributeId → {Arg4}", model, productAttribute, productAttributeValue, excludeProperties, model.ProductAttributeId);
 
         //prepare localized models
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogWarning("<<< Exiting PreparePredefinedProductAttributeValueModelAsync(model={Model},productAttribute={ProductAttribute},productAttributeValue={ProductAttributeValue},excludeProperties={ExcludeProperties})", model, productAttribute, productAttributeValue, excludeProperties);
         return model;
     }
 
@@ -269,6 +298,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     public virtual async Task<ProductAttributeProductListModel> PrepareProductAttributeProductListModelAsync(ProductAttributeProductSearchModel searchModel,
         ProductAttribute productAttribute)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeProductListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productAttribute);
@@ -284,11 +314,14 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
             return products.Select(product =>
             {
                 var productAttributeProductModel = product.ToModel<ProductAttributeProductModel>();
+				_logger.LogError("PrepareProductAttributeProductListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute}): productAttributeProductModel → {ProductAttributeProductModel}", searchModel, productAttribute, productAttributeProductModel);
                 productAttributeProductModel.ProductName = product.Name;
+				_logger.LogDebug("PrepareProductAttributeProductListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute}): productAttributeProductModel.ProductName → {Arg2}", searchModel, productAttribute, productAttributeProductModel.ProductName);
                 return productAttributeProductModel;
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeProductListModelAsync(searchModel={SearchModel},productAttribute={ProductAttribute})", searchModel, productAttribute);
         return model;
     }
 

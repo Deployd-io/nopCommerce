@@ -6,6 +6,7 @@ using Nop.Plugin.Payments.PayPalCommerce.Services;
 using Nop.Services.Localization;
 using Nop.Web.Factories;
 using Nop.Web.Models.Checkout;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Factories;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Factories;
 /// </summary>
 public class PayPalCommerceModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICheckoutModelFactory _checkoutModelFactory;
@@ -30,10 +32,14 @@ public class PayPalCommerceModelFactory
         PayPalCommerceServiceManager serviceManager,
         PayPalCommerceSettings settings)
     {
+		_logger.LogError(">>> Entering PayPalCommerceModelFactory(checkoutModelFactory={CheckoutModelFactory},localizationService={LocalizationService},serviceManager={ServiceManager},settings={Settings})", checkoutModelFactory, localizationService, serviceManager, settings);
         _checkoutModelFactory = checkoutModelFactory;
         _localizationService = localizationService;
+		_logger.LogDebug("PayPalCommerceModelFactory(checkoutModelFactory={CheckoutModelFactory},localizationService={LocalizationService},serviceManager={ServiceManager},settings={Settings}): _localizationService → {_localizationService}", checkoutModelFactory, localizationService, serviceManager, settings, _localizationService);
         _serviceManager = serviceManager;
+		_logger.LogDebug("PayPalCommerceModelFactory(checkoutModelFactory={CheckoutModelFactory},localizationService={LocalizationService},serviceManager={ServiceManager},settings={Settings}): _serviceManager → {_serviceManager}", checkoutModelFactory, localizationService, serviceManager, settings, _serviceManager);
         _settings = settings;
+		_logger.LogDebug("PayPalCommerceModelFactory(checkoutModelFactory={CheckoutModelFactory},localizationService={LocalizationService},serviceManager={ServiceManager},settings={Settings}): _settings → {_settings}", checkoutModelFactory, localizationService, serviceManager, settings, _settings);
     }
 
     #endregion
@@ -53,8 +59,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<MessagesModel> PrepareMessagesModelAsync(ButtonPlacement placement, bool loadScript)
     {
+		_logger.LogError(">>> Entering PrepareMessagesModelAsync(placement={Placement},loadScript={LoadScript})", placement, loadScript);
         var ((messageConfig, amount, currencyCode), _) = await _serviceManager.PrepareMessagesAsync(_settings, placement);
 
+		_logger.LogWarning("<<< Exiting PrepareMessagesModelAsync(placement={Placement},loadScript={LoadScript})", placement, loadScript);
         return new()
         {
             Placement = placement,
@@ -77,6 +85,7 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<PaymentInfoModel> PreparePaymentInfoModelAsync(ButtonPlacement placement, int? productId = null)
     {
+		_logger.LogError(">>> Entering PreparePaymentInfoModelAsync(placement={Placement},productId={ProductId})", placement, productId);
         var (((scriptUrl, clientToken, userToken), (email, name), (messageConfig, amount), (isRecurring, isShippable)), _) = await _serviceManager
             .PreparePaymentDetailsAsync(_settings, placement, productId);
 
@@ -104,9 +113,12 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<CheckoutPaymentInfoModel> PrepareCheckoutPaymentInfoModelAsync()
     {
+		_logger.LogError(">>> Entering PrepareCheckoutPaymentInfoModelAsync()");
         var (active, paymentMethod) = await _serviceManager.IsActiveAsync(_settings);
-        if (!active || paymentMethod is null)
+		_logger.LogWarning("<<< Exiting PrepareCheckoutPaymentInfoModelAsync()");
+        if (!active || paymentMethod is null) {
             return new();
+        }
 
         return await _checkoutModelFactory.PreparePaymentInfoModelAsync(paymentMethod);
     }
@@ -120,9 +132,12 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<IList<string>> GetShoppingCartWarningsAsync()
     {
+		_logger.LogError(">>> Entering GetShoppingCartWarningsAsync()");
         var (warnings, error) = await _serviceManager.ValidateShoppingCartAsync();
-        if (!string.IsNullOrEmpty(error))
+		_logger.LogWarning("<<< Exiting GetShoppingCartWarningsAsync()");
+        if (!string.IsNullOrEmpty(error)) {
             return [error];
+        }
 
         return warnings;
     }
@@ -154,8 +169,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<OrderModel> PrepareOrderModelAsync(ButtonPlacement placement, string orderId, string paymentSource, int? cardId, bool saveCard)
     {
+		_logger.LogError(">>> Entering PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard})", placement, orderId, paymentSource, cardId, saveCard);
         var model = new OrderModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard}): model → {Model}", placement, orderId, paymentSource, cardId, saveCard, model);
 
         //get the order or create a new one
         var (order, error) = string.IsNullOrEmpty(orderId)
@@ -171,9 +188,13 @@ public class PayPalCommerceModelFactory
 
         //set some order parameters
         model.OrderId = order.Id;
+		_logger.LogDebug("PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard}): model.OrderId → {Arg5}", placement, orderId, paymentSource, cardId, saveCard, model.OrderId);
+		_logger.LogDebug("PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard}): model.PayerActionUrl → {Arg5}", placement, orderId, paymentSource, cardId, saveCard, model.PayerActionUrl);
         model.Status = order.Status;
+		_logger.LogDebug("PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard}): model.Status → {Arg5}", placement, orderId, paymentSource, cardId, saveCard, model.Status);
         model.PayerActionUrl = order.PayerActionUrl;
 
+		_logger.LogWarning("<<< Exiting PrepareOrderModelAsync(placement={Placement},orderId={OrderId},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard})", placement, orderId, paymentSource, cardId, saveCard);
         return model;
     }
 
@@ -187,6 +208,7 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<OrderShippingModel> PrepareOrderShippingModelAsync(OrderShippingModel model)
     {
+		_logger.LogError(">>> Entering PrepareOrderShippingModelAsync(model={Model})", model);
         var (checkoutIsEnabled, loginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
         if (!checkoutIsEnabled || loginIsRequired)
             return model;
@@ -196,7 +218,9 @@ public class PayPalCommerceModelFactory
             (model.OptionId, model.OptionType));
         if (!string.IsNullOrEmpty(error))
             model.Error = error;
+			_logger.LogDebug("PrepareOrderShippingModelAsync(model={Model}): model.Error → {Arg1}", model, model.Error);
 
+		_logger.LogWarning("<<< Exiting PrepareOrderShippingModelAsync(model={Model})", model);
         return model;
     }
 
@@ -211,8 +235,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<OrderApprovedModel> PrepareOrderApprovedModelAsync(string orderId, string liabilityShift)
     {
+		_logger.LogError(">>> Entering PrepareOrderApprovedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift})", orderId, liabilityShift);
         var model = new OrderApprovedModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, var cart) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareOrderApprovedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift}): model → {Model}", orderId, liabilityShift, model);
         if (cart?.Any() != true)
             return model;
 
@@ -221,7 +247,9 @@ public class PayPalCommerceModelFactory
             model.Error = error;
         else
             (model.OrderId, model.PayNow) = (order?.Id, payNow);
+			_logger.LogDebug("PrepareOrderApprovedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift}): model.Error → {Arg2}", orderId, liabilityShift, model.Error);
 
+		_logger.LogWarning("<<< Exiting PrepareOrderApprovedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift})", orderId, liabilityShift);
         return model;
     }
 
@@ -238,6 +266,7 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<OrderConfirmModel> PrepareOrderConfirmModelAsync(string orderId, string orderGuid, string liabilityShift, bool approve)
     {
+		_logger.LogError(">>> Entering PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve})", orderId, orderGuid, liabilityShift, approve);
         var model = new OrderConfirmModel { OrderId = orderId, OrderGuid = orderGuid, LiabilityShift = liabilityShift };
         (model.CheckoutIsEnabled, model.LoginIsRequired, var cart) = await _serviceManager.CheckoutIsEnabledAsync();
         if (cart?.Any() != true)
@@ -245,7 +274,12 @@ public class PayPalCommerceModelFactory
 
         //prepare common confirmation model parameters
         var checkoutConfirmModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+		_logger.LogError("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): checkoutConfirmModel → {CheckoutConfirmModel}", orderId, orderGuid, liabilityShift, approve, checkoutConfirmModel);
+		_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.MinOrderTotalWarning → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.MinOrderTotalWarning);
+		_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.TermsOfServiceOnOrderConfirmPage → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.TermsOfServiceOnOrderConfirmPage);
+		_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.TermsOfServicePopup → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.TermsOfServicePopup);
         model.DisplayCaptcha = checkoutConfirmModel.DisplayCaptcha;
+		_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.DisplayCaptcha → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.DisplayCaptcha);
         model.MinOrderTotalWarning = checkoutConfirmModel.MinOrderTotalWarning;
         model.TermsOfServiceOnOrderConfirmPage = checkoutConfirmModel.TermsOfServiceOnOrderConfirmPage;
         model.TermsOfServicePopup = checkoutConfirmModel.TermsOfServicePopup;
@@ -258,7 +292,10 @@ public class PayPalCommerceModelFactory
             model.Error = error;
         else
             model.OrderId = order?.Id;
+			_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.Error → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.Error);
+			_logger.LogDebug("PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve}): model.OrderId → {Arg4}", orderId, orderGuid, liabilityShift, approve, model.OrderId);
 
+		_logger.LogWarning("<<< Exiting PrepareOrderConfirmModelAsync(orderId={OrderId},orderGuid={OrderGuid},liabilityShift={LiabilityShift},approve={Approve})", orderId, orderGuid, liabilityShift, approve);
         return model;
     }
 
@@ -273,8 +310,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<OrderCompletedModel> PrepareOrderCompletedModelAsync(string orderId, string liabilityShift)
     {
+		_logger.LogError(">>> Entering PrepareOrderCompletedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift})", orderId, liabilityShift);
         var model = new OrderCompletedModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, var cart) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareOrderCompletedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift}): model → {Model}", orderId, liabilityShift, model);
         if (cart?.Any() != true)
             return model;
 
@@ -282,8 +321,10 @@ public class PayPalCommerceModelFactory
         var ((nopOrder, order), error) = await _serviceManager.PlaceOrderAsync(_settings, orderId, liabilityShift);
         if (!string.IsNullOrEmpty(error))
             model.Error = error;
-        else if (order is null)
+        else if (order is null) {
             model.Error = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Order.Error");
+			_logger.LogDebug("PrepareOrderCompletedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift}): model.Error → {Arg2}", orderId, liabilityShift, model.Error);
+        }
         else
             model.OrderId = nopOrder.Id.ToString();
 
@@ -294,7 +335,9 @@ public class PayPalCommerceModelFactory
         var (_, warning) = await _serviceManager.ConfirmOrderAsync(_settings, nopOrder, order);
         if (!string.IsNullOrEmpty(warning))
             model.Warning = warning;
+			_logger.LogDebug("PrepareOrderCompletedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift}): model.Warning → {Arg2}", orderId, liabilityShift, model.Warning);
 
+		_logger.LogWarning("<<< Exiting PrepareOrderCompletedModelAsync(orderId={OrderId},liabilityShift={LiabilityShift})", orderId, liabilityShift);
         return model;
     }
 
@@ -309,14 +352,17 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<ApplePayModel> PrepareApplePayModelAsync(ButtonPlacement placement, bool shippingIsSet = false)
     {
+		_logger.LogError(">>> Entering PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>)", placement);
         var model = new ApplePayModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model → {Model}", placement, model);
 
         var ((amount, billingAddress, shippingAddress, shipping, storeName), error) = await _serviceManager
             .GetAppleTransactionInfoAsync(_settings, placement);
         if (!string.IsNullOrEmpty(error))
         {
             model.Error = error;
+			_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.Error → {Arg2}", placement, model.Error);
             return model;
         }
 
@@ -328,9 +374,13 @@ public class PayPalCommerceModelFactory
 
             if (resourcePostfix == "Discount")
                 amount = -amount;
+				_logger.LogError("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): amount → {Amount}", placement, amount);
+				_logger.LogWarning("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): amount → {Amount}", placement, amount);
 
             var price = amount.ToString("0.00", CultureInfo.InvariantCulture);
+			_logger.LogError("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): price → {Price}", placement, price);
             var status = "final";
+			_logger.LogError("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): status → {Status}", placement, status);
             var label = type == "TOTAL"
                 ? storeName
                 : await _localizationService.GetResourceAsync($"Plugins.Payments.PayPalCommerce.ApplePay.{resourcePostfix}");
@@ -348,14 +398,20 @@ public class PayPalCommerceModelFactory
         };
 
         model.Placement = placement;
+		_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.Placement → {Arg2}", placement, model.Placement);
+		_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.BillingAddress → {Arg2}", placement, model.BillingAddress);
+		_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.ShippingAddress → {Arg2}", placement, model.ShippingAddress);
         model.CurrencyCode = amount.CurrencyCode;
+		_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.CurrencyCode → {Arg2}", placement, model.CurrencyCode);
         model.BillingAddress = billingAddress;
         model.ShippingAddress = shippingAddress;
         model.Items = items.Where(item => !string.IsNullOrEmpty(item.Type)).ToList();
         model.ShippingOptions = shipping?.Options
             ?.Select(option => ($"{option.Id}|{option.Type}", option.Id, option.Label, option.Amount.Value))
             .ToList();
+			_logger.LogDebug("PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.ShippingOptions → {Arg2}", placement, model.ShippingOptions);
 
+		_logger.LogWarning("<<< Exiting PrepareApplePayModelAsync(placement={Placement},shippingIsSet=<redacted>)", placement);
         return model;
     }
 
@@ -369,6 +425,7 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<ApplePayShippingModel> PrepareApplePayShippingModelAsync(ApplePayShippingModel model)
     {
+		_logger.LogError(">>> Entering PrepareApplePayShippingModelAsync(model={Model})", model);
         //prepare updated shipping details
         var (shipping, error) = await _serviceManager.UpdateAppleShippingAsync(model.Placement,
             (model.AddressCity, model.AddressState, model.AddressCountryCode, model.AddressPostalCode),
@@ -383,17 +440,22 @@ public class PayPalCommerceModelFactory
 
         //get line items from the main model
         var applePayModel = await PrepareApplePayModelAsync(model.Placement, true);
+		_logger.LogError("PrepareApplePayShippingModelAsync(model={Model}): applePayModel → {ApplePayModel}", model, applePayModel);
         if (!string.IsNullOrEmpty(applePayModel.Error))
         {
             model.Error = applePayModel.Error;
+			_logger.LogDebug("PrepareApplePayShippingModelAsync(model={Model}): model.Error → {Arg1}", model, model.Error);
             return model;
         }
 
         model.Items = applePayModel.Items;
+		_logger.LogDebug("PrepareApplePayShippingModelAsync(model={Model}): model.Items → {Arg1}", model, model.Items);
         model.ShippingOptions = shipping?.Options
             ?.Select(option => ($"{option.Id}|{option.Type}", option.Id, option.Label, option.Amount.Value))
             .ToList();
+			_logger.LogDebug("PrepareApplePayShippingModelAsync(model={Model}): model.ShippingOptions → {Arg1}", model, model.ShippingOptions);
 
+		_logger.LogWarning("<<< Exiting PrepareApplePayShippingModelAsync(model={Model})", model);
         return model;
     }
 
@@ -408,13 +470,16 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<GooglePayModel> PrepareGooglePayModelAsync(ButtonPlacement placement, bool shippingIsSet = false)
     {
+		_logger.LogError(">>> Entering PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>)", placement);
         var model = new GooglePayModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model → {Model}", placement, model);
 
         var ((amount, country, shippingIsRequired), error) = await _serviceManager.GetGoogleTransactionInfoAsync(placement);
         if (!string.IsNullOrEmpty(error))
         {
             model.Error = error;
+			_logger.LogDebug("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.Error → {Arg2}", placement, model.Error);
             return model;
         }
 
@@ -428,10 +493,15 @@ public class PayPalCommerceModelFactory
 
             if (resourcePostfix == "Discount")
                 amount = -amount;
+				_logger.LogError("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): amount → {Amount}", placement, amount);
+				_logger.LogWarning("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): amount → {Amount}", placement, amount);
 
             var price = amount.ToString("0.00", CultureInfo.InvariantCulture);
+			_logger.LogError("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): price → {Price}", placement, price);
             var status = !shippingIsRequired || shippingIsSet ? "FINAL" : (type == "TOTAL" ? "ESTIMATED" : "PENDING");
+			_logger.LogError("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): status → {Status}", placement, status);
             var label = await _localizationService.GetResourceAsync($"Plugins.Payments.PayPalCommerce.GooglePay.{resourcePostfix}");
+			_logger.LogError("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): label → {Label}", placement, label);
             return (type, price, status, label);
         }
 
@@ -446,7 +516,11 @@ public class PayPalCommerceModelFactory
         };
 
         model.Placement = placement;
+		_logger.LogDebug("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.Placement → {Arg2}", placement, model.Placement);
+		_logger.LogDebug("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.CurrencyCode → {Arg2}", placement, model.CurrencyCode);
+		_logger.LogDebug("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.ShippingIsRequired → {Arg2}", placement, model.ShippingIsRequired);
         model.Country = country;
+		_logger.LogDebug("PrepareGooglePayModelAsync(placement={Placement},shippingIsSet=<redacted>): model.Country → {Arg2}", placement, model.Country);
         model.CurrencyCode = amount.CurrencyCode;
         model.ShippingIsRequired = shippingIsRequired;
         model.Items = items.Where(item => !string.IsNullOrEmpty(item.Type)).ToList();
@@ -464,6 +538,7 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<GooglePayShippingModel> PrepareGooglePayShippingModelAsync(GooglePayShippingModel model)
     {
+		_logger.LogError(">>> Entering PrepareGooglePayShippingModelAsync(model={Model})", model);
         //prepare updated shipping details
         var (shipping, error) = await _serviceManager.UpdateGoogleShippingAsync(model.Placement,
             (model.AddressCity, model.AddressState, model.AddressCountryCode, model.AddressPostalCode),
@@ -478,23 +553,32 @@ public class PayPalCommerceModelFactory
 
         //get common model parameters
         var googlePayModel = await PrepareGooglePayModelAsync(model.Placement, true);
+		_logger.LogError("PrepareGooglePayShippingModelAsync(model={Model}): googlePayModel → {GooglePayModel}", model, googlePayModel);
         if (!string.IsNullOrEmpty(googlePayModel.Error))
         {
             model.Error = googlePayModel.Error;
+			_logger.LogDebug("PrepareGooglePayShippingModelAsync(model={Model}): model.Error → {Arg1}", model, model.Error);
             return model;
         }
 
         model.Country = googlePayModel.Country;
+		_logger.LogDebug("PrepareGooglePayShippingModelAsync(model={Model}): model.Country → {Arg1}", model, model.Country);
+		_logger.LogDebug("PrepareGooglePayShippingModelAsync(model={Model}): model.Items → {Arg1}", model, model.Items);
         model.CurrencyCode = googlePayModel.CurrencyCode;
+		_logger.LogDebug("PrepareGooglePayShippingModelAsync(model={Model}): model.CurrencyCode → {Arg1}", model, model.CurrencyCode);
         model.Items = googlePayModel.Items;
         model.Options = shipping?.Options?.Select(option =>
         {
             var id = $"{option.Id}|{option.Type}";
+			_logger.LogError("PrepareGooglePayShippingModelAsync(model={Model}): id → {Id}", model, id);
             var name = $"{option.Amount.Value} {option.Amount.CurrencyCode}: {option.Id}";
+			_logger.LogError("PrepareGooglePayShippingModelAsync(model={Model}): name → {Name}", model, name);
 
             if (string.IsNullOrEmpty(model.OptionId) && option.Selected == true)
                 model.OptionId = id;
+				_logger.LogDebug("PrepareGooglePayShippingModelAsync(model={Model}): model.OptionId → {Arg1}", model, model.OptionId);
 
+		_logger.LogWarning("<<< Exiting PrepareGooglePayShippingModelAsync(model={Model})", model);
             return (id, name, option.Label);
         }).ToList();
 
@@ -510,8 +594,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<SetupTokenModel> PrepareSetupTokenModelAsync()
     {
+		_logger.LogError(">>> Entering PrepareSetupTokenModelAsync()");
         var model = new SetupTokenModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareSetupTokenModelAsync(): model → {Model}", model);
 
         var (paymentToken, error) = await _serviceManager.CreateSetupTokenAsync(_settings);
         if (!string.IsNullOrEmpty(error) || paymentToken is null)
@@ -523,8 +609,11 @@ public class PayPalCommerceModelFactory
         }
 
         model.Status = paymentToken.Status;
+		_logger.LogDebug("PrepareSetupTokenModelAsync(): model.Status → {Arg0}", model.Status);
         model.PayerActionUrl = paymentToken.PayerActionUrl;
+		_logger.LogDebug("PrepareSetupTokenModelAsync(): model.PayerActionUrl → {Arg0}", model.PayerActionUrl);
 
+		_logger.LogWarning("<<< Exiting PrepareSetupTokenModelAsync()");
         return model;
     }
 
@@ -538,8 +627,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<RecurringOrderModel> PrepareRecurringOrderModelAsync(string setupTokenId)
     {
+		_logger.LogError(">>> Entering PrepareRecurringOrderModelAsync(setupTokenId=<redacted>)");
         var model = new RecurringOrderModel();
         (model.CheckoutIsEnabled, model.LoginIsRequired, _) = await _serviceManager.CheckoutIsEnabledAsync();
+		_logger.LogError("PrepareRecurringOrderModelAsync(setupTokenId=<redacted>): model → {Model}", model);
 
         var (order, error) = await _serviceManager.CreateRecurringOrderAsync(_settings, setupTokenId);
         if (!string.IsNullOrEmpty(error) || order is null)
@@ -551,8 +642,11 @@ public class PayPalCommerceModelFactory
         }
 
         model.OrderId = order.Id;
+		_logger.LogDebug("PrepareRecurringOrderModelAsync(setupTokenId=<redacted>): model.OrderId → {Arg1}", model.OrderId);
         model.Status = order.Status;
+		_logger.LogDebug("PrepareRecurringOrderModelAsync(setupTokenId=<redacted>): model.Status → {Arg1}", model.Status);
 
+		_logger.LogWarning("<<< Exiting PrepareRecurringOrderModelAsync(setupTokenId=<redacted>)");
         return model;
     }
 
@@ -571,8 +665,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<PaymentTokenListModel> PreparePaymentTokenListModelAsync(int? deleteTokenId = null, int? defaultTokenId = null)
     {
+		_logger.LogError(">>> Entering PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>)");
         var model = new PaymentTokenListModel();
 
+		_logger.LogError("PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>): model → {Model}", model);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return model;
@@ -582,7 +678,9 @@ public class PayPalCommerceModelFactory
         if (!string.IsNullOrEmpty(error))
         {
             model.VaultIsEnabled = true;
+			_logger.LogDebug("PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>): model.VaultIsEnabled → {Arg2}", model.VaultIsEnabled);
             model.Error = error;
+			_logger.LogDebug("PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>): model.Error → {Arg2}", model.Error);
             return model;
         }
         if (!_settings.UseVault && tokens?.Any() != true)
@@ -597,7 +695,9 @@ public class PayPalCommerceModelFactory
             Title = token.Title,
             Expiration = token.Expiration
         }).ToList();
+		_logger.LogDebug("PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>): Expiration → {Expiration}", Expiration);
 
+		_logger.LogWarning("<<< Exiting PreparePaymentTokenListModelAsync(deleteTokenId=<redacted>,defaultTokenId=<redacted>)");
         return model;
     }
 
@@ -611,14 +711,18 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<SavedCardListModel> PrepareSavedCardListModelAsync(ButtonPlacement placement)
     {
+		_logger.LogError(">>> Entering PrepareSavedCardListModelAsync(placement={Placement})", placement);
         var model = new SavedCardListModel();
 
+		_logger.LogError("PrepareSavedCardListModelAsync(placement={Placement}): model → {Model}", placement, model);
         //get customer's card payment tokens
         var (tokens, error) = await _serviceManager.GetSavedCardsAsync(_settings, placement);
         if (!string.IsNullOrEmpty(error))
         {
             model.VaultIsEnabled = true;
+			_logger.LogDebug("PrepareSavedCardListModelAsync(placement={Placement}): model.VaultIsEnabled → {Arg1}", placement, model.VaultIsEnabled);
             model.Error = error;
+			_logger.LogDebug("PrepareSavedCardListModelAsync(placement={Placement}): model.Error → {Arg1}", placement, model.Error);
             return model;
         }
         if (tokens?.Any() != true)
@@ -626,6 +730,7 @@ public class PayPalCommerceModelFactory
 
         model.VaultIsEnabled = true;
         var prefix = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Card.Prefix");
+		_logger.LogError("PrepareSavedCardListModelAsync(placement={Placement}): prefix → {Prefix}", placement, prefix);
         model.PaymentTokens = tokens.Select(token => new PaymentTokenModel
         {
             Id = token.Id,
@@ -634,7 +739,9 @@ public class PayPalCommerceModelFactory
             Title = $"{prefix} {token.Title}",
             Expiration = token.Expiration
         }).ToList();
+		_logger.LogDebug("PrepareSavedCardListModelAsync(placement={Placement}): Expiration → {Expiration}", placement, Expiration);
 
+		_logger.LogWarning("<<< Exiting PrepareSavedCardListModelAsync(placement={Placement})", placement);
         return model;
     }
 
@@ -652,8 +759,10 @@ public class PayPalCommerceModelFactory
     /// </returns>
     public async Task<MerchantModel> PrepareMerchantModelAsync(PayPalCommerceSettings settings)
     {
+		_logger.LogError(">>> Entering PrepareMerchantModelAsync(settings={Settings})", settings);
         var model = new MerchantModel { Messages = new() { Success = new(), Warning = new(), Error = new() } };
 
+		_logger.LogError("PrepareMerchantModelAsync(settings={Settings}): model → {Model}", settings, model);
         //get merchant details
         var (merchant, error) = await _serviceManager.GetMerchantAsync(settings);
         if (merchant is null || !string.IsNullOrEmpty(error))
@@ -663,10 +772,13 @@ public class PayPalCommerceModelFactory
         }
 
         model.MerchantId = merchant.MerchantId;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.MerchantId → {Arg1}", settings, model.MerchantId);
         model.ConfiguratorSupported = merchant.ConfiguratorSupported;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.ConfiguratorSupported → {Arg1}", settings, model.ConfiguratorSupported);
 
         //check the features availability and prepare warning notifications
         model.AdvancedCardsEnabled = merchant.AdvancedCards.Active;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.AdvancedCardsEnabled → {Arg1}", settings, model.AdvancedCardsEnabled);
         if (!merchant.AdvancedCards.Active)
         {
             var message = "You are not able to offer Advanced Credit and Debit Card payments because its onboarding status is {0}. " +
@@ -674,6 +786,7 @@ public class PayPalCommerceModelFactory
             model.Messages.Warning.Add(string.Format(message, merchant.AdvancedCards.Status));
         }
         model.ApplePayEnabled = merchant.ApplePay.Active;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.ApplePayEnabled → {Arg1}", settings, model.ApplePayEnabled);
         if (!merchant.ApplePay.Active)
         {
             var message = "You are not able to offer Apple Pay because its onboarding status is {0}. " +
@@ -681,6 +794,7 @@ public class PayPalCommerceModelFactory
             model.Messages.Warning.Add(string.Format(message, merchant.ApplePay.Status));
         }
         model.GooglePayEnabled = merchant.GooglePay.Active;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.GooglePayEnabled → {Arg1}", settings, model.GooglePayEnabled);
         if (!merchant.GooglePay.Active)
         {
             var message = "You are not able to offer Google Pay because its onboarding status is {0}. " +
@@ -688,6 +802,7 @@ public class PayPalCommerceModelFactory
             model.Messages.Warning.Add(string.Format(message, merchant.GooglePay.Status));
         }
         model.VaultingEnabled = merchant.Vaulting.Active;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.VaultingEnabled → {Arg1}", settings, model.VaultingEnabled);
         if (!merchant.Vaulting.Active)
         {
             var message = "You are not able to offer the Vaulting functionality because its onboarding status is {0}. " +
@@ -739,9 +854,12 @@ public class PayPalCommerceModelFactory
 
         //check merchant status
         model.DisplayStatus = true;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.DisplayStatus → {Arg1}", settings, model.DisplayStatus);
         model.AccountCreated = !string.IsNullOrEmpty(merchant.MerchantId);
         model.EmailConfirmed = merchant.PrimaryEmailConfirmed ?? false;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.EmailConfirmed → {Arg1}", settings, model.EmailConfirmed);
         model.PaymentsReceivable = merchant.PaymentsReceivable ?? false;
+		_logger.LogDebug("PrepareMerchantModelAsync(settings={Settings}): model.PaymentsReceivable → {Arg1}", settings, model.PaymentsReceivable);
         if (!model.EmailConfirmed || !model.PaymentsReceivable)
         {
             model.Messages.Warning.Add(await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Onboarding.InProcess"));
@@ -771,6 +889,7 @@ public class PayPalCommerceModelFactory
 
         model.Messages.Success.Add(await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Onboarding.Completed"));
 
+		_logger.LogWarning("<<< Exiting PrepareMerchantModelAsync(settings={Settings})", settings);
         return model;
     }
 

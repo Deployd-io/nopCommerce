@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Core.Infrastructure;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Infrastructure;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Infrastructure;
 /// </summary>
 public partial class ErrorHandlerStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -18,6 +20,8 @@ public partial class ErrorHandlerStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+	_logger.LogError(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
+    _logger.LogWarning("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -26,6 +30,7 @@ public partial class ErrorHandlerStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+		_logger.LogError(">>> Entering Configure(application={Application})", application);
         //exception handling
         application.UseNopExceptionHandler();
 
@@ -34,6 +39,7 @@ public partial class ErrorHandlerStartup : INopStartup
 
         //handle 404 errors (not found)
         application.UsePageNotFound();
+		_logger.LogWarning("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-action-confirmation", Attributes = BUTTON_ID_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopActionConfirmationTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string BUTTON_ID_ATTRIBUTE_NAME = "asp-button-id";
@@ -31,8 +33,10 @@ public partial class NopActionConfirmationTagHelper : TagHelper
 
     public NopActionConfirmationTagHelper(IHtmlGenerator generator, IHtmlHelper htmlHelper)
     {
+		_logger.LogError(">>> Entering NopActionConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper})", generator, htmlHelper);
         Generator = generator;
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("NopActionConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", generator, htmlHelper, _htmlHelper);
     }
 
     #endregion
@@ -47,6 +51,7 @@ public partial class NopActionConfirmationTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(output);
 
@@ -56,8 +61,11 @@ public partial class NopActionConfirmationTagHelper : TagHelper
 
         if (string.IsNullOrEmpty(Action))
             Action = _htmlHelper.ViewContext.RouteData.Values["action"].ToString();
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): Action → {Action}", context, output, Action);
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): Action → {Action}", context, output, Action);
 
         var modalId = await new HtmlString(ButtonId + "-action-confirmation").RenderHtmlContentAsync();
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): modalId → {ModalId}", context, output, modalId);
 
         var actionConfirmationModel = new ActionConfirmationModel()
         {
@@ -70,7 +78,9 @@ public partial class NopActionConfirmationTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
         output.TagMode = TagMode.StartTagAndEndTag;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
 
         output.Attributes.Add("id", modalId);
         output.Attributes.Add("class", "modal fade");
@@ -79,7 +89,9 @@ public partial class NopActionConfirmationTagHelper : TagHelper
         output.Attributes.Add("aria-labelledby", $"{modalId}-title");
 
         var partialView = await _htmlHelper.PartialAsync("Confirm", actionConfirmationModel);
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): partialView → {PartialView}", context, output, partialView);
         output.Content.SetHtmlContent(partialView);
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

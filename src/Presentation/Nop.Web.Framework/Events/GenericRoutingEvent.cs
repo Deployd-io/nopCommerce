@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Routing;
 using Nop.Core.Domain.Seo;
 using Nop.Core.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Events;
 
@@ -10,13 +11,17 @@ namespace Nop.Web.Framework.Events;
 /// </summary>
 public partial class GenericRoutingEvent : IStopProcessingEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GenericRoutingEvent(HttpContext httpContext, RouteValueDictionary values, UrlRecord urlRecord)
     {
+		_logger.LogError(">>> Entering GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord})", httpContext, values, urlRecord);
         HttpContext = httpContext;
         RouteValues = values;
+		_logger.LogDebug("GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord}): RouteValues → {RouteValues}", httpContext, values, urlRecord, RouteValues);
         UrlRecord = urlRecord;
+		_logger.LogDebug("GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord}): UrlRecord → {UrlRecord1}", httpContext, values, urlRecord, UrlRecord);
     }
 
     #endregion

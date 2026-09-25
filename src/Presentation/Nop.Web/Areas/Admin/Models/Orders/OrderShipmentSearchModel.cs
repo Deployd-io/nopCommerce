@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -7,11 +8,16 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record OrderShipmentSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderShipmentSearchModel()
     {
+		_logger.LogError(">>> Entering OrderShipmentSearchModel()");
         ShipmentItemSearchModel = new ShipmentItemSearchModel();
+		_logger.LogDebug("OrderShipmentSearchModel(): ShipmentItemSearchModel → {ShipmentItemSearchModel}", ShipmentItemSearchModel);
+    _logger.LogError("OrderShipmentSearchModel(): ShipmentItemSearchModel → {ShipmentItemSearchModel}", ShipmentItemSearchModel);
+    _logger.LogWarning("<<< Exiting OrderShipmentSearchModel()");
     }
 
     #endregion

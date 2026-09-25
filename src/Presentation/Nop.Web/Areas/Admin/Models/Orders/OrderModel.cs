@@ -4,6 +4,7 @@ using Nop.Services.Orders;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -12,20 +13,31 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record OrderModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderModel()
     {
+		_logger.LogError(">>> Entering OrderModel()");
         CustomValues = new CustomValues();
         TaxRates = new List<TaxRate>();
+		_logger.LogError("OrderModel(): TaxRates → {TaxRates}", TaxRates);
         GiftCards = new List<GiftCard>();
+		_logger.LogError("OrderModel(): GiftCards → {GiftCards}", GiftCards);
         Items = new List<OrderItemModel>();
+		_logger.LogError("OrderModel(): Items → {Items}", Items);
         UsedDiscounts = new List<UsedDiscountModel>();
+		_logger.LogError("OrderModel(): UsedDiscounts → {UsedDiscounts}", UsedDiscounts);
         OrderShipmentSearchModel = new OrderShipmentSearchModel();
+		_logger.LogError("OrderModel(): OrderShipmentSearchModel → {OrderShipmentSearchModel}", OrderShipmentSearchModel);
         OrderNoteSearchModel = new OrderNoteSearchModel();
+		_logger.LogError("OrderModel(): OrderNoteSearchModel → {OrderNoteSearchModel}", OrderNoteSearchModel);
         BillingAddress = new AddressModel();
+		_logger.LogError("OrderModel(): BillingAddress → {BillingAddress}", BillingAddress);
         ShippingAddress = new AddressModel();
+		_logger.LogError("OrderModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
         PickupAddress = new AddressModel();
+		_logger.LogError("OrderModel(): PickupAddress → {PickupAddress}", PickupAddress);
     }
 
     #endregion

@@ -20,6 +20,7 @@ using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services;
 
@@ -27,6 +28,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// Represents plugin event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<CustomerActivatedEvent>,
     IConsumer<CustomerPermanentlyDeleted>,
     IConsumer<EntityDeletedEvent<Order>>,
@@ -67,17 +69,28 @@ public class EventConsumer :
         ITaxPluginManager taxPluginManager,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext})", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext);
         _avalaraTaxManager = avalaraTaxManager;
         _avalaraTaxSettings = avalaraTaxSettings;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _avalaraTaxSettings → {_avalaraTaxSettings}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _avalaraTaxSettings);
         _checkoutAttributeService = checkoutAttributeService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _checkoutAttributeService → {_checkoutAttributeService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _checkoutAttributeService);
         _customerService = customerService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _customerService → {_customerService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _genericAttributeService);
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _httpContextAccessor → {_httpContextAccessor}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _httpContextAccessor);
         _localizationService = localizationService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _localizationService → {_localizationService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _permissionService → {_permissionService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _permissionService);
         _productService = productService;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _productService → {_productService}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _productService);
         _taxPluginManager = taxPluginManager;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _taxPluginManager → {_taxPluginManager}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _taxPluginManager);
         _workContext = workContext;
+		_logger.LogDebug("EventConsumer(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},checkoutAttributeService={CheckoutAttributeService},customerService={CustomerService},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},workContext={WorkContext}): _workContext → {_workContext}", avalaraTaxManager, avalaraTaxSettings, checkoutAttributeService, customerService, genericAttributeService, httpContextAccessor, localizationService, permissionService, productService, taxPluginManager, workContext, _workContext);
     }
 
     #endregion
@@ -98,8 +111,9 @@ public class EventConsumer :
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, eventMessage.Customer))
             return;
 
-        if (!_avalaraTaxSettings.EnableCertificates)
+        if (!_avalaraTaxSettings.EnableCertificates) {
             return;
+        }
 
         //create customer
         await _avalaraTaxManager.CreateOrUpdateCustomerAsync(eventMessage.Customer);
@@ -116,10 +130,13 @@ public class EventConsumer :
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return;
 
-        if (!_avalaraTaxSettings.EnableCertificates)
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+        if (!_avalaraTaxSettings.EnableCertificates) {
             return;
+        }
 
         //delete customer
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await _avalaraTaxManager.DeleteCustomerAsync(eventMessage.CustomerId);
     }
 
@@ -137,6 +154,7 @@ public class EventConsumer :
 
         //ensure that Avalara tax provider is active for the passed customer, since it's the event from the public area
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): customer → {Customer}", eventMessage, customer);
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
             return;
 
@@ -149,12 +167,15 @@ public class EventConsumer :
             if (_avalaraTaxSettings.CustomerRoleIds.Any())
             {
                 var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+				_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): customerRoleIds → {CustomerRoleIds}", eventMessage, customerRoleIds);
                 if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
                     return;
             }
 
             var infoItem = navigationModel.CustomerNavigationItems.FirstOrDefault(item => item.Tab == (int)CustomerNavigationEnum.Info);
+			_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): infoItem → {InfoItem}", eventMessage, infoItem);
             var position = navigationModel.CustomerNavigationItems.IndexOf(infoItem) + 1;
+			_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): position → {Position}", eventMessage, position);
             navigationModel.CustomerNavigationItems.Insert(position, new CustomerNavigationItemModel
             {
                 RouteName = AvalaraTaxDefaults.ExemptionCertificatesRouteName,
@@ -162,6 +183,7 @@ public class EventConsumer :
                 Tab = AvalaraTaxDefaults.ExemptionCertificatesMenuTab,
                 Title = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.ExemptionCertificates")
             });
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): Title → {Title}", eventMessage, Title);
         }
 
         if (customerModel is not null && !_avalaraTaxSettings.AllowEditCustomer)

@@ -6,6 +6,7 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Services.ScheduleTasks;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Misc.Zettle;
 /// </summary>
 public class ZettlePlugin : BasePlugin, IMiscPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -34,11 +36,18 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
         MediaSettings mediaSettings,
         ZettleService zettleService)
     {
+		_logger.LogError(">>> Entering ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService})", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService);
         _localizationService = localizationService;
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService}): _nopUrlHelper → {_nopUrlHelper}", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService, _nopUrlHelper);
+		_logger.LogDebug("ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService}): _localizationService → {_localizationService}", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService, _localizationService);
+    _logger.LogWarning("<<< Exiting ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService})", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService);
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService}): _scheduleTaskService → {_scheduleTaskService}", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService, _scheduleTaskService);
         _settingService = settingService;
+		_logger.LogDebug("ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService}): _settingService → {_settingService}", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService, _settingService);
         _mediaSettings = mediaSettings;
+		_logger.LogDebug("ZettlePlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},mediaSettings={MediaSettings},zettleService={ZettleService}): _mediaSettings → {_mediaSettings}", localizationService, nopUrlHelper, scheduleTaskService, settingService, mediaSettings, zettleService, _mediaSettings);
         _zettleService = zettleService;
     }
 
@@ -51,6 +60,8 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(ZettleDefaults.ConfigurationRouteName);
     }
 
@@ -60,6 +71,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         //ensure MediaSettings.UseAbsoluteImagePath is enabled (used for images uploading)
         await _settingService.SetSettingAsync($"{nameof(MediaSettings)}.{nameof(MediaSettings.UseAbsoluteImagePath)}", true, clearCache: false);
 
@@ -76,6 +88,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
             CategorySyncEnabled = true,
             ClearRecordsOnChangeCredentials = true
         });
+		_logger.LogDebug("InstallAsync(): ClearRecordsOnChangeCredentials → {ClearRecordsOnChangeCredentials}", ClearRecordsOnChangeCredentials);
 
         if (await _scheduleTaskService.GetTaskByTypeAsync(ZettleDefaults.SynchronizationTask.Type) is null)
         {
@@ -88,10 +101,12 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
                 Type = ZettleDefaults.SynchronizationTask.Type,
                 Seconds = ZettleDefaults.SynchronizationTask.Period
             });
+			_logger.LogDebug("InstallAsync(): Seconds → {Seconds}", Seconds);
         }
 
         await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ["Plugins.Misc.Zettle.Credentials"] = "Credentials",
             ["Plugins.Misc.Zettle.Credentials.AccessRevoked"] = "Access to PayPal Zettle organization has been revoked. You need to reconfigure the plugin.",
             ["Plugins.Misc.Zettle.Credentials.Connected"] = "Connected",
@@ -166,6 +181,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
             ["Plugins.Misc.Zettle.Sync.Last"] = "Last import",
             ["Plugins.Misc.Zettle.Sync.Start"] = "Start Synchronization",
             ["Plugins.Misc.Zettle.Sync.Start.Confirm"] = @"
+					_logger.LogError("InstallAsync(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                     <p>
                         You want to start synchronization with the connected account.
                     </p>
@@ -182,6 +198,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -190,9 +207,12 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         var zettleSettings = await _settingService.LoadSettingAsync<ZettleSettings>();
-        if (zettleSettings.DisconnectOnUninstall)
+			_logger.LogError("UninstallAsync(): zettleSettings → {ZettleSettings}", zettleSettings);
+        if (zettleSettings.DisconnectOnUninstall) {
             await _zettleService.DisconnectAsync();
+        }
         else if (!string.IsNullOrEmpty(zettleSettings.WebhookUrl))
             await _zettleService.DeleteWebhookAsync();
 
@@ -200,10 +220,12 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.Zettle");
 
         var scheduleTask = await _scheduleTaskService.GetTaskByTypeAsync(ZettleDefaults.SynchronizationTask.Type);
+		_logger.LogError("UninstallAsync(): scheduleTask → {ScheduleTask}", scheduleTask);
         if (scheduleTask is not null)
             await _scheduleTaskService.DeleteTaskAsync(scheduleTask);
 
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

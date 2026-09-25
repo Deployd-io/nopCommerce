@@ -23,6 +23,7 @@ using Nop.Services.Seo;
 using Nop.Services.Shipping;
 using Nop.Services.Shipping.Date;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -31,6 +32,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class ShoppingCartService : IShoppingCartService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -158,11 +160,13 @@ public partial class ShoppingCartService : IShoppingCartService
         DateTime? rentalStartDate,
         DateTime? rentalEndDate)
     {
+		_logger.LogError(">>> Entering ShoppingCartItemIsEqualAsync(shoppingCartItem=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate})", product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate);
         if (shoppingCartItem.ProductId != product.Id)
             return false;
 
         //attributes
         var attributesEqual = await _productAttributeParser.AreProductAttributesEqualAsync(shoppingCartItem.AttributesXml, attributesXml, false, false);
+		_logger.LogError("ShoppingCartItemIsEqualAsync(shoppingCartItem=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): attributesEqual → {AttributesEqual}", product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, attributesEqual);
         if (!attributesEqual)
             return false;
 
@@ -184,6 +188,7 @@ public partial class ShoppingCartService : IShoppingCartService
         {
             //we use rounding to eliminate errors associated with storing real numbers in memory when comparing
             var customerEnteredPricesEqual = Math.Round(shoppingCartItem.CustomerEnteredPrice, 2) == Math.Round(customerEnteredPrice, 2);
+			_logger.LogError("ShoppingCartItemIsEqualAsync(shoppingCartItem=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): customerEnteredPricesEqual → {CustomerEnteredPricesEqual}", product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, customerEnteredPricesEqual);
             if (!customerEnteredPricesEqual)
                 return false;
         }
@@ -194,6 +199,7 @@ public partial class ShoppingCartService : IShoppingCartService
         //rental products
         var rentalInfoEqual = shoppingCartItem.RentalStartDateUtc == rentalStartDate && shoppingCartItem.RentalEndDateUtc == rentalEndDate;
 
+		_logger.LogWarning("<<< Exiting ShoppingCartItemIsEqualAsync(shoppingCartItem=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate})", product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate);
         return rentalInfoEqual;
     }
 
@@ -204,6 +210,9 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>Result</returns>
     protected virtual async Task<bool> IsCustomerShoppingCartEmptyAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering IsCustomerShoppingCartEmptyAsync(customer={Customer})", customer);
+		_logger.LogError("IsCustomerShoppingCartEmptyAsync(customer)={Customer}: database query executing", customer);
+    _logger.LogWarning("<<< Exiting IsCustomerShoppingCartEmptyAsync(customer={Customer})", customer);
         return !await _sciRepository.Table.AnyAsync(sci => sci.CustomerId == customer.Id);
     }
 
@@ -224,19 +233,23 @@ public partial class ShoppingCartService : IShoppingCartService
     protected virtual async Task<IList<string>> GetRequiredProductWarningsAsync(Customer customer, ShoppingCartType shoppingCartType, Product product,
         int storeId, int quantity, bool addRequiredProducts, int shoppingCartItemId)
     {
+		_logger.LogError(">>> Entering GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>)", customer, product, storeId, quantity, addRequiredProducts);
         ArgumentNullException.ThrowIfNull(customer);
 
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): warnings → {Warnings}", customer, product, storeId, quantity, addRequiredProducts, warnings);
 
         //at now we ignore quantities of required products and use 1
         var requiredProductQuantity = 1;
 
         //get customer shopping cart
         var cart = await GetShoppingCartAsync(customer, shoppingCartType, storeId);
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): cart → {Cart}", customer, product, storeId, quantity, addRequiredProducts, cart);
 
         var productsRequiringProduct = await GetProductsRequiringProductAsync(cart, product);
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): productsRequiringProduct → {ProductsRequiringProduct}", customer, product, storeId, quantity, addRequiredProducts, productsRequiringProduct);
 
         //whether other cart items require the passed product
         var passedProductRequiredQuantity = cart.Where(ci => productsRequiringProduct.Any(p => p.Id == ci.ProductId))
@@ -251,6 +264,7 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //get these required products
         var requiredProducts = await _productService.GetProductsByIdsAsync(_productService.ParseRequiredProductIds(product));
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): requiredProducts → {RequiredProducts}", customer, product, storeId, quantity, addRequiredProducts, requiredProducts);
         if (!requiredProducts.Any())
             return warnings;
 
@@ -259,10 +273,13 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //get warnings
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): urlHelper → {UrlHelper}", customer, product, storeId, quantity, addRequiredProducts, urlHelper);
         var warningLocale = await _localizationService.GetResourceAsync("ShoppingCart.RequiredProductWarning");
+		_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): warningLocale → {WarningLocale}", customer, product, storeId, quantity, addRequiredProducts, warningLocale);
         foreach (var requiredProduct in finalRequiredProducts)
         {
             var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct.Product);
+			_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): productsRequiringRequiredProduct → {ProductsRequiringRequiredProduct}", customer, product, storeId, quantity, addRequiredProducts, productsRequiringRequiredProduct);
 
             //get the required quantity of the required product
             var requiredProductRequiredQuantity = quantity * requiredProductQuantity +
@@ -272,12 +289,15 @@ public partial class ShoppingCartService : IShoppingCartService
 
             //whether required product is already in the cart in the required quantity
             var quantityToAdd = requiredProductRequiredQuantity * requiredProduct.Count - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Product.Id)?.Quantity ?? 0);
+			_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): quantityToAdd → {QuantityToAdd}", customer, product, storeId, quantity, addRequiredProducts, quantityToAdd);
             if (quantityToAdd <= 0)
                 continue;
 
             //prepare warning message
             var url = urlHelper.RouteUrl(nameof(Product), new { SeName = await _urlRecordService.GetSeNameAsync(requiredProduct.Product) });
+			_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): url → {Url}", customer, product, storeId, quantity, addRequiredProducts, url);
             var requiredProductName = WebUtility.HtmlEncode(await _localizationService.GetLocalizedAsync(requiredProduct.Product, x => x.Name));
+			_logger.LogError("GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>): requiredProductName → {RequiredProductName}", customer, product, storeId, quantity, addRequiredProducts, requiredProductName);
             var requiredProductWarning = _catalogSettings.UseLinksInRequiredProductWarnings
                 ? string.Format(warningLocale, $"<a href=\"{url}\">{requiredProductName}</a>", requiredProductRequiredQuantity * requiredProduct.Count)
                 : string.Format(warningLocale, requiredProductName, requiredProductRequiredQuantity);
@@ -303,9 +323,11 @@ public partial class ShoppingCartService : IShoppingCartService
             else
             {
                 warnings.Add(requiredProductWarning);
+				_logger.LogWarning("<<< Exiting GetShoppingCartItemWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>,getStandardWarnings={GetStandardWarnings},getAttributesWarnings={GetAttributesWarnings},getGiftCardWarnings={GetGiftCardWarnings},getRequiredProductWarnings={GetRequiredProductWarnings},getRentalWarnings={GetRentalWarnings})", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, getStandardWarnings, getAttributesWarnings, getGiftCardWarnings, getRequiredProductWarnings, getRentalWarnings);
             }
         }
 
+		_logger.LogWarning("<<< Exiting GetRequiredProductWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},storeId={StoreId},quantity={Quantity},addRequiredProducts={AddRequiredProducts},shoppingCartItemId=<redacted>)", customer, product, storeId, quantity, addRequiredProducts);
         return warnings;
     }
 
@@ -327,11 +349,13 @@ public partial class ShoppingCartService : IShoppingCartService
     protected virtual async Task<IList<string>> GetStandardWarningsAsync(Customer customer, ShoppingCartType shoppingCartType, Product product,
         string attributesXml, decimal customerEnteredPrice, int quantity, int shoppingCartItemId, int storeId)
     {
+		_logger.LogError(">>> Entering GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId})", customer, product, attributesXml, customerEnteredPrice, quantity, storeId);
         ArgumentNullException.ThrowIfNull(customer);
 
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): warnings → {Warnings}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, warnings);
 
         //deleted
         if (product.Deleted)
@@ -391,8 +415,11 @@ public partial class ShoppingCartService : IShoppingCartService
                 customerEnteredPrice > product.MaximumCustomerEnteredPrice)
             {
                 var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+				_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): currentCurrency → {CurrentCurrency}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, currentCurrency);
                 var minimumCustomerEnteredPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(product.MinimumCustomerEnteredPrice, currentCurrency);
+				_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): minimumCustomerEnteredPrice → {MinimumCustomerEnteredPrice}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, minimumCustomerEnteredPrice);
                 var maximumCustomerEnteredPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(product.MaximumCustomerEnteredPrice, currentCurrency);
+				_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): maximumCustomerEnteredPrice → {MaximumCustomerEnteredPrice}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, maximumCustomerEnteredPrice);
                 warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.CustomerEnteredPrice.RangeError"),
                     await _priceFormatter.FormatPriceAsync(minimumCustomerEnteredPrice, false, false),
                     await _priceFormatter.FormatPriceAsync(maximumCustomerEnteredPrice, false, false)));
@@ -401,6 +428,7 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //quantity validation
         var hasQtyWarnings = false;
+		_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): hasQtyWarnings → {HasQtyWarnings}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, hasQtyWarnings);
         if (quantity < product.OrderMinimumQuantity)
         {
             warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.MinimumQuantity"), product.OrderMinimumQuantity));
@@ -414,6 +442,7 @@ public partial class ShoppingCartService : IShoppingCartService
         }
 
         var allowedQuantities = _productService.ParseAllowedQuantities(product);
+		_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): allowedQuantities → {AllowedQuantities}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, allowedQuantities);
         if (allowedQuantities.Length > 0 && !allowedQuantities.Contains(quantity))
         {
             warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.AllowedQuantities"), string.Join(", ", allowedQuantities)));
@@ -431,6 +460,7 @@ public partial class ShoppingCartService : IShoppingCartService
                     if (product.BackorderMode == BackorderMode.NoBackorders)
                     {
                         var maximumQuantityCanBeAdded = await _productService.GetTotalStockQuantityAsync(product);
+						_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): maximumQuantityCanBeAdded → {MaximumQuantityCanBeAdded}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, maximumQuantityCanBeAdded);
 
                         warnings.AddRange(await GetQuantityProductWarningsAsync(product, quantity, maximumQuantityCanBeAdded));
 
@@ -439,12 +469,15 @@ public partial class ShoppingCartService : IShoppingCartService
 
                         //validate product quantity with non combinable product attributes
                         var productAttributeMappings = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+						_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): productAttributeMappings → {ProductAttributeMappings}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, productAttributeMappings);
                         if (productAttributeMappings?.Any() == true)
                         {
                             var onlyCombinableAttributes = productAttributeMappings.All(mapping => !mapping.IsNonCombinable());
+							_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): onlyCombinableAttributes → {OnlyCombinableAttributes}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, onlyCombinableAttributes);
                             if (!onlyCombinableAttributes)
                             {
                                 var cart = await GetShoppingCartAsync(customer, shoppingCartType, storeId);
+								_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): cart → {Cart}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, cart);
                                 var totalAddedQuantity = cart
                                     .Where(item => item.ProductId == product.Id && item.Id != shoppingCartItemId)
                                     .Sum(product => product.Quantity);
@@ -455,11 +488,13 @@ public partial class ShoppingCartService : IShoppingCartService
                                 foreach (var bundle in cart.Where(x => x.Id != shoppingCartItemId && !string.IsNullOrEmpty(x.AttributesXml)))
                                 {
                                     var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(bundle.AttributesXml);
+									_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): attributeValues → {AttributeValues}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, attributeValues);
                                     foreach (var attributeValue in attributeValues)
                                     {
                                         if (attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct && attributeValue.AssociatedProductId == product.Id)
                                             totalAddedQuantity += bundle.Quantity * attributeValue.Quantity;
                                     }
+									_logger.LogWarning("<<< Exiting GetShoppingCartAsync(customer={Customer},shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},customWishlistId={CustomWishlistId})", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
                                 }
 
                                 warnings.AddRange(await GetQuantityProductWarningsAsync(product, totalAddedQuantity, maximumQuantityCanBeAdded));
@@ -486,6 +521,11 @@ public partial class ShoppingCartService : IShoppingCartService
                                     if (attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct && attributeValue.AssociatedProductId == product.Id)
                                         totalQuantityInCart += bundle.Quantity * attributeValue.Quantity;
                                 }
+								_logger.LogError(">>> Entering GetShoppingCartAsync(customer={Customer},shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},customWishlistId={CustomWishlistId})", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
+								var __logStart = System.Diagnostics.Stopwatch.StartNew();
+								_logger.LogWarning("<<< Exiting GetShoppingCartAsync(customer={Customer},shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},customWishlistId={CustomWishlistId})", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
+								_logger.LogError("GetShoppingCartAsync(customer,shoppingCartType,storeId,productId,createdFromUtc,createdToUtc,customWishlistId)={Customer},<redacted>,{StoreId},{ProductId},{CreatedFromUtc},{CreatedToUtc},{CustomWishlistId}: find query executing", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
+								_logger.LogError("GetShoppingCartAsync(customer,shoppingCartType,storeId,productId,createdFromUtc,createdToUtc,customWishlistId)={Customer},<redacted>,{StoreId},{ProductId},{CreatedFromUtc},{CreatedToUtc},{CustomWishlistId}: external service call took {Arg7} ms", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId, __logStart.ElapsedMilliseconds);
                             }
 
                             warnings.AddRange(await GetQuantityProductWarningsAsync(product, totalQuantityInCart, maximumQuantityCanBeAdded));
@@ -495,6 +535,7 @@ public partial class ShoppingCartService : IShoppingCartService
                     break;
                 case ManageInventoryMethod.ManageStockByAttributes:
                     var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, attributesXml);
+					_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): combination → {Combination}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, combination);
                     if (combination != null)
                     {
                         //combination exists
@@ -509,6 +550,7 @@ public partial class ShoppingCartService : IShoppingCartService
                         {
                             //maybe, is it better  to display something like "No such product/combination" message?
                             var productAvailabilityRange = await _dateRangeService.GetProductAvailabilityRangeByIdAsync(product.ProductAvailabilityRangeId);
+							_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): productAvailabilityRange → {ProductAvailabilityRange}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, productAvailabilityRange);
                             var warning = productAvailabilityRange == null ? await _localizationService.GetResourceAsync("ShoppingCart.OutOfStock")
                                 : string.Format(await _localizationService.GetResourceAsync("ShoppingCart.AvailabilityRange"),
                                     await _localizationService.GetLocalizedAsync(productAvailabilityRange, range => range.Name));
@@ -524,9 +566,11 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //availability dates
         var availableStartDateError = false;
+		_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): availableStartDateError → {AvailableStartDateError}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, availableStartDateError);
         if (product.AvailableStartDateTimeUtc.HasValue)
         {
             var availableStartDateTime = DateTime.SpecifyKind(product.AvailableStartDateTimeUtc.Value, DateTimeKind.Utc);
+			_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): availableStartDateTime → {AvailableStartDateTime}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, availableStartDateTime);
             if (availableStartDateTime.CompareTo(DateTime.UtcNow) > 0)
             {
                 warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.NotAvailable"));
@@ -546,11 +590,13 @@ public partial class ShoppingCartService : IShoppingCartService
             return warnings;
 
         var availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
+		_logger.LogError("GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId}): availableEndDateTime → {AvailableEndDateTime}", customer, product, attributesXml, customerEnteredPrice, quantity, storeId, availableEndDateTime);
         if (availableEndDateTime.CompareTo(DateTime.UtcNow) < 0)
         {
             warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.NotAvailable"));
         }
 
+		_logger.LogWarning("<<< Exiting GetStandardWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},quantity={Quantity},shoppingCartItemId=<redacted>,storeId={StoreId})", customer, product, attributesXml, customerEnteredPrice, quantity, storeId);
         return warnings;
     }
 
@@ -566,15 +612,18 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     protected virtual async Task<IList<string>> GetQuantityProductWarningsAsync(Product product, int quantity, int maximumQuantityCanBeAdded)
     {
+		_logger.LogError(">>> Entering GetQuantityProductWarningsAsync(product={Product},quantity={Quantity},maximumQuantityCanBeAdded={MaximumQuantityCanBeAdded})", product, quantity, maximumQuantityCanBeAdded);
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetQuantityProductWarningsAsync(product={Product},quantity={Quantity},maximumQuantityCanBeAdded={MaximumQuantityCanBeAdded}): warnings → {Warnings}", product, quantity, maximumQuantityCanBeAdded, warnings);
 
         if (maximumQuantityCanBeAdded < quantity)
         {
             if (maximumQuantityCanBeAdded <= 0)
             {
                 var productAvailabilityRange = await _dateRangeService.GetProductAvailabilityRangeByIdAsync(product.ProductAvailabilityRangeId);
+				_logger.LogError("GetQuantityProductWarningsAsync(product={Product},quantity={Quantity},maximumQuantityCanBeAdded={MaximumQuantityCanBeAdded}): productAvailabilityRange → {ProductAvailabilityRange}", product, quantity, maximumQuantityCanBeAdded, productAvailabilityRange);
                 var warning = productAvailabilityRange == null ? await _localizationService.GetResourceAsync("ShoppingCart.OutOfStock")
                     : string.Format(await _localizationService.GetResourceAsync("ShoppingCart.AvailabilityRange"),
                         await _localizationService.GetLocalizedAsync(productAvailabilityRange, range => range.Name));
@@ -584,6 +633,7 @@ public partial class ShoppingCartService : IShoppingCartService
                 warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.QuantityExceedsStock"), maximumQuantityCanBeAdded));
         }
 
+		_logger.LogWarning("<<< Exiting GetQuantityProductWarningsAsync(product={Product},quantity={Quantity},maximumQuantityCanBeAdded={MaximumQuantityCanBeAdded})", product, quantity, maximumQuantityCanBeAdded);
         return warnings;
     }
 
@@ -601,9 +651,11 @@ public partial class ShoppingCartService : IShoppingCartService
     public virtual async Task DeleteShoppingCartItemAsync(ShoppingCartItem shoppingCartItem, bool resetCheckoutData = true,
         bool ensureOnlyActiveCheckoutAttributes = false)
     {
+		_logger.LogError(">>> Entering DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes})", resetCheckoutData, ensureOnlyActiveCheckoutAttributes);
         ArgumentNullException.ThrowIfNull(shoppingCartItem);
 
         var customer = await _customerService.GetCustomerByIdAsync(shoppingCartItem.CustomerId);
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): customer → {Customer}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, customer);
         var storeId = shoppingCartItem.StoreId;
 
         //reset checkout data
@@ -615,9 +667,11 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //reset "HasShoppingCartItems" property used for performance optimization
         var hasShoppingCartItems = !await IsCustomerShoppingCartEmptyAsync(customer);
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): hasShoppingCartItems → {HasShoppingCartItems}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, hasShoppingCartItems);
         if (hasShoppingCartItems != customer.HasShoppingCartItems)
         {
             customer.HasShoppingCartItems = hasShoppingCartItems;
+			_logger.LogDebug("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): customer.HasShoppingCartItems → {Arg3}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, customer.HasShoppingCartItems);
             await _customerService.UpdateCustomerAsync(customer);
         }
 
@@ -627,6 +681,7 @@ public partial class ShoppingCartService : IShoppingCartService
             shoppingCartItem.ShoppingCartType == ShoppingCartType.ShoppingCart)
         {
             var cart = await GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, storeId);
+			_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): cart → {Cart}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, cart);
 
             var checkoutAttributesXml =
                 await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CheckoutAttributes,
@@ -641,10 +696,12 @@ public partial class ShoppingCartService : IShoppingCartService
             return;
 
         var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): product → {Product}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, product);
         if (!product?.RequireOtherProducts ?? true)
             return;
 
         var requiredProductIds = _productService.ParseRequiredProductIds(product);
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): requiredProductIds → {RequiredProductIds}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, requiredProductIds);
         var requiredShoppingCartItems =
             (await GetShoppingCartAsync(customer, shoppingCartType: shoppingCartItem.ShoppingCartType))
             .Where(item => requiredProductIds.Any(id => id == item.ProductId))
@@ -660,6 +717,7 @@ public partial class ShoppingCartService : IShoppingCartService
                 quantity: cartItem.Quantity - shoppingCartItem.Quantity * requiredProductQuantity,
                 resetCheckoutData: false);
         }
+		_logger.LogWarning("<<< Exiting DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes})", resetCheckoutData, ensureOnlyActiveCheckoutAttributes);
     }
 
     /// <summary>
@@ -670,21 +728,31 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearShoppingCartAsync(Customer customer, int storeId)
     {
+		_logger.LogError(">>> Entering ClearShoppingCartAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var cart = await GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, storeId);
+		_logger.LogError("ClearShoppingCartAsync(customer={Customer},storeId={StoreId}): cart → {Cart}", customer, storeId, cart);
 
         //delete items
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("ClearShoppingCartAsync(customer,storeId)={Customer},{StoreId}: delete query executed in {Arg2} ms", customer, storeId, __logStartDb.ElapsedMilliseconds);
         await _sciRepository.DeleteAsync(cart, publishEvent: false);
         await _eventPublisher.PublishAsync(new ClearShoppingCartEvent(cart));
 
         //reset "HasShoppingCartItems" property used for performance optimization
         var hasShoppingCartItems = !await IsCustomerShoppingCartEmptyAsync(customer);
+		_logger.LogError("ClearShoppingCartAsync(customer={Customer},storeId={StoreId}): hasShoppingCartItems → {HasShoppingCartItems}", customer, storeId, hasShoppingCartItems);
         if (hasShoppingCartItems != customer.HasShoppingCartItems)
         {
             customer.HasShoppingCartItems = hasShoppingCartItems;
+			_logger.LogDebug("ClearShoppingCartAsync(customer={Customer},storeId={StoreId}): customer.HasShoppingCartItems → {Arg2}", customer, storeId, customer.HasShoppingCartItems);
+			_logger.LogError("ClearShoppingCartAsync(customer,storeId)={Customer},{StoreId}: external service call took {Arg2} ms", customer, storeId, __logStart.ElapsedMilliseconds);
             await _customerService.UpdateCustomerAsync(customer);
+			_logger.LogWarning("<<< Exiting ClearShoppingCartAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         }
+		__logStart = System.Diagnostics.Stopwatch.StartNew();
     }
 
     /// <summary>
@@ -697,9 +765,13 @@ public partial class ShoppingCartService : IShoppingCartService
     public virtual async Task DeleteShoppingCartItemAsync(int shoppingCartItemId, bool resetCheckoutData = true,
         bool ensureOnlyActiveCheckoutAttributes = false)
     {
+		_logger.LogError(">>> Entering DeleteShoppingCartItemAsync(shoppingCartItemId=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes})", resetCheckoutData, ensureOnlyActiveCheckoutAttributes);
         var shoppingCartItem = await _sciRepository.Table.FirstOrDefaultAsync(sci => sci.Id == shoppingCartItemId);
-        if (shoppingCartItem != null)
+			_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItemId=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes}): shoppingCartItem → {ShoppingCartItem}", resetCheckoutData, ensureOnlyActiveCheckoutAttributes, shoppingCartItem);
+			    _logger.LogWarning("<<< Exiting DeleteShoppingCartItemAsync(shoppingCartItemId=<redacted>,resetCheckoutData={ResetCheckoutData},ensureOnlyActiveCheckoutAttributes={EnsureOnlyActiveCheckoutAttributes})", resetCheckoutData, ensureOnlyActiveCheckoutAttributes);
+        if (shoppingCartItem != null) {
             await DeleteShoppingCartItemAsync(shoppingCartItem, resetCheckoutData, ensureOnlyActiveCheckoutAttributes);
+        }
     }
 
     /// <summary>
@@ -712,15 +784,20 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<int> DeleteExpiredShoppingCartItemsAsync(DateTime olderThanUtc)
     {
+		_logger.LogError(">>> Entering DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc})", olderThanUtc);
         var query = from sci in _sciRepository.Table
             where sci.UpdatedOnUtc < olderThanUtc
             select sci;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cartItems = await query.ToListAsync();
 
+		_logger.LogError("DeleteExpiredShoppingCartItemsAsync(olderThanUtc)={OlderThanUtc}: database query executed in {Arg1} ms", olderThanUtc, __logStart.ElapsedMilliseconds);
+		_logger.LogError("DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc}): cartItems → {CartItems}", olderThanUtc, cartItems);
         foreach (var cartItem in cartItems)
             await DeleteShoppingCartItemAsync(cartItem);
 
+		_logger.LogWarning("<<< Exiting DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc})", olderThanUtc);
         return cartItems.Count;
     }
 
@@ -735,6 +812,7 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<IList<Product>> GetProductsRequiringProductAsync(IList<ShoppingCartItem> cart, Product product)
     {
+		_logger.LogError(">>> Entering GetProductsRequiringProductAsync(cart={Cart},product={Product})", cart, product);
         ArgumentNullException.ThrowIfNull(cart);
 
         ArgumentNullException.ThrowIfNull(product);
@@ -743,9 +821,12 @@ public partial class ShoppingCartService : IShoppingCartService
             return new List<Product>();
 
         var productIds = cart.Select(ci => ci.ProductId).ToArray();
+		_logger.LogError("GetProductsRequiringProductAsync(cart={Cart},product={Product}): productIds → {ProductIds}", cart, product, productIds);
 
         var cartProducts = await _productService.GetProductsByIdsAsync(productIds);
+		_logger.LogError("GetProductsRequiringProductAsync(cart={Cart},product={Product}): cartProducts → {CartProducts}", cart, product, cartProducts);
 
+		_logger.LogWarning("<<< Exiting GetProductsRequiringProductAsync(cart={Cart},product={Product})", cart, product);
         return cartProducts.Where(cartProduct =>
             cartProduct.RequireOtherProducts &&
             _productService.ParseRequiredProductIds(cartProduct).Contains(product.Id)).ToList();
@@ -768,9 +849,12 @@ public partial class ShoppingCartService : IShoppingCartService
     public virtual async Task<IList<ShoppingCartItem>> GetShoppingCartAsync(Customer customer, ShoppingCartType? shoppingCartType = null,
         int storeId = 0, int? productId = null, DateTime? createdFromUtc = null, DateTime? createdToUtc = null, int? customWishlistId = null)
     {
+		_logger.LogError(">>> Entering GetShoppingCartAsync(customer={Customer},shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},customWishlistId={CustomWishlistId})", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var items = _sciRepository.Table.Where(sci => sci.CustomerId == customer.Id);
+		_logger.LogError("GetShoppingCartAsync(customer={Customer},shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},customWishlistId={CustomWishlistId}): items → {Items}", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId, items);
 
         //filter by type
         if (shoppingCartType.HasValue)
@@ -794,6 +878,8 @@ public partial class ShoppingCartService : IShoppingCartService
         if (createdToUtc.HasValue)
             items = items.Where(item => createdToUtc.Value >= item.CreatedOnUtc);
 
+		_logger.LogError("GetShoppingCartAsync(customer,shoppingCartType,storeId,productId,createdFromUtc,createdToUtc,customWishlistId)={Customer},<redacted>,{StoreId},{ProductId},{CreatedFromUtc},{CreatedToUtc},{CustomWishlistId}: find query executing", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
+		_logger.LogError("GetShoppingCartAsync(customer,shoppingCartType,storeId,productId,createdFromUtc,createdToUtc,customWishlistId)={Customer},<redacted>,{StoreId},{ProductId},{CreatedFromUtc},{CreatedToUtc},{CustomWishlistId}: external service call took {Arg7} ms", customer, storeId, productId, createdFromUtc, createdToUtc, customWishlistId, __logStart.ElapsedMilliseconds);
         return await _shortTermCacheManager.GetAsync(async () => await items.ToListAsync(), NopOrderDefaults.ShoppingCartItemsAllCacheKey, customer, shoppingCartType, storeId, productId, createdFromUtc, createdToUtc, customWishlistId);
     }
 
@@ -823,12 +909,16 @@ public partial class ShoppingCartService : IShoppingCartService
         bool ignoreBundledProducts = false,
         int shoppingCartItemId = 0)
     {
+		_logger.LogError(">>> Entering GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>)", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): warnings → {Warnings}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, warnings);
 
         //ensure it's our attributes
         var attributes1 = await _productAttributeParser.ParseProductAttributeMappingsAsync(attributesXml);
+		_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributes1 → {Attributes1}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributes1);
         if (ignoreNonCombinableAttributes)
         {
             attributes1 = attributes1.Where(x => !x.IsNonCombinable()).ToList();
@@ -850,6 +940,7 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //validate required product attributes (whether they're chosen/selected/entered)
         var attributes2 = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+		_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributes2 → {Attributes2}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributes2);
         if (ignoreNonCombinableAttributes)
         {
             attributes2 = attributes2.Where(x => !x.IsNonCombinable()).ToList();
@@ -861,6 +952,8 @@ public partial class ShoppingCartService : IShoppingCartService
             attributes2 = await attributes2.WhereAwait(async x =>
             {
                 var conditionMet = await _productAttributeParser.IsConditionMetAsync(x, attributesXml);
+				_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): conditionMet → {ConditionMet}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, conditionMet);
+			_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer,shoppingCartType,product,quantity,attributesXml,ignoreNonCombinableAttributes,ignoreConditionMet,ignoreBundledProducts,shoppingCartItemId)={Customer},<redacted>,{Product},{Quantity},{AttributesXml},{IgnoreNonCombinableAttributes},{IgnoreConditionMet},{IgnoreBundledProducts},<redacted>: database query executed in {Arg9} ms", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, __logStart.ElapsedMilliseconds);
                 return !conditionMet.HasValue || conditionMet.Value;
             }).ToListAsync();
         }
@@ -868,10 +961,12 @@ public partial class ShoppingCartService : IShoppingCartService
         foreach (var a2 in attributes2)
         {
             var productAttributeValues = await _productAttributeService.GetProductAttributeValuesAsync(a2.Id);
+			_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): productAttributeValues → {ProductAttributeValues}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, productAttributeValues);
 
             if (a2.IsRequired)
             {
                 var found = false;
+				_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): found → {Found}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, found);
                 //selected product attributes
                 foreach (var a1 in attributes1)
                 {
@@ -879,6 +974,7 @@ public partial class ShoppingCartService : IShoppingCartService
                         continue;
 
                     var attributeValuesStr = _productAttributeParser.ParseValues(attributesXml, a1.Id);
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributeValuesStr → {AttributeValuesStr}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributeValuesStr);
 
                     if (a2.ShouldHaveValues() && productAttributeValues.Any() && !productAttributeValues.Any(x => attributeValuesStr.Contains(x.Id.ToString())))
                         break;
@@ -897,8 +993,10 @@ public partial class ShoppingCartService : IShoppingCartService
                 if (!found)
                 {
                     var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(a2.ProductAttributeId);
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): productAttribute → {ProductAttribute}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, productAttribute);
 
                     var textPrompt = await _localizationService.GetLocalizedAsync(a2, x => x.TextPrompt);
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): textPrompt → {TextPrompt}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, textPrompt);
                     var notFoundWarning = !string.IsNullOrEmpty(textPrompt) ?
                         textPrompt :
                         string.Format(await _localizationService.GetResourceAsync("ShoppingCart.SelectAttribute"), await _localizationService.GetLocalizedAsync(productAttribute, a => a.Name));
@@ -945,10 +1043,14 @@ public partial class ShoppingCartService : IShoppingCartService
                     pam.AttributeControlType == AttributeControlType.MultilineTextbox)
                 {
                     enteredText = _productAttributeParser.ParseValues(attributesXml, pam.Id).FirstOrDefault();
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): enteredText → {EnteredText}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, enteredText);
+					_logger.LogDebug("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): enteredText → {EnteredText}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, enteredText);
                     enteredTextLength = string.IsNullOrEmpty(enteredText) ? 0 : enteredText.Length;
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): enteredTextLength → {EnteredTextLength}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, enteredTextLength);
 
                     if (pam.ValidationMinLength.Value > enteredTextLength)
                     {
+						_logger.LogDebug("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): enteredTextLength → {EnteredTextLength}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, enteredTextLength);
                         warnings.Add(string.Format(await _localizationService.GetResourceAsync("ShoppingCart.TextboxMinimumLength"), await _localizationService.GetLocalizedAsync(productAttribute, a => a.Name), pam.ValidationMinLength.Value));
                     }
                 }
@@ -975,12 +1077,14 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //validate bundled products
         var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(attributesXml);
+		_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributeValues → {AttributeValues}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributeValues);
         foreach (var attributeValue in attributeValues)
         {
             if (attributeValue.AttributeValueType != AttributeValueType.AssociatedToProduct)
                 continue;
 
             var productAttributeMapping = await _productAttributeService.GetProductAttributeMappingByIdAsync(attributeValue.ProductAttributeMappingId);
+			_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): productAttributeMapping → {ProductAttributeMapping}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, productAttributeMapping);
 
             if (productAttributeMapping == null)
                 continue;
@@ -990,10 +1094,12 @@ public partial class ShoppingCartService : IShoppingCartService
 
             //associated product (bundle)
             var associatedProduct = await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId);
+			_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): associatedProduct → {AssociatedProduct}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, associatedProduct);
 
             if (associatedProduct != null)
             {
                 var store = await _storeContext.GetCurrentStoreAsync();
+				_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): store → {Store}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, store);
                 var totalQty = quantity * attributeValue.Quantity;
                 var associatedProductWarnings = await GetShoppingCartItemWarningsAsync(customer,
                     shoppingCartType, associatedProduct, store.Id,
@@ -1004,7 +1110,9 @@ public partial class ShoppingCartService : IShoppingCartService
                 foreach (var associatedProductWarning in associatedProductWarnings)
                 {
                     var attributeName = await _localizationService.GetLocalizedAsync(productAttribute, a => a.Name);
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributeName → {AttributeName}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributeName);
                     var attributeValueName = await _localizationService.GetLocalizedAsync(attributeValue, a => a.Name);
+					_logger.LogError("GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>): attributeValueName → {AttributeValueName}", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts, attributeValueName);
                     warnings.Add(string.Format(
                         await _localizationService.GetResourceAsync("ShoppingCart.AssociatedAttributeWarning"),
                         attributeName, attributeValueName, associatedProductWarning));
@@ -1014,6 +1122,7 @@ public partial class ShoppingCartService : IShoppingCartService
                 warnings.Add($"Associated product cannot be loaded - {attributeValue.AssociatedProductId}");
         }
 
+		_logger.LogWarning("<<< Exiting GetShoppingCartItemAttributeWarningsAsync(customer={Customer},shoppingCartType=<redacted>,product={Product},quantity={Quantity},attributesXml={AttributesXml},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreConditionMet={IgnoreConditionMet},ignoreBundledProducts={IgnoreBundledProducts},shoppingCartItemId=<redacted>)", customer, product, quantity, attributesXml, ignoreNonCombinableAttributes, ignoreConditionMet, ignoreBundledProducts);
         return warnings;
     }
 
@@ -1030,16 +1139,20 @@ public partial class ShoppingCartService : IShoppingCartService
     public virtual async Task<IList<string>> GetShoppingCartItemGiftCardWarningsAsync(ShoppingCartType shoppingCartType,
         Product product, string attributesXml)
     {
+		_logger.LogError(">>> Entering GetShoppingCartItemGiftCardWarningsAsync(shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml})", product, attributesXml);
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetShoppingCartItemGiftCardWarningsAsync(shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml}): warnings → {Warnings}", product, attributesXml, warnings);
 
         //gift cards
         if (!product.IsGiftCard)
             return warnings;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("GetShoppingCartItemGiftCardWarningsAsync(shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml}): customer → {Customer}", product, attributesXml, customer);
         var giftCards = await _giftCardService.GetActiveGiftCardsAppliedByCustomerAsync(customer);
+		_logger.LogError("GetShoppingCartItemGiftCardWarningsAsync(shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml}): giftCards → {GiftCards}", product, attributesXml, giftCards);
         if (giftCards.Any())
             warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.GiftCardCouponCode.DontWorkWithGiftCards"));
 
@@ -1065,6 +1178,7 @@ public partial class ShoppingCartService : IShoppingCartService
         if (string.IsNullOrEmpty(giftCardSenderEmail) || !CommonHelper.IsValidEmail(giftCardSenderEmail))
             warnings.Add(await _localizationService.GetResourceAsync("ShoppingCart.SenderEmailError"));
 
+		_logger.LogWarning("<<< Exiting GetShoppingCartItemGiftCardWarningsAsync(shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return warnings;
     }
 
@@ -1081,9 +1195,11 @@ public partial class ShoppingCartService : IShoppingCartService
     public virtual async Task<IList<string>> GetRentalProductWarningsAsync(Product product,
         DateTime? rentalStartDate = null, DateTime? rentalEndDate = null)
     {
+		_logger.LogError(">>> Entering GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate})", product, rentalStartDate, rentalEndDate);
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): warnings → {Warnings}", product, rentalStartDate, rentalEndDate, warnings);
 
         if (!product.IsRental)
             return warnings;
@@ -1112,10 +1228,14 @@ public partial class ShoppingCartService : IShoppingCartService
         //we also ignore hours (anyway not supported yet)
         //today
         var nowDtInStoreTimeZone = _dateTimeHelper.ConvertToUserTime(DateTime.Now, TimeZoneInfo.Local, _dateTimeHelper.DefaultStoreTimeZone);
+		_logger.LogError("GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): nowDtInStoreTimeZone → {NowDtInStoreTimeZone}", product, rentalStartDate, rentalEndDate, nowDtInStoreTimeZone);
         var todayDt = new DateTime(nowDtInStoreTimeZone.Year, nowDtInStoreTimeZone.Month, nowDtInStoreTimeZone.Day);
+		_logger.LogError("GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): todayDt → {TodayDt}", product, rentalStartDate, rentalEndDate, todayDt);
         var todayDtUtc = _dateTimeHelper.ConvertToUtcTime(todayDt, _dateTimeHelper.DefaultStoreTimeZone);
+		_logger.LogError("GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): todayDtUtc → {TodayDtUtc}", product, rentalStartDate, rentalEndDate, todayDtUtc);
         //dates are entered in store timezone (e.g. like in hotels)
         var startDateUtc = _dateTimeHelper.ConvertToUtcTime(rentalStartDate.Value, _dateTimeHelper.DefaultStoreTimeZone);
+		_logger.LogError("GetRentalProductWarningsAsync(product={Product},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate}): startDateUtc → {StartDateUtc}", product, rentalStartDate, rentalEndDate, startDateUtc);
         //but we what if dates should be entered in a customer timezone?
         //DateTime startDateUtc = _dateTimeHelper.ConvertToUtcTime(rentalStartDate.Value, _dateTimeHelper.CurrentTimeZone);
         if (todayDtUtc.CompareTo(startDateUtc) <= 0)
@@ -1555,6 +1675,7 @@ public partial class ShoppingCartService : IShoppingCartService
         ArgumentNullException.ThrowIfNull(shoppingCart);
         ArgumentNullException.ThrowIfNull(product);
 
+			_logger.LogWarning("<<< Exiting FindShoppingCartItemInTheCartAsync(shoppingCart=<redacted>,shoppingCartType=<redacted>,product={Product},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate})", product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate);
         return await shoppingCart.Where(sci => sci.ShoppingCartType == shoppingCartType)
             .FirstOrDefaultAwaitAsync(async sci => await ShoppingCartItemIsEqualAsync(sci, product, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate));
     }
@@ -1583,11 +1704,14 @@ public partial class ShoppingCartService : IShoppingCartService
         DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
         int quantity = 1, bool addRequiredProducts = true, int? wishlistId = null)
     {
+		_logger.LogError(">>> Entering AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId})", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         ArgumentNullException.ThrowIfNull(product);
 
         var warnings = new List<string>();
+		_logger.LogError("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): warnings → {Warnings}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, warnings);
         if (shoppingCartType == ShoppingCartType.ShoppingCart && !await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART, customer))
         {
             warnings.Add("Shopping cart is disabled");
@@ -1616,6 +1740,7 @@ public partial class ShoppingCartService : IShoppingCartService
         await _customerService.ResetCheckoutDataAsync(customer, storeId);
 
         var cart = await GetShoppingCartAsync(customer, shoppingCartType, storeId);
+		_logger.LogError("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): cart → {Cart}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, cart);
 
         var shoppingCartItem = await FindShoppingCartItemInTheCartAsync(cart,
             shoppingCartType, product, attributesXml, customerEnteredPrice,
@@ -1640,10 +1765,14 @@ public partial class ShoppingCartService : IShoppingCartService
                 return warnings;
 
             shoppingCartItem.AttributesXml = attributesXml;
+			_logger.LogDebug("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): shoppingCartItem.AttributesXml → {Arg11}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, shoppingCartItem.AttributesXml);
+			_logger.LogDebug("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): shoppingCartItem.UpdatedOnUtc → {Arg11}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, shoppingCartItem.UpdatedOnUtc);
             shoppingCartItem.Quantity = newQuantity;
+			_logger.LogDebug("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): shoppingCartItem.Quantity → {Arg11}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, shoppingCartItem.Quantity);
             shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
 
             await _sciRepository.UpdateAsync(shoppingCartItem);
+			_logger.LogError("AddToCartAsync(customer,product,shoppingCartType,storeId,attributesXml,customerEnteredPrice,rentalStartDate,rentalEndDate,quantity,addRequiredProducts,wishlistId)={Customer},{Product},<redacted>,{StoreId},{AttributesXml},{CustomerEnteredPrice},{RentalStartDate},{RentalEndDate},{Quantity},{AddRequiredProducts},{WishlistId}: update query executed in {Arg11} ms", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, __logStart.ElapsedMilliseconds);
         }
         else
         {
@@ -1681,6 +1810,8 @@ public partial class ShoppingCartService : IShoppingCartService
 
                     break;
                 default:
+					_logger.LogError(">>> Entering addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId})", qty, wishlistId);
+					_logger.LogWarning("<<< Exiting addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId})", qty, wishlistId);
                     break;
             }
 
@@ -1702,25 +1833,31 @@ public partial class ShoppingCartService : IShoppingCartService
             };
 
             await _sciRepository.InsertAsync(shoppingCartItem);
+			_logger.LogError("AddToCartAsync(customer,product,shoppingCartType,storeId,attributesXml,customerEnteredPrice,rentalStartDate,rentalEndDate,quantity,addRequiredProducts,wishlistId)={Customer},{Product},<redacted>,{StoreId},{AttributesXml},{CustomerEnteredPrice},{RentalStartDate},{RentalEndDate},{Quantity},{AddRequiredProducts},{WishlistId}: save query executed in {Arg11} ms", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, __logStart.ElapsedMilliseconds);
 
             //updated "HasShoppingCartItems" property used for performance optimization
             var hasShoppingCartItems = !await IsCustomerShoppingCartEmptyAsync(customer);
+			_logger.LogError("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): hasShoppingCartItems → {HasShoppingCartItems}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, hasShoppingCartItems);
             if (hasShoppingCartItems != customer.HasShoppingCartItems)
             {
                 customer.HasShoppingCartItems = hasShoppingCartItems;
+				_logger.LogDebug("AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId}): customer.HasShoppingCartItems → {Arg11}", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId, customer.HasShoppingCartItems);
                 await _customerService.UpdateCustomerAsync(customer);
             }
         }
 
+		_logger.LogWarning("<<< Exiting AddToCartAsync(customer={Customer},product={Product},shoppingCartType=<redacted>,storeId={StoreId},attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},addRequiredProducts={AddRequiredProducts},wishlistId={WishlistId})", customer, product, storeId, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, addRequiredProducts, wishlistId);
         return warnings;
 
         async Task addRequiredProductsToCartAsync(int qty = 0, int? wishlistId = null)
         {
+			_logger.LogError(">>> Entering addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId})", qty, wishlistId);
             if (!product.RequireOtherProducts)
                 return;
 
             //get these required products
             var requiredProducts = await _productService.GetProductsByIdsAsync(_productService.ParseRequiredProductIds(product));
+			_logger.LogError("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): requiredProducts → {RequiredProducts}", qty, wishlistId, requiredProducts);
             if (!requiredProducts.Any())
                 return;
 
@@ -1730,6 +1867,7 @@ public partial class ShoppingCartService : IShoppingCartService
             foreach (var requiredProduct in finalRequiredProducts)
             {
                 var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct.Product);
+				_logger.LogError("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): productsRequiringRequiredProduct → {ProductsRequiringRequiredProduct}", qty, wishlistId, productsRequiringRequiredProduct);
 
                 //get the required quantity of the required product
                 var requiredProductRequiredQuantity = (qty > 0 ? qty : quantity) +
@@ -1739,6 +1877,7 @@ public partial class ShoppingCartService : IShoppingCartService
 
                 //whether required product is already in the cart in the required quantity
                 var quantityToAdd = requiredProductRequiredQuantity * requiredProduct.Count - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Product.Id)?.Quantity ?? 0);
+				_logger.LogError("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): quantityToAdd → {QuantityToAdd}", qty, wishlistId, quantityToAdd);
                 if (quantityToAdd <= 0)
                     continue;
 
@@ -1751,6 +1890,7 @@ public partial class ShoppingCartService : IShoppingCartService
                     if (addToCartWarnings.Any())
                     {
                         warnings.AddRange(addToCartWarnings);
+						_logger.LogWarning("<<< Exiting addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId})", qty, wishlistId);
                         return;
                     }
                 }
@@ -1779,14 +1919,20 @@ public partial class ShoppingCartService : IShoppingCartService
         DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
         int quantity = 1, bool resetCheckoutData = true)
     {
+		_logger.LogError(">>> Entering UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData})", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData);
         ArgumentNullException.ThrowIfNull(customer);
 
         var warnings = new List<string>();
+		_logger.LogError("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): warnings → {Warnings}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, warnings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var shoppingCartItem = await _sciRepository.GetByIdAsync(shoppingCartItemId, cache => default);
 
-        if (shoppingCartItem == null || shoppingCartItem.CustomerId != customer.Id)
+		_logger.LogError("UpdateShoppingCartItemAsync(customer,shoppingCartItemId,attributesXml,customerEnteredPrice,rentalStartDate,rentalEndDate,quantity,resetCheckoutData)={Customer},<redacted>,{AttributesXml},{CustomerEnteredPrice},{RentalStartDate},{RentalEndDate},{Quantity},{ResetCheckoutData}: find query executed in {Arg8} ms", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, __logStart.ElapsedMilliseconds);
+			_logger.LogError("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem → {ShoppingCartItem}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem);
+        if (shoppingCartItem == null || shoppingCartItem.CustomerId != customer.Id) {
             return warnings;
+        }
 
         if (resetCheckoutData)
         {
@@ -1795,6 +1941,7 @@ public partial class ShoppingCartService : IShoppingCartService
         }
 
         var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
+		_logger.LogError("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): product → {Product}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, product);
 
         if (quantity > 0)
         {
@@ -1808,13 +1955,20 @@ public partial class ShoppingCartService : IShoppingCartService
 
             //if everything is OK, then update a shopping cart item
             shoppingCartItem.Quantity = quantity;
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.Quantity → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.Quantity);
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.CustomerEnteredPrice → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.CustomerEnteredPrice);
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.RentalStartDateUtc → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.RentalStartDateUtc);
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.RentalEndDateUtc → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.RentalEndDateUtc);
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.UpdatedOnUtc → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.UpdatedOnUtc);
             shoppingCartItem.AttributesXml = attributesXml;
+			_logger.LogDebug("UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData}): shoppingCartItem.AttributesXml → {Arg8}", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, shoppingCartItem.AttributesXml);
             shoppingCartItem.CustomerEnteredPrice = customerEnteredPrice;
             shoppingCartItem.RentalStartDateUtc = rentalStartDate;
             shoppingCartItem.RentalEndDateUtc = rentalEndDate;
             shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
 
             await _sciRepository.UpdateAsync(shoppingCartItem);
+			_logger.LogError("UpdateShoppingCartItemAsync(customer,shoppingCartItemId,attributesXml,customerEnteredPrice,rentalStartDate,rentalEndDate,quantity,resetCheckoutData)={Customer},<redacted>,{AttributesXml},{CustomerEnteredPrice},{RentalStartDate},{RentalEndDate},{Quantity},{ResetCheckoutData}: update query executed in {Arg8} ms", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData, __logStart.ElapsedMilliseconds);
         }
         else
         {
@@ -1828,6 +1982,7 @@ public partial class ShoppingCartService : IShoppingCartService
             await DeleteShoppingCartItemAsync(shoppingCartItem, resetCheckoutData, true);
         }
 
+		_logger.LogWarning("<<< Exiting UpdateShoppingCartItemAsync(customer={Customer},shoppingCartItemId=<redacted>,attributesXml={AttributesXml},customerEnteredPrice={CustomerEnteredPrice},rentalStartDate={RentalStartDate},rentalEndDate={RentalEndDate},quantity={Quantity},resetCheckoutData={ResetCheckoutData})", customer, attributesXml, customerEnteredPrice, rentalStartDate, rentalEndDate, quantity, resetCheckoutData);
         return warnings;
     }
 
@@ -1839,33 +1994,50 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MoveItemToCustomWishlistAsync(int shoppingCartItemId, int? wishlistId = null)
     {
+		_logger.LogError(">>> Entering MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId})", wishlistId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var shoppingCartItemFrom = await _sciRepository.GetByIdAsync(shoppingCartItemId, cache => default);
         if (shoppingCartItemFrom == null)
             return;
+			var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemFrom → {ShoppingCartItemFrom}", wishlistId, shoppingCartItemFrom);
+			_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId,wishlistId)=<redacted>,{WishlistId}: find query executed in {Arg2} ms", wishlistId, __logStartDb.ElapsedMilliseconds);
 
         var customer = await _customerService.GetCustomerByIdAsync(shoppingCartItemFrom.CustomerId);
         var product = await _productService.GetProductByIdAsync(shoppingCartItemFrom.ProductId);
+		_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): customer → {Customer}", wishlistId, customer);
+		_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): product → {Product}", wishlistId, product);
         var cart = await GetShoppingCartAsync(customer, shoppingCartItemFrom.ShoppingCartType, shoppingCartItemFrom.StoreId, product.Id, customWishlistId: wishlistId);
 
+		_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): cart → {Cart}", wishlistId, cart);
         var shoppingCartItemTo = await cart.FirstOrDefaultAwaitAsync(async sci => await ShoppingCartItemIsEqualAsync(sci, product, shoppingCartItemFrom.AttributesXml, shoppingCartItemFrom.CustomerEnteredPrice, shoppingCartItemFrom.RentalStartDateUtc, shoppingCartItemFrom.RentalEndDateUtc));
 
+		_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemTo → {ShoppingCartItemTo}", wishlistId, shoppingCartItemTo);
         if (shoppingCartItemTo != null)
         {
             //update existing shopping cart item
             var newQuantity = shoppingCartItemTo.Quantity + shoppingCartItemFrom.Quantity;
             shoppingCartItemTo.Quantity = newQuantity;
+			_logger.LogDebug("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemTo.Quantity → {Arg2}", wishlistId, shoppingCartItemTo.Quantity);
             shoppingCartItemTo.UpdatedOnUtc = DateTime.UtcNow;
+			_logger.LogDebug("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemTo.UpdatedOnUtc → {Arg2}", wishlistId, shoppingCartItemTo.UpdatedOnUtc);
 
             await _sciRepository.UpdateAsync(shoppingCartItemTo);
+			_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId,wishlistId)=<redacted>,{WishlistId}: update query executed in {Arg2} ms", wishlistId, __logStartDb.ElapsedMilliseconds);
             await _sciRepository.DeleteAsync(shoppingCartItemFrom);
         }
         else
         {
+			_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId,wishlistId)=<redacted>,{WishlistId}: delete query executed in {Arg2} ms", wishlistId, __logStartDb.ElapsedMilliseconds);
             //update custom wishlist id
             shoppingCartItemFrom.CustomWishlistId = wishlistId;
+			_logger.LogDebug("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemFrom.CustomWishlistId → {Arg2}", wishlistId, shoppingCartItemFrom.CustomWishlistId);
             shoppingCartItemFrom.UpdatedOnUtc = DateTime.UtcNow;
+			_logger.LogDebug("MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId}): shoppingCartItemFrom.UpdatedOnUtc → {Arg2}", wishlistId, shoppingCartItemFrom.UpdatedOnUtc);
             await _sciRepository.UpdateAsync(shoppingCartItemFrom);
         }
+		_logger.LogError("MoveItemToCustomWishlistAsync(shoppingCartItemId,wishlistId)=<redacted>,{WishlistId}: external service call took {Arg2} ms", wishlistId, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting MoveItemToCustomWishlistAsync(shoppingCartItemId=<redacted>,wishlistId={WishlistId})", wishlistId);
     }
 
     /// <summary>
@@ -1877,6 +2049,7 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MigrateShoppingCartAsync(Customer fromCustomer, Customer toCustomer, bool includeCouponCodes)
     {
+		_logger.LogError(">>> Entering MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes})", fromCustomer, toCustomer, includeCouponCodes);
         ArgumentNullException.ThrowIfNull(fromCustomer);
         ArgumentNullException.ThrowIfNull(toCustomer);
 
@@ -1885,11 +2058,13 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //shopping cart items
         var fromCart = await GetShoppingCartAsync(fromCustomer);
+		_logger.LogError("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): fromCart → {FromCart}", fromCustomer, toCustomer, includeCouponCodes, fromCart);
 
         for (var i = 0; i < fromCart.Count; i++)
         {
             var sci = fromCart[i];
             var product = await _productService.GetProductByIdAsync(sci.ProductId);
+			_logger.LogError("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): product → {Product}", fromCustomer, toCustomer, includeCouponCodes, product);
 
             await AddToCartAsync(toCustomer, product, sci.ShoppingCartType, sci.StoreId,
                 sci.AttributesXml, sci.CustomerEnteredPrice,
@@ -1916,8 +2091,11 @@ public partial class ShoppingCartService : IShoppingCartService
 
         //move selected checkout attributes
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): store → {Store}", fromCustomer, toCustomer, includeCouponCodes, store);
         var checkoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(fromCustomer, NopCustomerDefaults.CheckoutAttributes, store.Id);
+		_logger.LogError("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): checkoutAttributesXml → {CheckoutAttributesXml}", fromCustomer, toCustomer, includeCouponCodes, checkoutAttributesXml);
         await _genericAttributeService.SaveAttributeAsync(toCustomer, NopCustomerDefaults.CheckoutAttributes, checkoutAttributesXml, store.Id);
+		_logger.LogWarning("<<< Exiting MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes})", fromCustomer, toCustomer, includeCouponCodes);
     }
 
     /// <summary>
@@ -1930,6 +2108,8 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<bool> ShoppingCartRequiresShippingAsync(IList<ShoppingCartItem> shoppingCart)
     {
+		_logger.LogError(">>> Entering ShoppingCartRequiresShippingAsync(shoppingCart=<redacted>)");
+		_logger.LogWarning("<<< Exiting ShoppingCartRequiresShippingAsync(shoppingCart=<redacted>)");
         return await shoppingCart.AnyAwaitAsync(async shoppingCartItem => await _shippingService.IsShipEnabledAsync(shoppingCartItem));
     }
 
@@ -1943,10 +2123,13 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<bool> ShoppingCartIsRecurringAsync(IList<ShoppingCartItem> shoppingCart)
     {
+		_logger.LogError(">>> Entering ShoppingCartIsRecurringAsync(shoppingCart=<redacted>)");
         ArgumentNullException.ThrowIfNull(shoppingCart);
 
-        if (!shoppingCart.Any())
+		_logger.LogWarning("<<< Exiting ShoppingCartIsRecurringAsync(shoppingCart=<redacted>)");
+        if (!shoppingCart.Any()) {
             return false;
+        }
 
         return await _productService.HasAnyRecurringProductAsync(shoppingCart.Select(sci => sci.ProductId).ToArray());
     }

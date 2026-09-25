@@ -9,6 +9,7 @@ using Nop.Services.Common;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class AddressModelFactory : IAddressModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -43,15 +45,24 @@ public partial class AddressModelFactory : IAddressModelFactory
         IStateProvinceService stateProvinceService,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext})", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext);
         _addressSettings = addressSettings;
         _addressService = addressService;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _addressService → {_addressService}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _addressService);
         _addressAttributeFormatter = addressAttributeFormatter;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _addressAttributeFormatter → {_addressAttributeFormatter}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _addressAttributeFormatter);
         _addressAttributeParser = addressAttributeParser;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _addressAttributeParser → {_addressAttributeParser}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _addressAttributeParser);
         _addressAttributeService = addressAttributeService;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _addressAttributeService → {_addressAttributeService}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _addressAttributeService);
         _countryService = countryService;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _countryService → {_countryService}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _localizationService → {_localizationService}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _localizationService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _stateProvinceService → {_stateProvinceService}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _stateProvinceService);
         _workContext = workContext;
+		_logger.LogDebug("AddressModelFactory(addressSettings={AddressSettings},addressService={AddressService},addressAttributeFormatter={AddressAttributeFormatter},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _workContext → {_workContext}", addressSettings, addressService, addressAttributeFormatter, addressAttributeParser, addressAttributeService, countryService, localizationService, stateProvinceService, workContext, _workContext);
     }
 
     #endregion
@@ -68,7 +79,9 @@ public partial class AddressModelFactory : IAddressModelFactory
     protected virtual async Task PrepareCustomAddressAttributesAsync(AddressModel model,
         Address address, string overrideAttributesXml = "")
     {
+		_logger.LogError(">>> Entering PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml})", model, address, overrideAttributesXml);
         var attributes = await _addressAttributeService.GetAllAttributesAsync();
+		_logger.LogError("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): attributes → {Attributes}", model, address, overrideAttributesXml, attributes);
         foreach (var attribute in attributes)
         {
             var attributeModel = new AddressAttributeModel
@@ -84,6 +97,7 @@ public partial class AddressModelFactory : IAddressModelFactory
             {
                 //values
                 var attributeValues = await _addressAttributeService.GetAttributeValuesAsync(attribute.Id);
+				_logger.LogError("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): attributeValues → {AttributeValues}", model, address, overrideAttributesXml, attributeValues);
                 foreach (var attributeValue in attributeValues)
                 {
                     var attributeValueModel = new AddressAttributeValueModel
@@ -111,9 +125,11 @@ public partial class AddressModelFactory : IAddressModelFactory
                         //clear default selection
                         foreach (var item in attributeModel.Values)
                             item.IsPreSelected = false;
+							_logger.LogDebug("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): item.IsPreSelected → {Arg3}", model, address, overrideAttributesXml, item.IsPreSelected);
 
                         //select new values
                         var selectedValues = await _addressAttributeParser.ParseAttributeValuesAsync(selectedAddressAttributes);
+						_logger.LogError("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): selectedValues → {SelectedValues}", model, address, overrideAttributesXml, selectedValues);
                         foreach (var attributeValue in selectedValues)
                         foreach (var item in attributeModel.Values)
                             if (attributeValue.Id == item.Id)
@@ -133,8 +149,10 @@ public partial class AddressModelFactory : IAddressModelFactory
                     if (!string.IsNullOrEmpty(selectedAddressAttributes))
                     {
                         var enteredText = _addressAttributeParser.ParseValues(selectedAddressAttributes, attribute.Id);
+						_logger.LogError("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): enteredText → {EnteredText}", model, address, overrideAttributesXml, enteredText);
                         if (enteredText.Any())
                             attributeModel.DefaultValue = enteredText[0];
+							_logger.LogDebug("PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml}): attributeModel.DefaultValue → {Arg3}", model, address, overrideAttributesXml, attributeModel.DefaultValue);
                     }
                 }
                     break;
@@ -149,6 +167,7 @@ public partial class AddressModelFactory : IAddressModelFactory
 
             model.CustomAddressAttributes.Add(attributeModel);
         }
+		_logger.LogWarning("<<< Exiting PrepareCustomAddressAttributesAsync(model={Model},address={Address},overrideAttributesXml={OverrideAttributesXml})", model, address, overrideAttributesXml);
     }
 
     #endregion
@@ -175,25 +194,41 @@ public partial class AddressModelFactory : IAddressModelFactory
         Customer customer = null,
         string overrideAttributesXml = "")
     {
+		_logger.LogError(">>> Entering PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml})", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml);
         ArgumentNullException.ThrowIfNull(model);
 
         ArgumentNullException.ThrowIfNull(addressSettings);
 
         var languageId = customer != null ? (customer?.LanguageId ?? 0) : (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogError("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): languageId → {LanguageId}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, languageId);
 
         if (!excludeProperties && address != null)
         {
             model.Id = address.Id;
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.Id → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.Id);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.LastName → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.LastName);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.Email → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.Email);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.Company → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.Company);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CountryId → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CountryId);
             model.FirstName = address.FirstName;
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.FirstName → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.FirstName);
             model.LastName = address.LastName;
             model.Email = address.Email;
             model.Company = address.Company;
             model.CountryId = address.CountryId;
             model.CountryName = await _countryService.GetCountryByAddressAsync(address) is Country country ? await _localizationService.GetLocalizedAsync(country, x => x.Name) : null;
             model.StateProvinceId = address.StateProvinceId;
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StateProvinceId → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StateProvinceId);
             model.StateProvinceName = await _stateProvinceService.GetStateProvinceByAddressAsync(address) is StateProvince stateProvince ? await _localizationService.GetLocalizedAsync(stateProvince, x => x.Name) : null;
             model.County = address.County;
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.County → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.County);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.Address1 → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.Address1);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.Address2 → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.Address2);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.ZipPostalCode → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.ZipPostalCode);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.PhoneNumber → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.PhoneNumber);
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.FaxNumber → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.FaxNumber);
             model.City = address.City;
+			_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.City → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.City);
             model.Address1 = address.Address1;
             model.Address2 = address.Address2;
             model.ZipPostalCode = address.ZipPostalCode;
@@ -203,8 +238,10 @@ public partial class AddressModelFactory : IAddressModelFactory
 
         if (address == null && prePopulateWithCustomerFields)
         {
-            if (customer == null)
+				_logger.LogError("Throwing Exception from PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml})", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml);
+            if (customer == null) {
                 throw new Exception("Customer cannot be null when prepopulating an address");
+            }
 
             model.Email = customer.Email;
             model.FirstName = customer.FirstName;
@@ -229,6 +266,7 @@ public partial class AddressModelFactory : IAddressModelFactory
         if (addressSettings.CountryEnabled && loadCountries != null)
         {
             var countries = await loadCountries();
+			_logger.LogError("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): countries → {Countries}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, countries);
 
             if (_addressSettings.PreselectCountryIfOnlyOne && countries.Count == 1)
             {
@@ -274,10 +312,12 @@ public partial class AddressModelFactory : IAddressModelFactory
                 else
                 {
                     var anyCountrySelected = model.AvailableCountries.Any(x => x.Selected);
+					_logger.LogError("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): anyCountrySelected → {AnyCountrySelected}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, anyCountrySelected);
                     model.AvailableStates.Add(new SelectListItem
                     {
                         Text = await _localizationService.GetResourceAsync(anyCountrySelected ? "Address.Other" : "Address.SelectState"),
                         Value = "0"
+						_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): Value → {Value}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, Value);
                     });
                 }
             }
@@ -285,7 +325,26 @@ public partial class AddressModelFactory : IAddressModelFactory
 
         //form fields
         model.CompanyEnabled = addressSettings.CompanyEnabled;
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CompanyEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CompanyEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StreetAddressEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StreetAddressEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StreetAddressRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StreetAddressRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StreetAddress2Enabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StreetAddress2Enabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StreetAddress2Required → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StreetAddress2Required);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.ZipPostalCodeEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.ZipPostalCodeEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.ZipPostalCodeRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.ZipPostalCodeRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CityEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CityEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CityRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CityRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CountyEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CountyEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CountyRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CountyRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CountryEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CountryEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.StateProvinceEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.StateProvinceEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.PhoneEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.PhoneEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.PhoneRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.PhoneRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.FaxEnabled → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.FaxEnabled);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.FaxRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.FaxRequired);
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.DefaultCountryId → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.DefaultCountryId);
         model.CompanyRequired = addressSettings.CompanyRequired;
+		_logger.LogDebug("PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml}): model.CompanyRequired → {Arg8}", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml, model.CompanyRequired);
         model.StreetAddressEnabled = addressSettings.StreetAddressEnabled;
         model.StreetAddressRequired = addressSettings.StreetAddressRequired;
         model.StreetAddress2Enabled = addressSettings.StreetAddress2Enabled;
@@ -315,6 +374,7 @@ public partial class AddressModelFactory : IAddressModelFactory
         }
 
         (model.AddressLine, model.AddressFields) = await _addressService.FormatAddressAsync(address, languageId);
+		_logger.LogWarning("<<< Exiting PrepareAddressModelAsync(model={Model},address={Address},excludeProperties={ExcludeProperties},addressSettings={AddressSettings},loadCountries={LoadCountries},prePopulateWithCustomerFields={PrePopulateWithCustomerFields},customer={Customer},overrideAttributesXml={OverrideAttributesXml})", model, address, excludeProperties, addressSettings, loadCountries, prePopulateWithCustomerFields, customer, overrideAttributesXml);
     }
 
     #endregion

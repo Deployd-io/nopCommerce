@@ -19,6 +19,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Controllers;
 
@@ -27,6 +28,7 @@ namespace Nop.Plugin.Misc.RFQ.Controllers;
 [AutoValidateAntiforgeryToken]
 public class RfqAdminController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly AdminModelFactory _modelFactory;
@@ -61,19 +63,32 @@ public class RfqAdminController : BasePluginController
         RfqService rfqService,
         RfqSettings rfqSettings)
     {
+		_logger.LogError(">>> Entering RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings})", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings);
         _modelFactory = modelFactory;
         _customerModelFactory = customerModelFactory;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _customerModelFactory → {_customerModelFactory}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _customerModelFactory);
         _customerService = customerService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _customerService → {_customerService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _customerService);
         _localizationService = localizationService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _localizationService → {_localizationService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _localizationService);
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _productAttributeParser → {_productAttributeParser}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _productAttributeParser);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _productAttributeService → {_productAttributeService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _productAttributeService);
         _productService = productService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _productService → {_productService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _productService);
         _notificationService = notificationService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _notificationService → {_notificationService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _notificationService);
         _settingService = settingService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _settingService → {_settingService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _settingService);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _shoppingCartService → {_shoppingCartService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _shoppingCartService);
         _rfqMessageService = rfqMessageService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _rfqMessageService → {_rfqMessageService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _rfqMessageService);
         _rfqService = rfqService;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _rfqService → {_rfqService}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _rfqService);
         _rfqSettings = rfqSettings;
+		_logger.LogDebug("RfqAdminController(modelFactory={ModelFactory},customerModelFactory={CustomerModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},shoppingCartService=<redacted>,rfqMessageService={RfqMessageService},rfqService={RfqService},rfqSettings={RfqSettings}): _rfqSettings → {_rfqSettings}", modelFactory, customerModelFactory, customerService, localizationService, notificationService, productAttributeParser, productAttributeService, productService, settingService, rfqMessageService, rfqService, rfqSettings, _rfqSettings);
     }
 
     #endregion
@@ -84,11 +99,14 @@ public class RfqAdminController : BasePluginController
 
     public async Task<IActionResult> Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             Enabled = _rfqSettings.Enabled
         };
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Misc.RFQ/Views/Admin/Configure.cshtml", model);
     }
 
@@ -117,9 +135,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public async Task<IActionResult> AddNewProduct(ProductSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering AddNewProduct(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareProductListModelAsync(searchModel);
+		_logger.LogError("AddNewProduct(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting AddNewProduct(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -127,6 +148,7 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public async Task<IActionResult> AddProductDetails(int productId, int quoteId)
     {
+		_logger.LogError(">>> Entering AddProductDetails(productId={ProductId},quoteId={QuoteId})", productId, quoteId);
         var quote = await _rfqService.GetQuoteByIdAsync(quoteId)
             ?? throw new ArgumentException("No quote found with the specified id");
 
@@ -135,7 +157,10 @@ public class RfqAdminController : BasePluginController
 
         //prepare model
         var model = await _modelFactory.PrepareAddProductModelAsync(new AddProductModel(), quote, product);
+		_logger.LogError("AddProductDetails(productId={ProductId},quoteId={QuoteId}): model → {Model}", productId, quoteId, model);
 
+		_logger.LogWarning("<<< Exiting AddProductDetails(productId={ProductId},quoteId={QuoteId})", productId, quoteId);
+		_logger.LogWarning("<<< Exiting AddProductDetails(quoteId={QuoteId},productId={ProductId},form={Form})", quoteId, productId, form);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AddProductDetails.cshtml", model);
     }
 
@@ -196,24 +221,33 @@ public class RfqAdminController : BasePluginController
     [HttpPost]
     public async Task<IActionResult> ProductDetailsAttributeChange(int productId, bool validateAttributeConditions, IFormCollection form)
     {
+		_logger.LogError(">>> Entering ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         var product = await _productService.GetProductByIdAsync(productId);
-        if (product == null)
+			_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): product → {Product}", productId, validateAttributeConditions, form, product);
+        if (product == null) {
             return new NullJsonResult();
+        }
 
         var errors = new List<string>();
+		_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): errors → {Errors}", productId, validateAttributeConditions, form, errors);
         var attributeXml = await _productAttributeParser.ParseProductAttributesAsync(product, form, errors);
+		_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributeXml → {AttributeXml}", productId, validateAttributeConditions, form, attributeXml);
 
         //conditional attributes
         var enabledAttributeMappingIds = new List<int>();
+		_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): enabledAttributeMappingIds → {EnabledAttributeMappingIds}", productId, validateAttributeConditions, form, enabledAttributeMappingIds);
         var disabledAttributeMappingIds = new List<int>();
+		_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): disabledAttributeMappingIds → {DisabledAttributeMappingIds}", productId, validateAttributeConditions, form, disabledAttributeMappingIds);
 
         if (validateAttributeConditions)
         {
             var attributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+			_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributes → {Attributes}", productId, validateAttributeConditions, form, attributes);
 
             foreach (var attribute in attributes)
             {
                 var conditionMet = await _productAttributeParser.IsConditionMetAsync(attribute, attributeXml);
+				_logger.LogError("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): conditionMet → {ConditionMet}", productId, validateAttributeConditions, form, conditionMet);
 
                 if (!conditionMet.HasValue)
                     continue;
@@ -225,6 +259,7 @@ public class RfqAdminController : BasePluginController
             }
         }
 
+		_logger.LogWarning("<<< Exiting ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         return Json(new
         {
             enabledattributemappingids = enabledAttributeMappingIds.ToArray(),
@@ -238,9 +273,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public async Task<IActionResult> CustomerList(CustomerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering CustomerList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerListModelAsync(searchModel);
+		_logger.LogError("CustomerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting CustomerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -248,9 +286,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public async Task<IActionResult> SelectCustomerPopup()
     {
+		_logger.LogError(">>> Entering SelectCustomerPopup()");
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerSearchModelAsync(new CustomerSearchModel());
+		_logger.LogError("SelectCustomerPopup(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting SelectCustomerPopup()");
         return View("~/Plugins/Misc.RFQ/Views/Admin/SelectCustomerPopup.cshtml", model);
     }
 
@@ -261,25 +302,33 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminRequests()
     {
+		_logger.LogError(">>> Entering AdminRequests()");
         //prepare model
         var model = await _modelFactory.PrepareRequestQuoteSearchModelAsync();
+		_logger.LogError("AdminRequests(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting AdminRequests()");
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminRequests.cshtml", model);
     }
 
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminRequest(int id)
     {
+		_logger.LogError(">>> Entering AdminRequest(id={Id})", id);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
+		_logger.LogError("AdminRequest(id={Id}): requestQuote → {RequestQuote}", id, requestQuote);
 
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         var model = await _modelFactory.PreparedRequestQuoteModelAsync(requestQuote);
+		_logger.LogError("AdminRequest(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting AdminRequest(id={Id})", id);
+		_logger.LogWarning("<<< Exiting AdminRequest(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminRequest.cshtml", model);
     }
 
@@ -317,16 +366,19 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> EditRequestItem(int id, IFormCollection form)
     {
+		_logger.LogError(">>> Entering EditRequestItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
+		_logger.LogError("EditRequestItem(id={Id},form={Form}): requestQuote → {RequestQuote}", id, form, requestQuote);
 
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         //get request a quote item identifier
         var requestQuoteItemId = 0;
+		_logger.LogError("EditRequestItem(id={Id},form={Form}): requestQuoteItemId → {RequestQuoteItemId}", id, form, requestQuoteItemId);
 
         var saveButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnSave", StringComparison.InvariantCultureIgnoreCase)).Key;
@@ -345,11 +397,13 @@ public class RfqAdminController : BasePluginController
         if (requestQuote.AdminNotes != form["AdminNotes"])
         {
             requestQuote.AdminNotes = form["AdminNotes"];
+			_logger.LogDebug("EditRequestItem(id={Id},form={Form}): requestQuote.AdminNotes → {Arg2}", id, form, requestQuote.AdminNotes);
             await _rfqService.UpdateRequestQuoteAsync(requestQuote);
         }
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Updated"));
 
+		_logger.LogWarning("<<< Exiting EditRequestItem(id={Id},form={Form})", id, form);
         return await AdminRequest(id);
     }
 
@@ -358,16 +412,19 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteRequestItem(int id, IFormCollection form)
     {
+		_logger.LogError(">>> Entering DeleteRequestItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
+		_logger.LogError("DeleteRequestItem(id={Id},form={Form}): requestQuote → {RequestQuote}", id, form, requestQuote);
 
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         //get request a quote item identifier
         var requestQuoteItemId = 0;
+		_logger.LogError("DeleteRequestItem(id={Id},form={Form}): requestQuoteItemId → {RequestQuoteItemId}", id, form, requestQuoteItemId);
 
         var deleteButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnDelete", StringComparison.InvariantCultureIgnoreCase)).Key;
@@ -382,6 +439,7 @@ public class RfqAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Updated"));
 
+		_logger.LogWarning("<<< Exiting DeleteRequestItem(id={Id},form={Form})", id, form);
         return await AdminRequest(id);
     }
 
@@ -390,10 +448,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteRequest(RequestQuoteModel model)
     {
+		_logger.LogError(">>> Entering DeleteRequest(model={Model})", model);
         await _rfqService.DeleteRequestQuoteAsync(model.Id);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteRequest(model={Model})", model);
         return RedirectToAction("AdminRequests");
     }
 
@@ -402,8 +462,10 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> CancelRequest(RequestQuoteModel model)
     {
+		_logger.LogError(">>> Entering CancelRequest(model={Model})", model);
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(model.Id);
 
+		_logger.LogError("CancelRequest(model={Model}): requestQuote → {RequestQuote}", model, requestQuote);
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
@@ -412,6 +474,7 @@ public class RfqAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Canceled"));
 
+		_logger.LogWarning("<<< Exiting CancelRequest(model={Model})", model);
         return RedirectToAction("AdminRequest", new { id = requestQuote.Id });
     }
 
@@ -419,10 +482,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteSelectedRequests(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DeleteSelectedRequests(selectedIds={SelectedIds})", selectedIds);
         await _rfqService.DeleteRequestsQuoteByIdsAsync(selectedIds);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Selected.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteSelectedRequests(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
@@ -430,9 +495,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> RequestList(RequestQuoteSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering RequestList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareRequestQuoteListModelAsync(searchModel);
+		_logger.LogError("RequestList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting RequestList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -444,24 +512,32 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> CreateQuote(RequestQuoteModel model)
     {
+		_logger.LogError(">>> Entering CreateQuote(model={Model})", model);
         var quoteId = await _rfqService.CreateQuoteByRequestAsync(model.Id);
 
+		_logger.LogError("CreateQuote(model={Model}): quoteId → {QuoteId}", model, quoteId);
+		_logger.LogWarning("<<< Exiting CreateQuote(model={Model})", model);
         return RedirectToAction("AdminQuote", new { id = quoteId });
     }
 
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminQuote(int id)
     {
+		_logger.LogError(">>> Entering AdminQuote(id={Id})", id);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
+		_logger.LogError("AdminQuote(id={Id}): quote → {Quote}", id, quote);
 
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         var model = await _modelFactory.PreparedQuoteModelAsync(quote);
+		_logger.LogError("AdminQuote(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting AdminQuote(id={Id})", id);
+		_logger.LogWarning("<<< Exiting AdminQuote(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminQuote.cshtml", model);
     }
 
@@ -470,8 +546,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminQuotes(QuoteSearchModel model)
     {
+		_logger.LogError(">>> Entering AdminQuotes(model={Model})", model);
         var requestQuote = await _rfqService.CreateQuoteAsync(model.CustomerId);
 
+		_logger.LogError("AdminQuotes(model={Model}): requestQuote → {RequestQuote}", model, requestQuote);
+		_logger.LogWarning("<<< Exiting AdminQuotes(model={Model})", model);
+		_logger.LogWarning("<<< Exiting AdminQuotes()");
         return RedirectToAction("AdminQuote", new { id = requestQuote.Id });
     }
 
@@ -488,10 +568,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteSelectedQuotes(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DeleteSelectedQuotes(selectedIds={SelectedIds})", selectedIds);
         await _rfqService.DeleteQuotesByIdsAsync(selectedIds);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Selected.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteSelectedQuotes(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
@@ -499,9 +581,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> QuoteList(QuoteSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering QuoteList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareQuoteListModelAsync(searchModel);
+		_logger.LogError("QuoteList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting QuoteList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -509,14 +594,18 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public async Task<IActionResult> AddProductToQuote(int quoteId)
     {
+		_logger.LogError(">>> Entering AddProductToQuote(quoteId={QuoteId})", quoteId);
         var quote = await _rfqService.GetQuoteByIdAsync(quoteId);
 
+		_logger.LogError("AddProductToQuote(quoteId={QuoteId}): quote → {Quote}", quoteId, quote);
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         //prepare model
         var model = await _modelFactory.PrepareAddProductSearchModelAsync(new ProductSearchModel(), quote.Id);
+		_logger.LogError("AddProductToQuote(quoteId={QuoteId}): model → {Model}", quoteId, model);
 
+		_logger.LogWarning("<<< Exiting AddProductToQuote(quoteId={QuoteId})", quoteId);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AddProductToQuote.cshtml", model);
     }
 
@@ -525,8 +614,10 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> SendQuote(QuoteModel model)
     {
+		_logger.LogError(">>> Entering SendQuote(model={Model})", model);
         var quote = await _rfqService.GetQuoteByIdAsync(model.Id);
 
+		_logger.LogError("SendQuote(model={Model}): quote → {Quote}", model, quote);
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
@@ -536,6 +627,7 @@ public class RfqAdminController : BasePluginController
         await _rfqMessageService.AdminSentNewQuoteAsync(quote);
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.QuoteSubmitted"));
 
+		_logger.LogWarning("<<< Exiting SendQuote(model={Model})", model);
         return RedirectToAction("AdminQuote", new { id = quote.Id });
     }
 
@@ -544,10 +636,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteQuote(QuoteModel model)
     {
+		_logger.LogError(">>> Entering DeleteQuote(model={Model})", model);
         await _rfqService.DeleteQuoteAsync(model.Id);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteQuote(model={Model})", model);
         return RedirectToAction("AdminQuotes");
     }
 
@@ -596,16 +690,19 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> EditQuoteItem(int id, IFormCollection form)
     {
+		_logger.LogError(">>> Entering EditQuoteItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
+		_logger.LogError("EditQuoteItem(id={Id},form={Form}): quote → {Quote}", id, form, quote);
 
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         //get the quote item identifier
         var quoteItemId = 0;
+		_logger.LogError("EditQuoteItem(id={Id},form={Form}): quoteItemId → {QuoteItemId}", id, form, quoteItemId);
 
         var saveButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnSave", StringComparison.InvariantCultureIgnoreCase)).Key;
@@ -624,11 +721,13 @@ public class RfqAdminController : BasePluginController
         if (quote.AdminNotes != form["AdminNotes"])
         {
             quote.AdminNotes = form["AdminNotes"];
+			_logger.LogDebug("EditQuoteItem(id={Id},form={Form}): quote.AdminNotes → {Arg2}", id, form, quote.AdminNotes);
             await _rfqService.UpdateQuoteAsync(quote);
         }
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Updated"));
 
+		_logger.LogWarning("<<< Exiting EditQuoteItem(id={Id},form={Form})", id, form);
         return await AdminQuote(id);
     }
 
@@ -637,16 +736,19 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteQuoteItem(int id, IFormCollection form)
     {
+		_logger.LogError(">>> Entering DeleteQuoteItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
+		_logger.LogError("DeleteQuoteItem(id={Id},form={Form}): quote → {Quote}", id, form, quote);
 
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         //get the quote item identifier
         var quoteItemId = 0;
+		_logger.LogError("DeleteQuoteItem(id={Id},form={Form}): quoteItemId → {QuoteItemId}", id, form, quoteItemId);
 
         var deleteButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnDelete", StringComparison.InvariantCultureIgnoreCase)).Key;
@@ -661,6 +763,7 @@ public class RfqAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Updated"));
 
+		_logger.LogWarning("<<< Exiting DeleteQuoteItem(id={Id},form={Form})", id, form);
         return await AdminQuote(id);
     }
 

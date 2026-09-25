@@ -13,6 +13,7 @@ namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class SecurityController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAdminMenu _adminMenu;
@@ -36,11 +37,17 @@ public partial class SecurityController : BaseAdminController
         IWorkContext workContext)
     {
         _adminMenu = adminMenu;
+		_logger.LogDebug("SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext}): _adminMenu → {_adminMenu}", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext, _adminMenu);
         _customerService = customerService;
+		_logger.LogDebug("SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext}): _customerService → {_customerService}", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext, _customerService);
         _logger = logger;
+		_logger.LogError(">>> Entering SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext})", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext);
         _permissionService = permissionService;
         _securityModelFactory = securityModelFactory;
+		_logger.LogDebug("SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext}): _permissionService → {_permissionService}", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext, _permissionService);
         _workContext = workContext;
+		_logger.LogWarning("<<< Exiting SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext})", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext);
+		_logger.LogDebug("SecurityController(adminMenu={AdminMenu},customerService={CustomerService},logger={Logger},permissionService={PermissionService},securityModelFactory={SecurityModelFactory},workContext={WorkContext}): _workContext → {_workContext}", adminMenu, customerService, logger, permissionService, securityModelFactory, workContext, _workContext);
     }
     
     #endregion
@@ -49,6 +56,7 @@ public partial class SecurityController : BaseAdminController
 
     public virtual async Task<IActionResult> AccessDenied(string pageUrl, string pageSystemNameKey)
     {
+		_logger.LogError(">>> Entering AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey})", pageUrl, pageSystemNameKey);
         if (!_menuSystemNames.Any())
         {
             void fillSystemNames(AdminMenuItem node)
@@ -56,6 +64,7 @@ public partial class SecurityController : BaseAdminController
                 if (!string.IsNullOrEmpty(node.ControllerName) && !string.IsNullOrEmpty(node.ActionName))
                 {
                     var key = $"{node.ControllerName}.{node.ActionName}";
+					_logger.LogError("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): key → {Key}", pageUrl, pageSystemNameKey, key);
                     _menuSystemNames[key] = node.SystemName;
                 }
 
@@ -67,8 +76,10 @@ public partial class SecurityController : BaseAdminController
         }
 
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): currentCustomer → {CurrentCustomer}", pageUrl, pageSystemNameKey, currentCustomer);
 
         var menuSystemName = "Home";
+		_logger.LogError("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): menuSystemName → {MenuSystemName}", pageUrl, pageSystemNameKey, menuSystemName);
 
         if (!string.IsNullOrEmpty(pageSystemNameKey))
         {
@@ -96,17 +107,25 @@ public partial class SecurityController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionCategory(PermissionItemSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PermissionCategory(searchModel={SearchModel})", searchModel);
         var model = await _securityModelFactory.PreparePermissionItemListModelAsync(searchModel);
 
+		_logger.LogError("PermissionCategory(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogWarning("<<< Exiting PermissionCategory(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionEditPopup(int id)
     {
+		_logger.LogError(">>> Entering PermissionEditPopup(id={Id})", id);
         var permissionRecord = await _permissionService.GetPermissionRecordByIdAsync(id);
         var model = await _securityModelFactory.PreparePermissionItemModelAsync(permissionRecord);
+		_logger.LogError("PermissionEditPopup(id={Id}): model → {Model}", id, model);
+		_logger.LogError("PermissionEditPopup(id={Id}): permissionRecord → {PermissionRecord}", id, permissionRecord);
 
+		_logger.LogWarning("<<< Exiting PermissionEditPopup(id={Id})", id);
+		_logger.LogWarning("<<< Exiting PermissionEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -154,17 +173,23 @@ public partial class SecurityController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionCategories(PermissionCategorySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PermissionCategories(searchModel={SearchModel})", searchModel);
         var model = await _securityModelFactory.PreparePermissionCategoryListModelAsync(searchModel);
 
+		_logger.LogError("PermissionCategories(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogWarning("<<< Exiting PermissionCategories(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Permissions()
     {
+		_logger.LogError(">>> Entering Permissions()");
         //prepare model
         var model = await _securityModelFactory.PreparePermissionConfigurationModelAsync(new PermissionConfigurationModel());
+		_logger.LogError("Permissions(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Permissions()");
         return View(model);
     }
 

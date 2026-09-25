@@ -9,11 +9,13 @@ using LinqToDB.SqlQuery;
 using MySqlConnector;
 using Nop.Core;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.DataProviders;
 
 public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     //it's quite fast hash (to cheaply distinguish between objects)
@@ -28,11 +30,14 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </summary>
     protected override DataConnection CreateDataConnection()
     {
+		_logger.LogError(">>> Entering CreateDataConnection()");
         var dataContext = CreateDataConnection(LinqToDbDataProvider);
 
+		_logger.LogError("CreateDataConnection(): dataContext → {DataContext}", dataContext);
         dataContext.MappingSchema.SetDataType(typeof(Guid), new SqlDataType(DataType.NChar, typeof(Guid), 36));
         dataContext.MappingSchema.SetConvertExpression<string, Guid>(strGuid => new Guid(strGuid));
 
+		_logger.LogWarning("<<< Exiting CreateDataConnection()");
         return dataContext;
     }
 
@@ -42,6 +47,8 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>The connection string builder</returns>
     protected virtual MySqlConnectionStringBuilder GetConnectionStringBuilder()
     {
+		_logger.LogError(">>> Entering GetConnectionStringBuilder()");
+        _logger.LogWarning("<<< Exiting GetConnectionStringBuilder()");
         return new MySqlConnectionStringBuilder(DataSettings.ConnectionString);
     }
 
@@ -52,8 +59,10 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection to a database</returns>
     protected override DbConnection GetInternalDbConnection(string connectionString)
     {
+		_logger.LogError(">>> Entering GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
+		_logger.LogWarning("<<< Exiting GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         return new MySqlConnection(connectionString);
     }
 
@@ -67,20 +76,25 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <param name="triesToConnect"></param>
     public virtual void CreateDatabase(int triesToConnect = 10)
     {
+		_logger.LogError(">>> Entering CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
         if (DatabaseExists())
             return;
 
         var builder = GetConnectionStringBuilder();
+		_logger.LogError("CreateDatabase(triesToConnect={TriesToConnect}): builder → {Builder}", triesToConnect, builder);
 
         //gets database name
         var databaseName = builder.Database;
+		_logger.LogError("CreateDatabase(triesToConnect={TriesToConnect}): databaseName → {DatabaseName}", triesToConnect, databaseName);
 
         //now create connection string to 'master' database. It always exists.
         builder.Database = null;
+		_logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): builder.Database → {Arg1}", triesToConnect, builder.Database);
 
         using (var connection = GetInternalDbConnection(builder.ConnectionString))
         {
             var query = $"CREATE DATABASE IF NOT EXISTS {databaseName}";
+			_logger.LogError("CreateDatabase(triesToConnect={TriesToConnect}): query → {Query}", triesToConnect, query);
 
             if (!string.IsNullOrWhiteSpace(DataSettings.CharacterSet))
                 query = $"{query} CHARACTER SET {DataSettings.CharacterSet}";
@@ -89,9 +103,13 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
                 query = $"{query} COLLATE {DataSettings.Collation}";
 
             var command = connection.CreateCommand();
+			_logger.LogError("CreateDatabase(triesToConnect={TriesToConnect}): command → {Command}", triesToConnect, command);
             command.CommandText = query;
+			_logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): command.CommandText → {Arg1}", triesToConnect, command.CommandText);
             command.Connection.Open();
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogError("CreateDatabase(triesToConnect)={TriesToConnect}: database query executed in {Arg1} ms", triesToConnect, __logStart.ElapsedMilliseconds);
             command.ExecuteNonQuery();
         }
 
@@ -105,14 +123,17 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
         //that's why we are in a cycle of "triesToConnect" times trying to connect to a database with a delay of one second.
         for (var i = 0; i <= triesToConnect; i++)
         {
-            if (i == triesToConnect)
+				_logger.LogError("Throwing Exception from CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
+            if (i == triesToConnect) {
                 throw new Exception("Unable to connect to the new database. Please try one more time");
+            }
 
             if (!DatabaseExists())
                 Thread.Sleep(1000);
             else
                 break;
         }
+		_logger.LogWarning("<<< Exiting CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
     }
 
     /// <summary>
@@ -124,9 +145,11 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual async Task<bool> DatabaseExistsAsync()
     {
+		_logger.LogError(">>> Entering DatabaseExistsAsync()");
         try
         {
             await using var connection = GetInternalDbConnection(DataSettings.ConnectionString);
+			_logger.LogError("DatabaseExistsAsync(): connection → {Connection}", connection);
 
             //just try to connect
             await connection.OpenAsync();
@@ -135,6 +158,8 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
         }
         catch
         {
+			_logger.LogError("Exception in DatabaseExistsAsync(): {Arg0}", ex.Message);
+			_logger.LogWarning("<<< Exiting DatabaseExistsAsync()");
             return false;
         }
     }
@@ -145,9 +170,11 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns true if the database exists.</returns>
     public virtual bool DatabaseExists()
     {
+		_logger.LogError(">>> Entering DatabaseExists()");
         try
         {
             using var connection = CreateDbConnection();
+			_logger.LogError("DatabaseExists(): connection → {Connection}", connection);
             //just try to connect
             connection.Open();
 
@@ -155,6 +182,8 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
         }
         catch
         {
+			_logger.LogError("Exception in DatabaseExists(): {Arg0}", ex.Message);
+			_logger.LogWarning("<<< Exiting DatabaseExists()");
             return false;
         }
     }
@@ -169,13 +198,18 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual async Task<int?> GetTableIdentAsync<TEntity>() where TEntity : BaseEntity
     {
+		_logger.LogError(">>> Entering GetTableIdentAsync()");
         using var currentConnection = CreateDataConnection();
         var tableName = NopMappingSchema.GetEntityDescriptor(typeof(TEntity)).EntityName;
+		_logger.LogError("GetTableIdentAsync(): tableName → {TableName}", tableName);
         var databaseName = GetConnectionStringBuilder().Database;
+		_logger.LogError("GetTableIdentAsync(): databaseName → {DatabaseName}", databaseName);
+		_logger.LogError("GetTableIdentAsync(): currentConnection → {CurrentConnection}", currentConnection);
 
         //we're using the DbConnection object until linq2db solve this issue https://github.com/linq2db/linq2db/issues/1987
         //with DataContext we could be used KeepConnectionAlive option
         await using var dbConnection = GetInternalDbConnection(DataSettings.ConnectionString);
+		_logger.LogError("GetTableIdentAsync(): dbConnection → {DbConnection}", dbConnection);
 
         dbConnection.StateChange += (sender, e) =>
         {
@@ -185,7 +219,11 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
                     return;
 
                 var connection = (IDbConnection)sender;
+				_logger.LogError("GetTableIdentAsync(): connection → {Connection}", connection);
+				_logger.LogDebug("GetTableIdentAsync(): internalCommand.Connection → {Arg0}", internalCommand.Connection);
+				_logger.LogDebug("GetTableIdentAsync(): internalCommand.CommandText → {Arg0}", internalCommand.CommandText);
                 using var internalCommand = connection.CreateCommand();
+				_logger.LogError("GetTableIdentAsync(): internalCommand → {InternalCommand}", internalCommand);
                 internalCommand.Connection = connection;
                 internalCommand.CommandText = "SET @@SESSION.information_schema_stats_expiry = 0;";
                 internalCommand.ExecuteNonQuery();
@@ -193,15 +231,23 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
             //ignoring for older than 8.0 versions MySQL (#1193 Unknown system variable)
             catch (MySqlException ex) when (ex.Number == 1193)
             {
+				_logger.LogError("Exception in GetTableIdentAsync(): {Arg0}", ex.Message);
                 //ignore
             }
         };
 
+		_logger.LogWarning("<<< Exiting GetTableIdentAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await using var command = dbConnection.CreateCommand();
+		_logger.LogError("GetTableIdentAsync(): command → {Command}", command);
+		_logger.LogDebug("GetTableIdentAsync(): command.CommandText → {Arg0}", command.CommandText);
         command.Connection = dbConnection;
+		_logger.LogDebug("GetTableIdentAsync(): command.Connection → {Arg0}", command.Connection);
         command.CommandText = $"SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{databaseName}' AND TABLE_NAME = '{tableName}'";
+		_logger.LogError("GetTableIdentAsync(): TABLE_SCHEMA → {TABLE_SCHEMA}", TABLE_SCHEMA);
         await dbConnection.OpenAsync();
 
+		_logger.LogError("GetTableIdentAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         return Convert.ToInt32((await command.ExecuteScalarAsync()) ?? 1);
     }
 
@@ -213,12 +259,20 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetTableIdentAsync<TEntity>(int ident) where TEntity : BaseEntity
     {
+		_logger.LogError(">>> Entering SetTableIdentAsync(ident={Ident})", ident);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var currentIdent = await GetTableIdentAsync<TEntity>();
-        if (!currentIdent.HasValue || ident <= currentIdent.Value)
+			_logger.LogError("SetTableIdentAsync(ident={Ident}): currentIdent → {CurrentIdent}", ident, currentIdent);
+			_logger.LogWarning("<<< Exiting SetTableIdentAsync(ident={Ident})", ident);
+        if (!currentIdent.HasValue || ident <= currentIdent.Value) {
             return;
+        }
 
         using var currentConnection = CreateDataConnection();
+		_logger.LogError("SetTableIdentAsync(ident={Ident}): currentConnection → {CurrentConnection}", ident, currentConnection);
+		_logger.LogError("SetTableIdentAsync(ident)={Ident}: database query executed in {Arg1} ms", ident, __logStart.ElapsedMilliseconds);
         var tableName = NopMappingSchema.GetEntityDescriptor(typeof(TEntity)).EntityName;
+		_logger.LogError("SetTableIdentAsync(ident={Ident}): tableName → {TableName}", ident, tableName);
 
         await currentConnection.ExecuteAsync($"ALTER TABLE `{tableName}` AUTO_INCREMENT = {ident};");
     }
@@ -229,6 +283,9 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task BackupDatabaseAsync(string fileName)
     {
+		_logger.LogError(">>> Entering BackupDatabaseAsync(fileName={FileName})", fileName);
+		_logger.LogError("Throwing DataException from BackupDatabaseAsync(fileName={FileName})", fileName);
+    _logger.LogWarning("<<< Exiting BackupDatabaseAsync(fileName={FileName})", fileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -239,6 +296,9 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task RestoreDatabaseAsync(string backupFileName)
     {
+		_logger.LogError(">>> Entering RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
+		_logger.LogError("Throwing DataException from RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
+    _logger.LogWarning("<<< Exiting RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -248,11 +308,15 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ReIndexTablesAsync()
     {
+		_logger.LogError(">>> Entering ReIndexTablesAsync()");
         using var currentConnection = CreateDataConnection();
         var tables = currentConnection.Query<string>($"SHOW TABLES FROM `{GetConnectionStringBuilder().Database}`").ToList();
+		_logger.LogError("ReIndexTablesAsync(): tables → {Tables}", tables);
+		_logger.LogError("ReIndexTablesAsync(): currentConnection → {CurrentConnection}", currentConnection);
 
         if (tables.Count > 0)
             await currentConnection.ExecuteAsync($"OPTIMIZE TABLE `{string.Join("`, `", tables)}`");
+			_logger.LogWarning("<<< Exiting ReIndexTablesAsync()");
     }
 
     /// <summary>
@@ -261,6 +325,9 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task ShrinkDatabaseAsync()
     {
+		_logger.LogError(">>> Entering ShrinkDatabaseAsync()");
+		_logger.LogError("Throwing DataException from ShrinkDatabaseAsync()");
+    _logger.LogWarning("<<< Exiting ShrinkDatabaseAsync()");
         throw new DataException("This database provider does not support database shrinking.  Instead, use Re-index operation to optimize database space. Optimization is only available when the 'innodb_file_per_table' setting is enabled");
     }
 
@@ -271,10 +338,13 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection string</returns>
     public virtual string BuildConnectionString(INopConnectionStringInfo nopConnectionString)
     {
+		_logger.LogError(">>> Entering BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         ArgumentNullException.ThrowIfNull(nopConnectionString);
 
-        if (nopConnectionString.IntegratedSecurity)
+			_logger.LogError("Throwing NopException from BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
+        if (nopConnectionString.IntegratedSecurity) {
             throw new NopException("Data provider supports connection only with login and password");
+        }
 
         var builder = new MySqlConnectionStringBuilder
         {
@@ -287,6 +357,7 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
             UseXaTransactions = false
         };
 
+		_logger.LogWarning("<<< Exiting BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         return builder.ConnectionString;
     }
 
@@ -300,9 +371,11 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of a foreign key</returns>
     public virtual string CreateForeignKeyName(string foreignTable, string foreignColumn, string primaryTable, string primaryColumn)
     {
+		_logger.LogError(">>> Entering CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
         //mySql support only 64 chars for constraint name
         //that is why we use hash function for create unique name
         //see details on this topic: https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
+		_logger.LogWarning("<<< Exiting CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
         return "FK_" + HashHelper.CreateHash(Encoding.UTF8.GetBytes($"{foreignTable}_{foreignColumn}_{primaryTable}_{primaryColumn}"), HASH_ALGORITHM);
     }
 
@@ -314,6 +387,8 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of an index</returns>
     public virtual string GetIndexName(string targetTable, string targetColumn)
     {
+		_logger.LogError(">>> Entering GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
+        _logger.LogWarning("<<< Exiting GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
         return "IX_" + HashHelper.CreateHash(Encoding.UTF8.GetBytes($"{targetTable}_{targetColumn}"), HASH_ALGORITHM);
     }
 
@@ -326,8 +401,10 @@ public partial class MySqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual Task<string> GetDataBaseCollationAsync()
     {
+		_logger.LogError(">>> Entering GetDataBaseCollationAsync()");
         var connectionBuilder = GetConnectionStringBuilder();
 
+		_logger.LogError("GetDataBaseCollationAsync(): connectionBuilder → {ConnectionBuilder}", connectionBuilder);
         return GetSqlStringValueAsync($"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '{connectionBuilder.Database}';");
     }
 

@@ -3,22 +3,29 @@ using FluentMigrator.SqlServer;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Topics;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo490;
 
 [NopSchemaMigration("2025-01-28 00:00:01", "AddIndexesMigration for 4.90.0")]
 public class AddIndexesMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Collect the UP migration expressions
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         //#7296
         var topicTableName = nameof(Topic);
+		_logger.LogError("Up(): topicTableName → {TopicTableName}", topicTableName);
         var topicEndDateColumnName = nameof(Topic.AvailableEndDateTimeUtc);
+		_logger.LogError("Up(): topicEndDateColumnName → {TopicEndDateColumnName}", topicEndDateColumnName);
         var topicStartDateColumnName = nameof(Topic.AvailableStartDateTimeUtc);
+		_logger.LogError("Up(): topicStartDateColumnName → {TopicStartDateColumnName}", topicStartDateColumnName);
         var topicAvailableDatesIndexName = "IX_Topic_Availability";
+		_logger.LogError("Up(): topicAvailableDatesIndexName → {TopicAvailableDatesIndexName}", topicAvailableDatesIndexName);
         if (!Schema.Table(topicTableName).Index(topicAvailableDatesIndexName).Exists())
             Create.Index(topicAvailableDatesIndexName)
                 .OnTable(topicTableName)
@@ -30,12 +37,19 @@ public class AddIndexesMigration : ForwardOnlyMigration
         const string databaseType = "sqlserver";
 
         var productTableName = nameof(Product);
+		_logger.LogError("Up(): productTableName → {ProductTableName}", productTableName);
         var nameColumnName = nameof(Product.Name);
+		_logger.LogError("Up(): nameColumnName → {NameColumnName}", nameColumnName);
         var skuColumnName = nameof(Product.Sku);
+		_logger.LogError("Up(): skuColumnName → {SkuColumnName}", skuColumnName);
         var manufacturerPartNumberColumnName = nameof(Product.ManufacturerPartNumber);
+		_logger.LogError("Up(): manufacturerPartNumberColumnName → {ManufacturerPartNumberColumnName}", manufacturerPartNumberColumnName);
         var idColumnName = nameof(Product.Id);
+		_logger.LogError("Up(): idColumnName → {IdColumnName}", idColumnName);
         var deletedColumnName = nameof(Product.Deleted);
+		_logger.LogError("Up(): deletedColumnName → {DeletedColumnName}", deletedColumnName);
         var productSearchIndexName = "IX_Product_Search";
+		_logger.LogError("Up(): productSearchIndexName → {ProductSearchIndexName}", productSearchIndexName);
         if (!Schema.Table(productTableName).Index(productSearchIndexName).Exists())
             IfDatabase(databaseType).Create.Index(productSearchIndexName)
                 .OnTable(productTableName)
@@ -47,9 +61,12 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .Include(idColumnName);
 
         var productAttributeCombinationTableName = nameof(ProductAttributeCombination);
+		_logger.LogError("Up(): productAttributeCombinationTableName → {ProductAttributeCombinationTableName}", productAttributeCombinationTableName);
         skuColumnName = nameof(ProductAttributeCombination.Sku);
         var productIdColumnName = nameof(ProductAttributeCombination.ProductId);
+		_logger.LogError("Up(): productIdColumnName → {ProductIdColumnName}", productIdColumnName);
         var productAttributeCombinationSkuIndexName = "IX_ProductAttributeCombination_Sku";
+		_logger.LogError("Up(): productAttributeCombinationSkuIndexName → {ProductAttributeCombinationSkuIndexName}", productAttributeCombinationSkuIndexName);
         if (!Schema.Table(productAttributeCombinationTableName).Index(productAttributeCombinationSkuIndexName).Exists())
             Create.Index(productAttributeCombinationSkuIndexName)
                 .OnTable(productAttributeCombinationTableName)
@@ -58,10 +75,12 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .Include(productIdColumnName);
 
         var categoryTableName = nameof(Category);
+		_logger.LogError("Up(): categoryTableName → {CategoryTableName}", categoryTableName);
         nameColumnName = nameof(Category.Name);
         deletedColumnName = nameof(Category.Deleted);
         idColumnName = nameof(Category.Id);
         var categoryNameDeletedIndexName = "IX_Category_Name_Deleted";
+		_logger.LogError("Up(): categoryNameDeletedIndexName → {CategoryNameDeletedIndexName}", categoryNameDeletedIndexName);
         if (!Schema.Table(categoryTableName).Index(categoryNameDeletedIndexName).Exists())
             Create.Index(categoryNameDeletedIndexName)
                 .OnTable(categoryTableName)
@@ -71,10 +90,12 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .Include(idColumnName);
 
         var manufacturerTableName = nameof(Manufacturer);
+		_logger.LogError("Up(): manufacturerTableName → {ManufacturerTableName}", manufacturerTableName);
         nameColumnName = nameof(Manufacturer.Name);
         deletedColumnName = nameof(Manufacturer.Deleted);
         idColumnName = nameof(Manufacturer.Id);
         var manufacturerNameDeletedIndexName = "IX_Manufacturer_Name_Deleted";
+		_logger.LogError("Up(): manufacturerNameDeletedIndexName → {ManufacturerNameDeletedIndexName}", manufacturerNameDeletedIndexName);
         if (!Schema.Table(manufacturerTableName).Index(manufacturerNameDeletedIndexName).Exists())
             Create.Index(manufacturerNameDeletedIndexName)
                 .OnTable(manufacturerTableName)
@@ -84,9 +105,12 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .Include(idColumnName);
 
         var productCategoryTableName = NameCompatibilityManager.GetTableName(typeof(ProductCategory));
+		_logger.LogError("Up(): productCategoryTableName → {ProductCategoryTableName}", productCategoryTableName);
         var categoryIdColumnName = nameof(ProductCategory.CategoryId);
+		_logger.LogError("Up(): categoryIdColumnName → {CategoryIdColumnName}", categoryIdColumnName);
         productIdColumnName = nameof(ProductCategory.ProductId);
         var productCategoryMappingIndexName = "IX_ProductCategoryMapping_CategoryId";
+		_logger.LogError("Up(): productCategoryMappingIndexName → {ProductCategoryMappingIndexName}", productCategoryMappingIndexName);
         if (!Schema.Table(productCategoryTableName).Index(productCategoryMappingIndexName).Exists())
             Create.Index(productCategoryMappingIndexName)
                 .OnTable(productCategoryTableName)
@@ -95,14 +119,18 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .Include(productIdColumnName);
 
         var productManufacturerTableName = NameCompatibilityManager.GetTableName(typeof(ProductManufacturer));
+		_logger.LogError("Up(): productManufacturerTableName → {ProductManufacturerTableName}", productManufacturerTableName);
         var manufacturerIdColumnName = nameof(ProductManufacturer.ManufacturerId);
+		_logger.LogError("Up(): manufacturerIdColumnName → {ManufacturerIdColumnName}", manufacturerIdColumnName);
         productIdColumnName = nameof(ProductManufacturer.ProductId);
         var productManufacturerMappingIndexName = "IX_ProductManufacturerMapping_ManufacturerId";
+		_logger.LogError("Up(): productManufacturerMappingIndexName → {ProductManufacturerMappingIndexName}", productManufacturerMappingIndexName);
         if (!Schema.Table(productManufacturerTableName).Index(productManufacturerMappingIndexName).Exists())
             Create.Index(productManufacturerMappingIndexName)
                 .OnTable(productManufacturerTableName)
                 .OnColumn(manufacturerIdColumnName).Ascending()
                 .WithOptions().NonClustered()
                 .Include(productIdColumnName);
+				_logger.LogWarning("<<< Exiting Up()");
     }
 }

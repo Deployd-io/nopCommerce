@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-editor", Attributes = FOR_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopEditorTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -32,7 +34,10 @@ public partial class NopEditorTagHelper : TagHelper
 
     public NopEditorTagHelper(IHtmlHelper htmlHelper)
     {
+		_logger.LogError(">>> Entering NopEditorTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("NopEditorTagHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
+    _logger.LogWarning("<<< Exiting NopEditorTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
     }
 
     #endregion
@@ -47,6 +52,7 @@ public partial class NopEditorTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -56,9 +62,11 @@ public partial class NopEditorTagHelper : TagHelper
 
         //container for additional attributes
         var htmlAttributes = new Dictionary<string, object>();
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): htmlAttributes → {HtmlAttributes}", context, output, htmlAttributes);
 
         //set custom html attributes
         var htmlAttributesDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(CustomHtmlAttributes);
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): htmlAttributesDictionary → {HtmlAttributesDictionary}", context, output, htmlAttributesDictionary);
         if (htmlAttributesDictionary?.Count > 0)
         {
             foreach (var (key, value) in htmlAttributesDictionary)
@@ -80,21 +88,26 @@ public partial class NopEditorTagHelper : TagHelper
 
         //add form-control class
         _ = bool.TryParse(RenderFormControlClass, out var renderFormControlClass);
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): _ → {_}", context, output, _);
         if (string.IsNullOrEmpty(RenderFormControlClass) && For.Metadata.ModelType.Name.Equals("String") || renderFormControlClass)
             htmlAttributes.Add("class", "form-control");
 
         //generate editor
         var pattern = @"(?=\[\w+\]\.)";
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): pattern → {Pattern}", context, output, pattern);
         if (!_htmlHelper.ViewData.ContainsKey(For.Name) && Regex.IsMatch(For.Name, pattern))
         {
             var prefix = _htmlHelper.ViewData.TemplateInfo.HtmlFieldPrefix;
             var key = string.IsNullOrEmpty(prefix) ? For.Name : $"{prefix}.{For.Name}";
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): key → {Key}", context, output, key);
             _htmlHelper.ViewData.Add(key, For.Model);
         }
 
         var htmlOutput = _htmlHelper.Editor(For.Name, Template, new { htmlAttributes, postfix = Postfix });
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): htmlOutput → {HtmlOutput}", context, output, htmlOutput);
         output.Content.SetHtmlContent(htmlOutput);
 
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

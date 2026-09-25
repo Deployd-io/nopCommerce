@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Tax;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Tax;
 /// </summary>
 public partial class CheckVatService : ICheckVatService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IHttpClientFactory _httpClientFactory;
@@ -21,8 +23,11 @@ public partial class CheckVatService : ICheckVatService
 
     public CheckVatService(IHttpClientFactory httpClientFactory, TaxSettings taxSettings)
     {
+		_logger.LogError(">>> Entering CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings})", httpClientFactory, taxSettings);
         _httpClientFactory = httpClientFactory;
         _taxSettings = taxSettings;
+		_logger.LogDebug("CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings}): _httpClientFactory → {_httpClientFactory}", httpClientFactory, taxSettings, _httpClientFactory);
+    _logger.LogWarning("<<< Exiting CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings})", httpClientFactory, taxSettings);
     }
 
     #endregion
@@ -38,10 +43,13 @@ public partial class CheckVatService : ICheckVatService
     /// </returns>
     protected virtual async Task<string> GetHmrcAccessTokenAsync()
     {
+		_logger.LogError(">>> Entering GetHmrcAccessTokenAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(_taxSettings.HmrcClientId) || string.IsNullOrEmpty(_taxSettings.HmrcClientSecret))
             return null;
 
         var client = _httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient);
+		_logger.LogError("GetHmrcAccessTokenAsync(): client → {Client}", client);
         client.BaseAddress = new Uri(_taxSettings.HmrcApiUrl);
 
         var data = new FormUrlEncodedContent(new[]
@@ -53,10 +61,13 @@ public partial class CheckVatService : ICheckVatService
         });
 
         var response = await client.PostAsync(NopTaxDefaults.HmrcOauthTokenUrl, data);
+		_logger.LogError("GetHmrcAccessTokenAsync(): response → {Response}", response);
 
         if (!response.IsSuccessStatusCode)
             return null;
 
+		_logger.LogError("GetHmrcAccessTokenAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetHmrcAccessTokenAsync()");
         return JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(),
             new
             {

@@ -1,15 +1,21 @@
-﻿namespace Nop.Plugin.Widgets.FacebookPixel.Models;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Plugin.Widgets.FacebookPixel.Models;
 
 /// <summary>
 /// Represents a configuration model
 /// </summary>
 public class ConfigurationModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogError(">>> Entering ConfigurationModel()");
         FacebookPixelSearchModel = new FacebookPixelSearchModel();
+		_logger.LogDebug("ConfigurationModel(): FacebookPixelSearchModel → {FacebookPixelSearchModel}", FacebookPixelSearchModel);
+    _logger.LogError("ConfigurationModel(): FacebookPixelSearchModel → {FacebookPixelSearchModel}", FacebookPixelSearchModel);
+    _logger.LogWarning("<<< Exiting ConfigurationModel()");
     }
 
     #endregion

@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class MeasureController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -38,13 +40,20 @@ public partial class MeasureController : BaseAdminController
         ISettingService settingService,
         MeasureSettings measureSettings)
     {
+		_logger.LogError(">>> Entering MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings})", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings);
         _customerActivityService = customerActivityService;
         _localizationService = localizationService;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _localizationService → {_localizationService}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _localizationService);
         _measureModelFactory = measureModelFactory;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _measureModelFactory → {_measureModelFactory}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _measureModelFactory);
         _measureService = measureService;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _measureService → {_measureService}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _measureService);
         _permissionService = permissionService;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _permissionService → {_permissionService}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _settingService → {_settingService}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _settingService);
         _measureSettings = measureSettings;
+		_logger.LogDebug("MeasureController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},measureModelFactory={MeasureModelFactory},measureService={MeasureService},permissionService={PermissionService},settingService={SettingService},measureSettings={MeasureSettings}): _measureSettings → {_measureSettings}", customerActivityService, localizationService, measureModelFactory, measureService, permissionService, settingService, measureSettings, _measureSettings);
     }
 
     #endregion
@@ -54,9 +63,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureSearchModelAsync(new MeasureSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
         return View(model);
     }
 
@@ -66,9 +78,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Weights(MeasureWeightSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering Weights(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureWeightListModelAsync(searchModel);
+		_logger.LogError("Weights(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting Weights(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -76,17 +91,20 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> WeightUpdate(MeasureWeightModel model)
     {
+		_logger.LogError(">>> Entering WeightUpdate(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         var weight = await _measureService.GetMeasureWeightByIdAsync(model.Id);
         weight = model.ToEntity(weight);
+		_logger.LogError("WeightUpdate(model={Model}): weight → {Weight}", model, weight);
         await _measureService.UpdateMeasureWeightAsync(weight);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("EditMeasureWeight",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.EditMeasureWeight"), weight.Id), weight);
 
+		_logger.LogWarning("<<< Exiting WeightUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -94,17 +112,20 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> WeightAdd(MeasureWeightModel model)
     {
+		_logger.LogError(">>> Entering WeightAdd(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         var weight = new MeasureWeight();
         weight = model.ToEntity(weight);
+		_logger.LogError("WeightAdd(model={Model}): weight → {Weight}", model, weight);
         await _measureService.InsertMeasureWeightAsync(weight);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("AddNewMeasureWeight",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewMeasureWeight"), weight.Id), weight);
 
+		_logger.LogWarning("<<< Exiting WeightAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -112,6 +133,7 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> WeightDelete(int id)
     {
+		_logger.LogError(">>> Entering WeightDelete(id={Id})", id);
         //try to get a weight with the specified id
         var weight = await _measureService.GetMeasureWeightByIdAsync(id)
             ?? throw new ArgumentException("No weight found with the specified id", nameof(id));
@@ -127,6 +149,7 @@ public partial class MeasureController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMeasureWeight",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMeasureWeight"), weight.Id), weight);
 
+		_logger.LogWarning("<<< Exiting WeightDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -134,13 +157,16 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryWeight(int id)
     {
+		_logger.LogError(">>> Entering MarkAsPrimaryWeight(id={Id})", id);
         //try to get a weight with the specified id
         var weight = await _measureService.GetMeasureWeightByIdAsync(id)
             ?? throw new ArgumentException("No weight found with the specified id", nameof(id));
 
         _measureSettings.BaseWeightId = weight.Id;
+		_logger.LogDebug("MarkAsPrimaryWeight(id={Id}): _measureSettings.BaseWeightId → {Arg1}", id, _measureSettings.BaseWeightId);
         await _settingService.SaveSettingAsync(_measureSettings);
 
+		_logger.LogWarning("<<< Exiting MarkAsPrimaryWeight(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -152,9 +178,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Dimensions(MeasureDimensionSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering Dimensions(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureDimensionListModelAsync(searchModel);
+		_logger.LogError("Dimensions(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting Dimensions(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -162,17 +191,20 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DimensionUpdate(MeasureDimensionModel model)
     {
+		_logger.LogError(">>> Entering DimensionUpdate(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         var dimension = await _measureService.GetMeasureDimensionByIdAsync(model.Id);
         dimension = model.ToEntity(dimension);
+		_logger.LogError("DimensionUpdate(model={Model}): dimension → {Dimension}", model, dimension);
         await _measureService.UpdateMeasureDimensionAsync(dimension);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("EditMeasureDimension",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.EditMeasureDimension"), dimension.Id), dimension);
 
+		_logger.LogWarning("<<< Exiting DimensionUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -180,17 +212,20 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DimensionAdd(MeasureDimensionModel model)
     {
+		_logger.LogError(">>> Entering DimensionAdd(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         var dimension = new MeasureDimension();
         dimension = model.ToEntity(dimension);
+		_logger.LogError("DimensionAdd(model={Model}): dimension → {Dimension}", model, dimension);
         await _measureService.InsertMeasureDimensionAsync(dimension);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("AddNewMeasureDimension",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewMeasureDimension"), dimension.Id), dimension);
 
+		_logger.LogWarning("<<< Exiting DimensionAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -198,6 +233,7 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DimensionDelete(int id)
     {
+		_logger.LogError(">>> Entering DimensionDelete(id={Id})", id);
         //try to get a dimension with the specified id
         var dimension = await _measureService.GetMeasureDimensionByIdAsync(id)
             ?? throw new ArgumentException("No dimension found with the specified id", nameof(id));
@@ -213,6 +249,7 @@ public partial class MeasureController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMeasureDimension",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMeasureDimension"), dimension.Id), dimension);
 
+		_logger.LogWarning("<<< Exiting DimensionDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -220,13 +257,16 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryDimension(int id)
     {
+		_logger.LogError(">>> Entering MarkAsPrimaryDimension(id={Id})", id);
         //try to get a dimension with the specified id
         var dimension = await _measureService.GetMeasureDimensionByIdAsync(id)
             ?? throw new ArgumentException("No dimension found with the specified id", nameof(id));
 
         _measureSettings.BaseDimensionId = dimension.Id;
+		_logger.LogDebug("MarkAsPrimaryDimension(id={Id}): _measureSettings.BaseDimensionId → {Arg1}", id, _measureSettings.BaseDimensionId);
         await _settingService.SaveSettingAsync(_measureSettings);
 
+		_logger.LogWarning("<<< Exiting MarkAsPrimaryDimension(id={Id})", id);
         return Json(new { result = true });
     }
 

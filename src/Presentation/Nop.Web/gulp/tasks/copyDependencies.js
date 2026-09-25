@@ -3,6 +3,7 @@ import filter from 'gulp-filter';
 import { readFileSync } from 'fs';
 import merge from 'merge2';
 import rename from 'gulp-rename';
+const logger = console;
 
 const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf-8')); 
 const nodeModules = './node_modules/';
@@ -10,6 +11,8 @@ const targetPath = './wwwroot/lib_npm/';
 
 export default function copyDependencies()
 {
+logger.error('>>> Entering copyDependencies()');
+logger.warn('<<< Exiting copyDependencies()');
   return merge(
     [
     //common dependencies

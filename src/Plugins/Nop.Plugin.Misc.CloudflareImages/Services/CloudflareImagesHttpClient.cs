@@ -2,6 +2,7 @@
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.CloudflareImages.Services;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Misc.CloudflareImages.Services;
 /// </summary>
 public class CloudflareImagesHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly CloudflareImagesSettings _cloudflareImagesSettings;
@@ -21,9 +23,14 @@ public class CloudflareImagesHttpClient
 
     public CloudflareImagesHttpClient(CloudflareImagesSettings cloudflareImagesSettings, HttpClient httpClient)
     {
+		_logger.LogError(">>> Entering CloudflareImagesHttpClient(cloudflareImagesSettings={CloudflareImagesSettings},httpClient={HttpClient})", cloudflareImagesSettings, httpClient);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _cloudflareImagesSettings = cloudflareImagesSettings;
         httpClient.Timeout = TimeSpan.FromSeconds(_cloudflareImagesSettings.RequestTimeout ?? CloudflareImagesDefaults.RequestTimeout);
+		_logger.LogDebug("CloudflareImagesHttpClient(cloudflareImagesSettings={CloudflareImagesSettings},httpClient={HttpClient}): _cloudflareImagesSettings → {_cloudflareImagesSettings}", cloudflareImagesSettings, httpClient, _cloudflareImagesSettings);
         _httpClient = httpClient;
+		_logger.LogError("CloudflareImagesHttpClient(cloudflareImagesSettings,httpClient)={CloudflareImagesSettings},{HttpClient}: external service call took {Arg2} ms", cloudflareImagesSettings, httpClient, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting CloudflareImagesHttpClient(cloudflareImagesSettings={CloudflareImagesSettings},httpClient={HttpClient})", cloudflareImagesSettings, httpClient);
     }
 
     #endregion
@@ -39,9 +46,12 @@ public class CloudflareImagesHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     private async Task<string> RequestAsync(string apiUri = "", HttpContent data = null, HttpMethod httpMethod = null)
     {
+		_logger.LogError(">>> Entering RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         httpMethod ??= HttpMethod.Get;
 
         var requestUri = new Uri(string.Format(CloudflareImagesDefaults.BaseApiUrl, _cloudflareImagesSettings.AccountId, apiUri));
+		_logger.LogError("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): requestUri → {RequestUri}", apiUri, data, httpMethod, requestUri);
 
         var request = new HttpRequestMessage
         {
@@ -53,16 +63,23 @@ public class CloudflareImagesHttpClient
 
         if (httpMethod == HttpMethod.Post)
             request.Content = data;
+			_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): request.Content → {Arg3}", apiUri, data, httpMethod, request.Content);
 
         var httpResponse = await _httpClient.SendAsync(request);
+		_logger.LogError("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): httpResponse → {HttpResponse}", apiUri, data, httpMethod, httpResponse);
         var response = await httpResponse.Content.ReadAsStringAsync();
+		_logger.LogError("RequestAsync(apiUri,data,httpMethod)={ApiUri},{Data},{HttpMethod}: external service call {ApiUri1} took {Arg4} ms", apiUri, data, httpMethod, apiUri, __logStart.ElapsedMilliseconds);
+		_logger.LogError("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): response → {Response}", apiUri, data, httpMethod, response);
 
         if (httpResponse.StatusCode == HttpStatusCode.OK)
             return response;
 
-        if (!string.IsNullOrEmpty(response))
+			_logger.LogError("Throwing NopException from RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
+        if (!string.IsNullOrEmpty(response)) {
             throw new NopException(response);
+        }
 
+		_logger.LogWarning("<<< Exiting RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
         throw new NopException($"{CloudflareImagesDefaults.SystemName} unknown error.");
     }
 
@@ -80,13 +97,17 @@ public class CloudflareImagesHttpClient
     /// </returns>
     public async Task<CloudflareImagesResponse> SaveThumbAsync(MultipartFormDataContent dataContent)
     {
+		_logger.LogError(">>> Entering SaveThumbAsync(dataContent={DataContent})", dataContent);
         try
         {
             var result = await RequestAsync(string.Empty, dataContent, HttpMethod.Post);
+			_logger.LogError("SaveThumbAsync(dataContent={DataContent}): result → {Result}", dataContent, result);
             return JsonConvert.DeserializeObject<CloudflareImagesResponse>(result);
         }
         catch
         {
+			_logger.LogError("Exception in SaveThumbAsync(dataContent={DataContent}): {Arg1}", dataContent, ex.Message);
+			_logger.LogWarning("<<< Exiting SaveThumbAsync(dataContent={DataContent})", dataContent);
             return null;
         }
     }
@@ -98,14 +119,17 @@ public class CloudflareImagesHttpClient
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteThumbAsync(string imageId)
     {
+		_logger.LogError(">>> Entering DeleteThumbAsync(imageId={ImageId})", imageId);
         try
         {
             await RequestAsync($"/{imageId}", null, HttpMethod.Delete);
         }
         catch
         {
+			_logger.LogError("Exception in DeleteThumbAsync(imageId={ImageId}): {Arg1}", imageId, ex.Message);
             // ignored
         }
+		_logger.LogWarning("<<< Exiting DeleteThumbAsync(imageId={ImageId})", imageId);
     }
 
     #endregion

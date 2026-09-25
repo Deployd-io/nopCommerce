@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Domain.Shipping;
 
@@ -10,6 +11,7 @@ namespace Nop.Core.Domain.Shipping;
 /// </summary>
 public partial class ShippingOptionListTypeConverter : TypeConverter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Gets a value indicating whether this converter can        
     /// convert an object in the given source type to the native type of the converter
@@ -20,11 +22,13 @@ public partial class ShippingOptionListTypeConverter : TypeConverter
     /// <returns>Result</returns>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
+		_logger.LogError(">>> Entering CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         if (sourceType == typeof(string))
         {
             return true;
         }
 
+		_logger.LogWarning("<<< Exiting CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         return base.CanConvertFrom(context, sourceType);
     }
 
@@ -71,6 +75,7 @@ public partial class ShippingOptionListTypeConverter : TypeConverter
     /// <returns>Result</returns>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
+		_logger.LogError(">>> Entering ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         if (destinationType != typeof(string))
             return base.ConvertTo(context, culture, value, destinationType);
 
@@ -78,10 +83,15 @@ public partial class ShippingOptionListTypeConverter : TypeConverter
             return string.Empty;
 
         var sb = new StringBuilder();
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): sb → {Sb}", context, culture, value, destinationType, sb);
         using var tw = new StringWriter(sb);
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): tw → {Tw}", context, culture, value, destinationType, tw);
         var xmlS = new XmlSerializer(typeof(List<ShippingOption>));
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): xmlS → {XmlS}", context, culture, value, destinationType, xmlS);
         xmlS.Serialize(tw, value);
         var serialized = sb.ToString();
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): serialized → {Serialized}", context, culture, value, destinationType, serialized);
+		_logger.LogWarning("<<< Exiting ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         return serialized;
     }
 }

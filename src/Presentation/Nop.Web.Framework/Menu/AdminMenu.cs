@@ -9,6 +9,7 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Services.Security;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Menu;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Framework.Menu;
 /// </summary>
 public partial class AdminMenu : IAdminMenu
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected AdminMenuItem _baseRootMenuItem;
@@ -51,13 +53,22 @@ public partial class AdminMenu : IAdminMenu
         IUrlHelperFactory urlHelperFactory,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext})", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext);
         _filterLevelSettings = filterLevelSettings;
         _actionContextAccessor = actionContextAccessor;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _actionContextAccessor → {_actionContextAccessor}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _actionContextAccessor);
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _filterLevelSettings → {_filterLevelSettings}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _filterLevelSettings);
+    _logger.LogWarning("<<< Exiting AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext})", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _eventPublisher → {_eventPublisher}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _eventPublisher);
         _localizationService = localizationService;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _localizationService → {_localizationService}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _permissionService → {_permissionService}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _permissionService);
         _adminMenuPluginManager = adminMenuPluginManager;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _adminMenuPluginManager → {_adminMenuPluginManager}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _adminMenuPluginManager);
         _urlHelperFactory = urlHelperFactory;
+		_logger.LogDebug("AdminMenu(filterLevelSettings={FilterLevelSettings},actionContextAccessor={ActionContextAccessor},eventPublisher={EventPublisher},localizationService={LocalizationService},permissionService={PermissionService},adminMenuPluginManager={AdminMenuPluginManager},urlHelperFactory={UrlHelperFactory},workContext={WorkContext}): _urlHelperFactory → {_urlHelperFactory}", filterLevelSettings, actionContextAccessor, eventPublisher, localizationService, permissionService, adminMenuPluginManager, urlHelperFactory, workContext, _urlHelperFactory);
         _workContext = workContext;
     }
 
@@ -71,6 +82,7 @@ public partial class AdminMenu : IAdminMenu
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task FillBaseRootAsync()
     {
+		_logger.LogError(">>> Entering FillBaseRootAsync()");
         if (_baseRootMenuItem != null)
             return;
 
@@ -1041,6 +1053,7 @@ public partial class AdminMenu : IAdminMenu
                 }
             }
         };
+		_logger.LogWarning("<<< Exiting FillBaseRootAsync()");
     }
 
     /// <summary>
@@ -1053,6 +1066,7 @@ public partial class AdminMenu : IAdminMenu
     /// </returns>
     protected virtual async Task<AdminMenuItem> LoadMenuAsync(bool showHidden)
     {
+		_logger.LogError(">>> Entering LoadMenuAsync(showHidden={ShowHidden})", showHidden);
         await FillBaseRootAsync();
 
         AdminMenuItem cloneMenuItem(AdminMenuItem item)
@@ -1071,8 +1085,10 @@ public partial class AdminMenu : IAdminMenu
         }
 
         var root = cloneMenuItem(_baseRootMenuItem);
+		_logger.LogError("LoadMenuAsync(showHidden={ShowHidden}): root → {Root}", showHidden, root);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("LoadMenuAsync(showHidden={ShowHidden}): customer → {Customer}", showHidden, customer);
 
         await _eventPublisher.PublishAsync(new AdminMenuCreatedEvent(this, root));
 
@@ -1081,25 +1097,35 @@ public partial class AdminMenu : IAdminMenu
             await _eventPublisher.PublishAsync(new ThirdPartyPluginsMenuItemCreatedEvent(this, root.GetItemBySystemName("Third party plugins")));
 
             var adminMenuPlugins = await _adminMenuPluginManager.LoadAllPluginsAsync(customer);
+			_logger.LogError("LoadMenuAsync(showHidden={ShowHidden}): adminMenuPlugins → {AdminMenuPlugins}", showHidden, adminMenuPlugins);
 
             foreach (var adminMenuPlugin in adminMenuPlugins)
                 await adminMenuPlugin.ManageSiteMapAsync(root);
         }
 
-        async ValueTask<bool> authorizePermission(string permissionName) => await _permissionService.AuthorizeAsync(permissionName.Trim());
+        async ValueTask<bool> authorizePermission(string permissionName)
+        {
+            _logger.LogError(">>> Entering authorizePermission(permissionName={PermissionName})", permissionName);
+            _logger.LogWarning("<<< Exiting authorizePermission(permissionName={PermissionName})", permissionName);
+            return await _permissionService.AuthorizeAsync(permissionName.Trim());
+        }
 
         async Task checkPermissions(AdminMenuItem menuItem, AdminMenuItem rootItem = null)
         {
+			_logger.LogError(">>> Entering checkPermissions(menuItem={MenuItem},rootItem={RootItem})", menuItem, rootItem);
             if (menuItem.Visible)
             {
                 var permissions = (menuItem.PermissionNames.Any() ? menuItem.PermissionNames : (rootItem?.PermissionNames ?? new List<string>())).Distinct().Where(p => !string.IsNullOrEmpty(p)).ToList();
+				_logger.LogError("LoadMenuAsync(showHidden={ShowHidden}): permissions → {Permissions}", showHidden, permissions);
 
+				_logger.LogError("checkPermissions(menuItem={MenuItem},rootItem={RootItem}): permissions → {Permissions}", menuItem, rootItem, permissions);
                 if (permissions.Any())
                     menuItem.Visible = menuItem.ChildNodes.Any() ? await permissions.AnyAwaitAsync(authorizePermission) : await permissions.AllAwaitAsync(authorizePermission);
             }
 
             foreach (var childNode in menuItem.ChildNodes)
                 await checkPermissions(childNode, menuItem);
+				_logger.LogWarning("<<< Exiting checkPermissions(menuItem={MenuItem},rootItem={RootItem})", menuItem, rootItem);
         }
 
         await checkPermissions(root);
@@ -1124,6 +1150,7 @@ public partial class AdminMenu : IAdminMenu
 
         checkVisible(root);
 
+		_logger.LogWarning("<<< Exiting LoadMenuAsync(showHidden={ShowHidden})", showHidden);
         return root;
     }
 
@@ -1141,12 +1168,16 @@ public partial class AdminMenu : IAdminMenu
     /// </returns>
     public virtual async Task<AdminMenuItem> GetRootNodeAsync(bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetRootNodeAsync(showHidden={ShowHidden})", showHidden);
         if (_rootItem != null)
             return _rootItem;
 
         _rootItem = await LoadMenuAsync(showHidden);
+		_logger.LogError("GetRootNodeAsync(showHidden={ShowHidden}): _rootItem → {_rootItem}", showHidden, _rootItem);
+		_logger.LogDebug("GetRootNodeAsync(showHidden={ShowHidden}): _rootItem → {_rootItem}", showHidden, _rootItem);
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext ?? throw new ArgumentNullException(nameof(_actionContextAccessor.ActionContext)));
+		_logger.LogError("GetRootNodeAsync(showHidden={ShowHidden}): urlHelper → {UrlHelper}", showHidden, urlHelper);
 
         void transformUrl(AdminMenuItem node)
         {
@@ -1170,11 +1201,14 @@ public partial class AdminMenu : IAdminMenu
     /// <returns>Menu item URL</returns>
     public virtual string GetMenuItemUrl(string controllerName, string actionName)
     {
+		_logger.LogError(">>> Entering GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName})", controllerName, actionName);
         if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(actionName))
             return null;
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext ?? throw new ArgumentNullException(nameof(_actionContextAccessor.ActionContext)));
+		_logger.LogError("GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName}): urlHelper → {UrlHelper}", controllerName, actionName, urlHelper);
 
+		_logger.LogWarning("<<< Exiting GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName})", controllerName, actionName);
         return urlHelper.Action(actionName, controllerName, new RouteValueDictionary { { "area", AreaNames.ADMIN } }, null, null);
     }
 

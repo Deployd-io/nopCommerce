@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core;
 
@@ -10,6 +11,7 @@ namespace Nop.Core;
 /// </summary>
 public partial class XmlHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -22,10 +24,13 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> XmlEncodeAsync(string str)
     {
+		_logger.LogError(">>> Entering XmlEncodeAsync(str={Str})", str);
         if (str == null)
             return null;
         str = Regex.Replace(str, @"[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD]", string.Empty, RegexOptions.Compiled);
+		_logger.LogError("XmlEncodeAsync(str={Str}): str → {Str1}", str, str);
 
+		_logger.LogWarning("<<< Exiting XmlEncodeAsync(str={Str})", str);
         return await XmlEncodeAsIsAsync(str);
     }
 
@@ -39,6 +44,7 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> XmlEncodeAsIsAsync(string str)
     {
+		_logger.LogError(">>> Entering XmlEncodeAsIsAsync(str={Str})", str);
         if (str == null)
             return null;
 
@@ -49,10 +55,13 @@ public partial class XmlHelper
         };
 
         await using var sw = new StringWriter();
+		_logger.LogError("XmlEncodeAsIsAsync(str={Str}): sw → {Sw}", str, sw);
         await using var xwr = XmlWriter.Create(sw, settings);
+		_logger.LogError("XmlEncodeAsIsAsync(str={Str}): xwr → {Xwr}", str, xwr);
         await xwr.WriteStringAsync(str);
         await xwr.FlushAsync();
 
+		_logger.LogWarning("<<< Exiting XmlEncodeAsIsAsync(str={Str})", str);
         return sw.ToString();
     }
 
@@ -63,10 +72,14 @@ public partial class XmlHelper
     /// <returns>Decoded attribute</returns>
     public static string XmlDecode(string str)
     {
+		_logger.LogError(">>> Entering XmlDecode(str={Str})", str);
         var sb = new StringBuilder(str);
 
+		_logger.LogError("XmlDecode(str={Str}): sb → {Sb}", str, sb);
         var rez = sb.Replace("&quot;", "\"").Replace("&apos;", "'").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").ToString();
+		_logger.LogError("XmlDecode(str={Str}): rez → {Rez}", str, rez);
 
+		_logger.LogWarning("<<< Exiting XmlDecode(str={Str})", str);
         return rez;
     }
 
@@ -80,11 +93,16 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> SerializeDateTimeAsync(DateTime dateTime)
     {
+		_logger.LogError(">>> Entering SerializeDateTimeAsync(dateTime={DateTime})", dateTime);
         var xmlS = new XmlSerializer(typeof(DateTime));
         var sb = new StringBuilder();
+		_logger.LogError("SerializeDateTimeAsync(dateTime={DateTime}): sb → {Sb}", dateTime, sb);
         await using var sw = new StringWriter(sb);
+		_logger.LogError("SerializeDateTimeAsync(dateTime={DateTime}): sw → {Sw}", dateTime, sw);
+		_logger.LogError("SerializeDateTimeAsync(dateTime={DateTime}): xmlS → {XmlS}", dateTime, xmlS);
         xmlS.Serialize(sw, dateTime);
 
+		_logger.LogWarning("<<< Exiting SerializeDateTimeAsync(dateTime={DateTime})", dateTime);
         return sb.ToString();
     }
 

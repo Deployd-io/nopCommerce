@@ -11,6 +11,7 @@ using Nop.Services.Plugins;
 using Nop.Services.Security;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.RFQ;
 /// </summary>
 public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly EmailAccountSettings _emailAccountSettings;
@@ -43,14 +45,22 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         ISettingService settingService,
         WidgetSettings widgetSettings)
     {
+		_logger.LogError(">>> Entering RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings})", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings);
         _emailAccountSettings = emailAccountSettings;
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _emailAccountService → {_emailAccountService}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _emailAccountService);
         _localizationService = localizationService;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _localizationService);
         _messageTemplateService = messageTemplateService;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _messageTemplateService → {_messageTemplateService}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _messageTemplateService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _nopUrlHelper → {_nopUrlHelper}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _nopUrlHelper);
         _permissionService = permissionService;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _permissionService → {_permissionService}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _settingService → {_settingService}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _settingService);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("RfqPlugin(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},nopUrlHelper={NopUrlHelper},permissionService={PermissionService},settingService={SettingService},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", emailAccountSettings, emailAccountService, localizationService, messageTemplateService, nopUrlHelper, permissionService, settingService, widgetSettings, _widgetSettings);
     }
 
     #endregion
@@ -62,6 +72,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(RfqDefaults.ConfigurationRouteName);
     }
 
@@ -74,6 +86,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogError(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogWarning("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.OrderSummaryContentAfter,
@@ -88,11 +102,14 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogError(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone == PublicWidgetZones.OrderSummaryContentAfter)
             return typeof(AddRfqComponent);
 
-        if (widgetZone == PublicWidgetZones.AccountNavigationAfter)
+		_logger.LogWarning("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+        if (widgetZone == PublicWidgetZones.AccountNavigationAfter) {
             return typeof(CustomerRfqMenuComponent);
+        }
 
         return null;
     }
@@ -103,11 +120,13 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new RfqSettings
         {
             Enabled = true
         });
+		_logger.LogInformation("InstallAsync(): Enabled → {Enabled}", Enabled);
 
         if (!_widgetSettings.ActiveWidgetSystemNames.Contains(RfqDefaults.SystemName))
         {
@@ -120,8 +139,11 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
             ?? throw new Exception("Default email account cannot be loaded");
 
         var messageTemplates = new List<MessageTemplate>();
+		_logger.LogError("InstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(0);
+		_logger.LogError("InstallAsync(): allMessageTemplates → {AllMessageTemplates}", allMessageTemplates);
         var existsMessageTemplateNames = allMessageTemplates.Select(t => t.Name).ToList();
+		_logger.LogError("InstallAsync(): existsMessageTemplateNames → {ExistsMessageTemplateNames}", existsMessageTemplateNames);
 
         if (!existsMessageTemplateNames.Contains(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE))
         {
@@ -133,6 +155,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
                 IsActive = true,
                 EmailAccountId = eaGeneral.Id
             });
+			_logger.LogDebug("InstallAsync(): EmailAccountId → {EmailAccountId}", EmailAccountId);
         }
 
         if (!existsMessageTemplateNames.Contains(RfqDefaults.ADMIN_SENT_NEW_QUOTE))
@@ -262,6 +285,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -270,6 +294,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<RfqSettings>();
 
@@ -293,6 +318,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         }
 
         var deletedMessageTemplates = new List<MessageTemplate>();
+		_logger.LogError("UninstallAsync(): deletedMessageTemplates → {DeletedMessageTemplates}", deletedMessageTemplates);
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE)).ToList());
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.ADMIN_SENT_NEW_QUOTE)).ToList());
 
@@ -308,6 +334,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourceAsync($"Admin.ContentManagement.MessageTemplates.Description.{RfqDefaults.ADMIN_SENT_NEW_QUOTE}");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.Admin.AccessRFQ");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.PublicStore.AccessRFQ");
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

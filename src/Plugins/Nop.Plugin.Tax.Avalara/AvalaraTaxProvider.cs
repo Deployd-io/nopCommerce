@@ -12,6 +12,7 @@ using Nop.Services.ScheduleTasks;
 using Nop.Services.Tax;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara;
 
@@ -20,6 +21,7 @@ namespace Nop.Plugin.Tax.Avalara;
 /// </summary>
 public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -46,14 +48,24 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         TaxSettings taxSettings,
         WidgetSettings widgetSettings)
     {
+		_logger.LogError(">>> Entering AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings})", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings);
         _avalaraTaxManager = avalaraTaxManager;
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _httpContextAccessor → {_httpContextAccessor}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _httpContextAccessor);
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _avalaraTaxManager → {_avalaraTaxManager}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _avalaraTaxManager);
+    _logger.LogWarning("<<< Exiting AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings})", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _localizationService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _nopUrlHelper → {_nopUrlHelper}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _nopUrlHelper);
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _scheduleTaskService → {_scheduleTaskService}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _scheduleTaskService);
         _settingService = settingService;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _settingService → {_settingService}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _settingService);
         _taxPluginManager = taxPluginManager;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _taxPluginManager → {_taxPluginManager}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _taxPluginManager);
         _taxSettings = taxSettings;
+		_logger.LogDebug("AvalaraTaxProvider(avalaraTaxManager={AvalaraTaxManager},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},scheduleTaskService={ScheduleTaskService},settingService={SettingService},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings},widgetSettings={WidgetSettings}): _taxSettings → {_taxSettings}", avalaraTaxManager, httpContextAccessor, localizationService, nopUrlHelper, scheduleTaskService, settingService, taxPluginManager, taxSettings, widgetSettings, _taxSettings);
         _widgetSettings = widgetSettings;
     }
 
@@ -71,13 +83,16 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public async Task<TaxRateResult> GetTaxRateAsync(TaxRateRequest taxRateRequest)
     {
+		_logger.LogError(">>> Entering GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
         if (taxRateRequest?.Address is null)
             return new TaxRateResult { Errors = new List<string> { "Address not set" } };
 
         //get tax rate
         var (taxRate, error) = await _avalaraTaxManager.GetTaxRateAsync(taxRateRequest);
-        if (!string.IsNullOrEmpty(error))
+		_logger.LogWarning("<<< Exiting GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
+        if (!string.IsNullOrEmpty(error)) {
             return new TaxRateResult { Errors = new List<string> { error } };
+        }
 
         return new TaxRateResult { TaxRate = taxRate };
     }
@@ -92,19 +107,24 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public async Task<TaxTotalResult> GetTaxTotalAsync(TaxTotalRequest taxTotalRequest)
     {
+		_logger.LogError(">>> Entering GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         //cache tax total within the request
         var key = $"nop.TaxTotal-{taxTotalRequest.UsePaymentMethodAdditionalFee}";
+		_logger.LogError("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): key → {Key}", taxTotalRequest, key);
 
         if (_httpContextAccessor.HttpContext.Items.TryGetValue(key, out var result) && result is TaxTotalResult taxTotalResult)
             return taxTotalResult;
 
         //create a transaction
         taxTotalResult = new();
+		_logger.LogError("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult → {TaxTotalResult}", taxTotalRequest, taxTotalResult);
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult → {TaxTotalResult}", taxTotalRequest, taxTotalResult);
         var (transaction, error) = await _avalaraTaxManager.CreateTaxTotalTransactionAsync(taxTotalRequest);
         if (string.IsNullOrEmpty(error))
         {
             //and get tax details
             taxTotalResult.TaxTotal = transaction.totalTax.Value;
+			_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult.TaxTotal → {Arg1}", taxTotalRequest, taxTotalResult.TaxTotal);
             var taxRates = transaction.summary?
                 .Where(summary => summary.rate.HasValue && summary.tax.HasValue)
                 .Select(summary => new { Rate = summary.rate.Value * 100, Value = summary.tax.Value })
@@ -125,6 +145,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
 
         _httpContextAccessor.HttpContext.Items.TryAdd(key, taxTotalResult);
 
+		_logger.LogWarning("<<< Exiting GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         return taxTotalResult;
     }
 
@@ -133,6 +154,8 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(AvalaraTaxDefaults.ConfigurationRouteName);
     }
 
@@ -145,6 +168,8 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogError(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogWarning("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             AdminWidgetZones.CustomerDetailsBlock,
@@ -163,6 +188,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogError(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone.Equals(AdminWidgetZones.CustomerDetailsBlock) || widgetZone.Equals(AdminWidgetZones.CustomerRoleDetailsTop))
             return typeof(EntityUseCodeViewComponent);
 
@@ -172,8 +198,10 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         if (widgetZone.Equals(PublicWidgetZones.CheckoutConfirmTop) || widgetZone.Equals(PublicWidgetZones.OpCheckoutConfirmTop))
             return typeof(AddressValidationViewComponent);
 
-        if (widgetZone.Equals(PublicWidgetZones.OrderSummaryContentBefore))
+		_logger.LogWarning("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+        if (widgetZone.Equals(PublicWidgetZones.OrderSummaryContentBefore)) {
             return typeof(AppliedCertificateViewComponent);
+        }
 
         return null;
     }
@@ -184,6 +212,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new AvalaraTaxSettings
         {
@@ -218,6 +247,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
                 Name = AvalaraTaxDefaults.DownloadTaxRatesTask.Name,
                 Type = AvalaraTaxDefaults.DownloadTaxRatesTask.Type
             });
+			_logger.LogDebug("InstallAsync(): Type → {Type}", Type);
         }
 
         //locales
@@ -375,6 +405,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -383,6 +414,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         //generic attributes
         await _avalaraTaxManager.DeleteAttributesAsync();
 
@@ -397,6 +429,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
 
         //schedule task
         var task = await _scheduleTaskService.GetTaskByTypeAsync(AvalaraTaxDefaults.DownloadTaxRatesTask.Type);
+		_logger.LogError("UninstallAsync(): task → {Task}", task);
         if (task is not null)
             await _scheduleTaskService.DeleteTaskAsync(task);
 
@@ -405,6 +438,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Tax.Avalara");
 
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

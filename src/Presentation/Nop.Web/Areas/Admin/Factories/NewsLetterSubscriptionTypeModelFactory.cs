@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscriptionTypeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -29,9 +31,14 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
         INewsLetterSubscriptionTypeService newsLetterSubscriptionTypeService,
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory)
     {
+		_logger.LogError(">>> Entering NewsLetterSubscriptionTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeMappingSupportedModelFactory=<redacted>)", localizationService, localizedModelFactory, newsLetterSubscriptionTypeService);
         _localizationService = localizationService;
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("NewsLetterSubscriptionTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeMappingSupportedModelFactory=<redacted>): _localizedModelFactory → {_localizedModelFactory}", localizationService, localizedModelFactory, newsLetterSubscriptionTypeService, _localizedModelFactory);
+		_logger.LogDebug("NewsLetterSubscriptionTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeMappingSupportedModelFactory=<redacted>): _localizationService → {_localizationService}", localizationService, localizedModelFactory, newsLetterSubscriptionTypeService, _localizationService);
+    _logger.LogWarning("<<< Exiting NewsLetterSubscriptionTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeMappingSupportedModelFactory=<redacted>)", localizationService, localizedModelFactory, newsLetterSubscriptionTypeService);
         _newsLetterSubscriptionTypeService = newsLetterSubscriptionTypeService;
+		_logger.LogDebug("NewsLetterSubscriptionTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeMappingSupportedModelFactory=<redacted>): _newsLetterSubscriptionTypeService → {_newsLetterSubscriptionTypeService}", localizationService, localizedModelFactory, newsLetterSubscriptionTypeService, _newsLetterSubscriptionTypeService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
     }
 
@@ -49,11 +56,13 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual Task<NewsLetterSubscriptionTypeSearchModel> PrepareNewsLetterSubscriptionTypeSearchModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,15 +76,18 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionTypeListModel> PrepareNewsLetterSubscriptionTypeListModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get newsletter subscription type
         var subscriptionTypes = (await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync()).ToPagedList(searchModel);
+		_logger.LogError("PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel}): subscriptionTypes → {SubscriptionTypes}", searchModel, subscriptionTypes);
 
         //prepare list model
         var model = new NewsLetterSubscriptionTypeListModel().PrepareToGrid(searchModel, subscriptionTypes, () =>
         {
             //fill in model values from the entity
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
             return subscriptionTypes.Select(subscriptionType => subscriptionType.ToModel<NewsLetterSubscriptionTypeModel>());
         });
 
@@ -95,6 +107,7 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     public virtual async Task<NewsLetterSubscriptionTypeModel> PrepareNewsLetterSubscriptionTypeModelAsync(NewsLetterSubscriptionTypeModel model,
         NewsLetterSubscriptionType subscriptionType, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionTypeModelAsync(model={Model},subscriptionType={SubscriptionType},excludeProperties={ExcludeProperties})", model, subscriptionType, excludeProperties);
         Func<NewsLetterSubscriptionTypeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (subscriptionType != null)
@@ -116,6 +129,7 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, subscriptionType, excludeProperties);
 
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionTypeModelAsync(model={Model},subscriptionType={SubscriptionType},excludeProperties={ExcludeProperties})", model, subscriptionType, excludeProperties);
         return model;
     }
 

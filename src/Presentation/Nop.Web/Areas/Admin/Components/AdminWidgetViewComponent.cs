@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Factories;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Components;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Areas.Admin.Components;
 /// </summary>
 public partial class AdminWidgetViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IWidgetModelFactory _widgetModelFactory;
@@ -19,7 +21,10 @@ public partial class AdminWidgetViewComponent : NopViewComponent
 
     public AdminWidgetViewComponent(IWidgetModelFactory widgetModelFactory)
     {
+		_logger.LogError(">>> Entering AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory})", widgetModelFactory);
         _widgetModelFactory = widgetModelFactory;
+		_logger.LogDebug("AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory}): _widgetModelFactory → {_widgetModelFactory}", widgetModelFactory, _widgetModelFactory);
+    _logger.LogWarning("<<< Exiting AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory})", widgetModelFactory);
     }
 
     #endregion
@@ -37,12 +42,16 @@ public partial class AdminWidgetViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData = null)
     {
+		_logger.LogError(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //prepare model
         var models = await _widgetModelFactory.PrepareRenderWidgetModelAsync(widgetZone, additionalData, false);
+		_logger.LogError("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): models → {Models}", widgetZone, additionalData, models);
 
         //no data?
-        if (!models.Any())
+		_logger.LogWarning("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
+        if (!models.Any()) {
             return Content(string.Empty);
+        }
 
         return View(models);
     }

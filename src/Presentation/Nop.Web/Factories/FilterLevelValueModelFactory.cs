@@ -4,11 +4,13 @@ using Nop.Services.Catalog;
 using Nop.Services.FilterLevels;
 using Nop.Services.Localization;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
 public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICatalogModelFactory _catalogModelFactory;
@@ -23,9 +25,12 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
         IFilterLevelValueService filterLevelValueService,
         ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering FilterLevelValueModelFactory(catalogModelFactory={CatalogModelFactory},filterLevelValueService={FilterLevelValueService},localizationService={LocalizationService})", catalogModelFactory, filterLevelValueService, localizationService);
         _catalogModelFactory = catalogModelFactory;
         _filterLevelValueService = filterLevelValueService;
+		_logger.LogDebug("FilterLevelValueModelFactory(catalogModelFactory={CatalogModelFactory},filterLevelValueService={FilterLevelValueService},localizationService={LocalizationService}): _filterLevelValueService → {_filterLevelValueService}", catalogModelFactory, filterLevelValueService, localizationService, _filterLevelValueService);
         _localizationService = localizationService;
+		_logger.LogDebug("FilterLevelValueModelFactory(catalogModelFactory={CatalogModelFactory},filterLevelValueService={FilterLevelValueService},localizationService={LocalizationService}): _localizationService → {_localizationService}", catalogModelFactory, filterLevelValueService, localizationService, _localizationService);
     }
 
     #endregion
@@ -40,6 +45,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareFilterLevelValuesAsync(IList<SelectListItem> items, FilterLevelEnum filterLevelValueEnum, string filterLevelValue = null)
     {
+		_logger.LogError(">>> Entering PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue})", items, filterLevelValueEnum, filterLevelValue);
         ArgumentNullException.ThrowIfNull(items);
 
         var param1 = filterLevelValueEnum == FilterLevelEnum.FilterLevel1 ? filterLevelValue : null;
@@ -68,7 +74,9 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
 
         //insert special item for the default value
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.Select");
+		_logger.LogError("PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue}): defaultItemText → {DefaultItemText}", items, filterLevelValueEnum, filterLevelValue, defaultItemText);
         items.Insert(0, new SelectListItem { Text = defaultItemText, Value = "" });
+		_logger.LogWarning("<<< Exiting PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue})", items, filterLevelValueEnum, filterLevelValue);
     }
 
     #endregion
@@ -84,6 +92,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual FilterLevelValueOverviewModel PrepareFilterLevelValueOverviewModel(IList<FilterLevelValue> filterLevelValues)
     {
+		_logger.LogError(">>> Entering PrepareFilterLevelValueOverviewModel(filterLevelValues={FilterLevelValues})", filterLevelValues);
         ArgumentNullException.ThrowIfNull(filterLevelValues);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
@@ -107,6 +116,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             model.FilterLevelValues.Add(itemModel);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareFilterLevelValueOverviewModel(filterLevelValues={FilterLevelValues})", filterLevelValues);
         return model;
     }    
 
@@ -120,18 +130,23 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<FilterLevelValueSearchModel> PrepareFilterLevelValueSearchModelAsync(FilterLevelValueSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
 
         //prepare filter (0 - all;)
         searchModel.HideSearchFilterValue1 = filterLevel1Disabled;
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue1 → {Arg1}", searchModel, searchModel.HideSearchFilterValue1);
         if (!filterLevel1Disabled)
             await PrepareFilterLevelValuesAsync(searchModel.AvailableFilterLevel1Values, FilterLevelEnum.FilterLevel1);
 
         searchModel.HideSearchFilterValue2 = filterLevel2Disabled;
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue2 → {Arg1}", searchModel, searchModel.HideSearchFilterValue2);
         searchModel.HideSearchFilterValue3 = filterLevel3Disabled;
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue3 → {Arg1}", searchModel, searchModel.HideSearchFilterValue3);
 
+		_logger.LogWarning("<<< Exiting PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -146,12 +161,16 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<SearchFilterLevelValueModel> PrepareSearchFilterLevelValueModelAsync(SearchFilterLevelValueModel model, CatalogProductsCommand command)
     {
+		_logger.LogError(">>> Entering PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command})", model, command);
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(command);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
         model.HideSearchFilterValue1 = filterLevel1Disabled;
+		_logger.LogDebug("PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command}): model.HideSearchFilterValue1 → {Arg2}", model, command, model.HideSearchFilterValue1);
+		_logger.LogDebug("PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command}): model.HideSearchFilterValue3 → {Arg2}", model, command, model.HideSearchFilterValue3);
         model.HideSearchFilterValue2 = filterLevel2Disabled;
+		_logger.LogDebug("PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command}): model.HideSearchFilterValue2 → {Arg2}", model, command, model.HideSearchFilterValue2);
         model.HideSearchFilterValue3 = filterLevel3Disabled;
 
         if (!filterLevel1Disabled)
@@ -161,6 +180,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             {
                 if (item.Value == model.fl1id)
                     item.Selected = true;
+					_logger.LogDebug("PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command}): item.Selected → {Arg2}", model, command, item.Selected);
             }
 
             if (!string.IsNullOrEmpty(model.fl1id) && !filterLevel2Disabled)
@@ -186,6 +206,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             model.CatalogProductsModel = await _catalogModelFactory.PrepareSearchProductsByFilterLevelValuesModelAsync(model, command);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareSearchFilterLevelValueModelAsync(model={Model},command={Command})", model, command);
         return model;
     }
 

@@ -25,6 +25,7 @@ namespace Nop.Plugin.Shipping.UPS.Services;
 /// </summary>
 public class UPSService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     /// <summary>
@@ -85,17 +86,29 @@ public class UPSService
         UPSSettings upsSettings)
     {
         _currencySettings = currencySettings;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _currencySettings → {_currencySettings}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _currencySettings);
         _httpClientFactory = httpClientFactory;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _httpClientFactory → {_httpClientFactory}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _httpClientFactory);
         _countryService = countryService;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _countryService → {_countryService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _countryService);
         _currencyService = currencyService;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _currencyService → {_currencyService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _currencyService);
         _localizationService = localizationService;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _localizationService → {_localizationService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _localizationService);
         _logger = logger;
+		_logger.LogError(">>> Entering UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings})", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings);
         _measureService = measureService;
         _orderTotalCalculationService = orderTotalCalculationService;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _measureService → {_measureService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _measureService);
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _orderTotalCalculationService → {_orderTotalCalculationService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _orderTotalCalculationService);
         _shippingService = shippingService;
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _shippingService → {_shippingService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _shippingService);
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _stateProvinceService → {_stateProvinceService}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _stateProvinceService);
         _workContext = workContext;
         _upsSettings = upsSettings;
+		_logger.LogWarning("<<< Exiting UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings})", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings);
+		_logger.LogDebug("UPSService(currencySettings={CurrencySettings},httpClientFactory={HttpClientFactory},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},logger={Logger},measureService={MeasureService},orderTotalCalculationService={OrderTotalCalculationService},shippingService=<redacted>,stateProvinceService={StateProvinceService},workContext={WorkContext},upsSettings={UpsSettings}): _upsSettings → {_upsSettings}", currencySettings, httpClientFactory, countryService, currencyService, localizationService, logger, measureService, orderTotalCalculationService, stateProvinceService, workContext, upsSettings, _upsSettings);
     }
 
     #endregion
@@ -108,20 +121,27 @@ public class UPSService
     /// <returns>The asynchronous task whose result contains access token</returns>
     private async Task<string> GetAccessTokenAsync()
     {
+		_logger.LogError(">>> Entering GetAccessTokenAsync()");
         if (!string.IsNullOrEmpty(_accessToken))
             return _accessToken;
 
-        if (string.IsNullOrEmpty(_upsSettings.ClientId))
+			_logger.LogError("Throwing NopException from GetAccessTokenAsync()");
+        if (string.IsNullOrEmpty(_upsSettings.ClientId)) {
             throw new NopException("Client ID is not set");
+        }
 
         if (string.IsNullOrEmpty(_upsSettings.ClientSecret))
             throw new NopException("Client secret is not set");
 
         var client = new OAuthClient(_httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient), _upsSettings);
+		_logger.LogError("GetAccessTokenAsync(): client → {Client}", client);
 
         var response = await client.GenerateTokenAsync();
+		_logger.LogError("GetAccessTokenAsync(): response → {Response}", response);
         _accessToken = response.Access_token;
+		_logger.LogDebug("GetAccessTokenAsync(): _accessToken → {_accessToken}", _accessToken);
 
+		_logger.LogWarning("<<< Exiting GetAccessTokenAsync()");
         return _accessToken;
     }
 
@@ -134,6 +154,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetWeightLimitAsync()
     {
+		_logger.LogError(">>> Entering GetWeightLimitAsync()");
+        _logger.LogWarning("<<< Exiting GetWeightLimitAsync()");
         return await _measureService.ConvertWeightAsync(WEIGHT_LIMIT, _lbWeight, _measureWeight);
     }
 
@@ -146,6 +168,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetSizeLimitAsync()
     {
+		_logger.LogError(">>> Entering GetSizeLimitAsync()");
+        _logger.LogWarning("<<< Exiting GetSizeLimitAsync()");
         return await _measureService.ConvertDimensionAsync(SIZE_LIMIT, _inchesDimension, _measureDimension);
     }
 
@@ -158,6 +182,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetLengthLimitAsync()
     {
+		_logger.LogError(">>> Entering GetLengthLimitAsync()");
+        _logger.LogWarning("<<< Exiting GetLengthLimitAsync()");
         return await _measureService.ConvertDimensionAsync(LENGTH_LIMIT, _inchesDimension, _measureDimension);
     }
 
@@ -169,9 +195,14 @@ public class UPSService
     /// <returns>The attribute value</returns>
     private TAttribute GetAttributeValue<TAttribute>(Enum enumValue) where TAttribute : Attribute
     {
+		_logger.LogError(">>> Entering GetAttributeValue(enumValue={EnumValue})", enumValue);
         var enumType = enumValue.GetType();
+		_logger.LogWarning("<<< Exiting GetAttributeValue(enumValue={EnumValue})", enumValue);
         var enumValueInfo = enumType.GetMember(enumValue.ToString()).FirstOrDefault();
+		_logger.LogError("GetAttributeValue(enumValue={EnumValue}): enumValueInfo → {EnumValueInfo}", enumValue, enumValueInfo);
         var attribute = enumValueInfo?.GetCustomAttributes(typeof(TAttribute), false).FirstOrDefault();
+		_logger.LogError("GetAttributeValue(enumValue={EnumValue}): attribute → {Attribute}", enumValue, attribute);
+		_logger.LogError("GetAttributeValue(enumValue={EnumValue}): enumType → {EnumType}", enumValue, enumType);
         return attribute as TAttribute;
     }
 
@@ -185,10 +216,14 @@ public class UPSService
     /// </returns>
     private async Task<TrackResponse> TrackAsync(string trackingNumber)
     {
+		_logger.LogError(">>> Entering TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         var client = new TrackClient(_httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient), _upsSettings, await GetAccessTokenAsync());
 
+		_logger.LogError("TrackAsync(trackingNumber={TrackingNumber}): client → {Client}", trackingNumber, client);
         var trackResponse = await client.TrackAsync(trackingNumber);
+		_logger.LogError("TrackAsync(trackingNumber={TrackingNumber}): trackResponse → {TrackResponse}", trackingNumber, trackResponse);
 
+		_logger.LogWarning("<<< Exiting TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         return trackResponse;
     }
 
@@ -202,16 +237,20 @@ public class UPSService
     /// </returns>
     private async Task<ShipmentStatusEvent> PrepareShipmentStatusEventAsync(Activity activity)
     {
+		_logger.LogError(">>> Entering PrepareShipmentStatusEventAsync(activity={Activity})", activity);
         var shipmentStatusEvent = new ShipmentStatusEvent();
 
+		_logger.LogError("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent → {ShipmentStatusEvent}", activity, shipmentStatusEvent);
         try
         {
             //prepare date
             shipmentStatusEvent.Date = DateTime
                 .ParseExact($"{activity.Date} {activity.Time}", "yyyyMMdd HHmmss", CultureInfo.InvariantCulture);
+				_logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent.Date → {Arg1}", activity, shipmentStatusEvent.Date);
 
             //prepare address
             var addressDetails = new List<string>();
+			_logger.LogError("PrepareShipmentStatusEventAsync(activity={Activity}): addressDetails → {AddressDetails}", activity, addressDetails);
 
             var address = activity.Location?.Address;
 
@@ -234,6 +273,7 @@ public class UPSService
             }
 
             shipmentStatusEvent.CountryCode = activity.Location?.Address?.CountryCode;
+			_logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent.CountryCode → {Arg1}", activity, shipmentStatusEvent.CountryCode);
             shipmentStatusEvent.Location = string.Join(", ", addressDetails);
 
             if (activity.Status == null)
@@ -241,6 +281,7 @@ public class UPSService
 
             //prepare description
             var eventName = string.Empty;
+			_logger.LogError("PrepareShipmentStatusEventAsync(activity={Activity}): eventName → {EventName}", activity, eventName);
             switch (activity.Status.Type)
             {
                 case "I":
@@ -273,9 +314,11 @@ public class UPSService
         }
         catch
         {
+			_logger.LogError("Exception in PrepareShipmentStatusEventAsync(activity={Activity}): {Arg1}", activity, ex.Message);
             // ignored
         }
 
+		_logger.LogWarning("<<< Exiting PrepareShipmentStatusEventAsync(activity={Activity})", activity);
         return shipmentStatusEvent;
     }
 
@@ -289,11 +332,16 @@ public class UPSService
     /// </returns>
     private async Task<RateResponse> GetRatesAsync(RateRequest request)
     {
+		_logger.LogError(">>> Entering GetRatesAsync(request={Request})", request);
         var client = new RateClient(_httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient), _upsSettings, await GetAccessTokenAsync());
 
+		_logger.LogError("GetRatesAsync(request={Request}): client → {Client}", request, client);
         //try to get response details
         var response = await client.ProcessRateAsync(request);
+		_logger.LogError("GetRatesAsync(request={Request}): response → {Response}", request, response);
 
+		_logger.LogWarning("<<< Exiting GetRatesAsync(request={Request})", request);
+		_logger.LogWarning("<<< Exiting GetRatesAsync(shippingOptionRequest=<redacted>)");
         return response;
     }
 
@@ -308,6 +356,7 @@ public class UPSService
     /// </returns>
     private async Task<RateRequest> CreateRateRequestAsync(GetShippingOptionRequest shippingOptionRequest, bool saturdayDelivery = false)
     {
+		_logger.LogError(">>> Entering CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery})", saturdayDelivery);
         //set request details
         var request = new RateRequest
         {
@@ -326,8 +375,10 @@ public class UPSService
 
         //prepare addresses details
         var stateCodeTo = (await _stateProvinceService.GetStateProvinceByAddressAsync(shippingOptionRequest.ShippingAddress))?.Abbreviation;
+		_logger.LogError("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): stateCodeTo → {StateCodeTo}", saturdayDelivery, stateCodeTo);
         var stateCodeFrom = shippingOptionRequest.StateProvinceFrom?.Abbreviation;
         var countryCodeFrom = (shippingOptionRequest.CountryFrom ?? (await _countryService.GetAllCountriesAsync()).FirstOrDefault())?.TwoLetterIsoCode ?? string.Empty;
+		_logger.LogError("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): countryCodeFrom → {CountryCodeFrom}", saturdayDelivery, countryCodeFrom);
 
         var addressFrom = new Shipper_Address
         {
@@ -359,6 +410,7 @@ public class UPSService
 
         //set shipment details
         request.Shipment = new RateRequest_Shipment
+		_logger.LogDebug("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): request.Shipment → {Arg2}", saturdayDelivery, request.Shipment);
         {
             Shipper = new Shipment_Shipper
             {
@@ -394,10 +446,12 @@ public class UPSService
         if (countryCodeFrom.Equals("US", StringComparison.InvariantCultureIgnoreCase))
         {
             request.PickupType = new RateRequest_PickupType
+			_logger.LogDebug("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): request.PickupType → {Arg2}", saturdayDelivery, request.PickupType);
             {
                 Code = GetUpsCode(_upsSettings.PickupType)
             };
             request.CustomerClassification = new RateRequest_CustomerClassification
+			_logger.LogDebug("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): request.CustomerClassification → {Arg2}", saturdayDelivery, request.CustomerClassification);
             {
                 Code = GetUpsCode(_upsSettings.CustomerClassification)
             };
@@ -437,12 +491,14 @@ public class UPSService
         };
 
         var currencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
+		_logger.LogError("CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery}): currencyCode → {CurrencyCode}", saturdayDelivery, currencyCode);
         request.Shipment.InvoiceLineTotal = new Shipment_InvoiceLineTotal
         {
             CurrencyCode = currencyCode,
             MonetaryValue = shippingOptionRequest.Items.Sum(x => x.Product.Price * x.GetQuantity()).ToString("F2", CultureInfo.InvariantCulture)
         };
 
+		_logger.LogWarning("<<< Exiting CreateRateRequestAsync(shippingOptionRequest=<redacted>,saturdayDelivery={SaturdayDelivery})", saturdayDelivery);
         return request;
     }
 
@@ -460,6 +516,7 @@ public class UPSService
     /// </returns>
     private async Task<Shipment_Package> CreatePackageAsync(decimal width, decimal length, decimal height, decimal weight, decimal insuranceAmount)
     {
+		_logger.LogError(">>> Entering CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount})", width, length, height, weight, insuranceAmount);
         //set package details
         var package = new Shipment_Package
         {
@@ -473,6 +530,7 @@ public class UPSService
         if (!_upsSettings.PassDimensions)
             width = length = height = 0;
         package.Dimensions = new Package_Dimensions
+			_logger.LogDebug("CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount}): package.Dimensions → {Arg5}", width, length, height, weight, insuranceAmount, package.Dimensions);
         {
             Width = width.ToString("0.00", CultureInfo.InvariantCulture),
             Length = length.ToString("0.00", CultureInfo.InvariantCulture),
@@ -480,6 +538,7 @@ public class UPSService
             UnitOfMeasurement = new Dimensions_UnitOfMeasurement { Code = _upsSettings.DimensionsType, Description = _upsSettings.DimensionsType }
         };
         package.PackageWeight = new Package_PackageWeight
+		_logger.LogDebug("CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount}): package.PackageWeight → {Arg5}", width, length, height, weight, insuranceAmount, package.PackageWeight);
         {
             Weight = weight.ToString("0.00", CultureInfo.InvariantCulture),
             UnitOfMeasurement = new PackageWeight_UnitOfMeasurement { Code = _upsSettings.WeightType, Description = _upsSettings.WeightType },
@@ -489,9 +548,12 @@ public class UPSService
         if (_upsSettings.InsurePackage && insuranceAmount > decimal.Zero)
         {
             var currencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
+			_logger.LogError("CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount}): currencyCode → {CurrencyCode}", width, length, height, weight, insuranceAmount, currencyCode);
+			_logger.LogDebug("CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount}): package.PackageServiceOptions → {Arg5}", width, length, height, weight, insuranceAmount, package.PackageServiceOptions);
             var monetaryValue = insuranceAmount.ToString("0.00", CultureInfo.InvariantCulture);
             package.PackageServiceOptions = new Package_PackageServiceOptions
             {
+				_logger.LogError("CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount}): monetaryValue → {MonetaryValue}", width, length, height, weight, insuranceAmount, monetaryValue);
                 DeclaredValue = new PackageServiceOptions_DeclaredValue
                 {
                     CurrencyCode = currencyCode,
@@ -500,6 +562,7 @@ public class UPSService
             };
         }
 
+		_logger.LogWarning("<<< Exiting CreatePackageAsync(width={Width},length={Length},height={Height},weight={Weight},insuranceAmount={InsuranceAmount})", width, length, height, weight, insuranceAmount);
         return package;
     }
 
@@ -513,6 +576,8 @@ public class UPSService
     /// </returns>
     private async Task<IEnumerable<Shipment_Package>> GetPackagesForOneItemPerPackageAsync(GetShippingOptionRequest shippingOptionRequest)
     {
+		_logger.LogError(">>> Entering GetPackagesForOneItemPerPackageAsync(shippingOptionRequest=<redacted>)");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await shippingOptionRequest.Items.SelectManyAwait(async packageItem =>
         {
             //get dimensions and weight of the single item
@@ -527,6 +592,8 @@ public class UPSService
             //create packages according to item quantity
             var package = await CreatePackageAsync(width, length, height, weight, insuranceAmount);
 
+		_logger.LogError("GetPackagesForOneItemPerPackageAsync(shippingOptionRequest)=<redacted>: database query executed in {Arg1} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetPackagesForOneItemPerPackageAsync(shippingOptionRequest=<redacted>)");
             return Enumerable.Repeat(package, packageItem.GetQuantity());
         }).ToListAsync();
     }
@@ -541,16 +608,21 @@ public class UPSService
     /// </returns>
     private async Task<IEnumerable<Shipment_Package>> GetPackagesByDimensionsAsync(GetShippingOptionRequest shippingOptionRequest)
     {
+		_logger.LogError(">>> Entering GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>)");
         //get dimensions and weight of the whole package
         var (width, length, height) = await GetDimensionsAsync(shippingOptionRequest.Items);
         var weight = await GetWeightAsync(shippingOptionRequest);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): weight → {Weight}", weight);
 
         //whether the package doesn't exceed the weight and size limits
         var weightLimit = await GetWeightLimitAsync();
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): weightLimit → {WeightLimit}", weightLimit);
         var sizeLimit = await GetSizeLimitAsync();
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): sizeLimit → {SizeLimit}", sizeLimit);
         if (weight <= weightLimit && GetPackageSize(width, length, height) <= sizeLimit)
         {
             var insuranceAmount = 0;
+			_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): insuranceAmount → {InsuranceAmount}", insuranceAmount);
             if (_upsSettings.InsurePackage)
             {
                 //The maximum declared amount per package: 50000 USD.
@@ -576,15 +648,23 @@ public class UPSService
             ? Convert.ToInt32(Math.Ceiling(GetPackageSize(width, length, height) / await GetLengthLimitAsync()))
             : 1;
         var totalPackages = Math.Max(Math.Max(totalPackagesBySizeLimit, totalPackagesByWeightLimit), 1);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): totalPackages → {TotalPackages}", totalPackages);
 
         width = Math.Max(width / totalPackages, 1);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): width → {Width}", width);
         length = Math.Max(length / totalPackages, 1);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): length → {Length}", length);
         height = Math.Max(height / totalPackages, 1);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): height → {Height}", height);
         weight = Math.Max(weight / totalPackages, 1);
 
+		_logger.LogDebug("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): width → {Width}", width);
+		_logger.LogDebug("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): length → {Length}", length);
         var insuranceAmountPerPackage = 0;
         if (_upsSettings.InsurePackage)
         {
+			_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): insuranceAmountPerPackage → {InsuranceAmountPerPackage}", insuranceAmountPerPackage);
+			_logger.LogDebug("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): height → {Height}", height);
             //The maximum declared amount per package: 50000 USD.
             //use subTotalWithoutDiscount as insured value
             var cart = shippingOptionRequest.Items.Select(item =>
@@ -599,6 +679,8 @@ public class UPSService
 
         //create packages according to calculated value
         var package = await CreatePackageAsync(width, length, height, weight, insuranceAmountPerPackage);
+		_logger.LogError("GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>): package → {Package}", package);
+		_logger.LogWarning("<<< Exiting GetPackagesByDimensionsAsync(shippingOptionRequest=<redacted>)");
         return Enumerable.Repeat(package, totalPackages);
     }
 
@@ -612,6 +694,7 @@ public class UPSService
     /// </returns>
     private async Task<IEnumerable<Shipment_Package>> GetPackagesByCubicRootAsync(GetShippingOptionRequest shippingOptionRequest)
     {
+		_logger.LogError(">>> Entering GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>)");
         ArgumentNullException.ThrowIfNull(shippingOptionRequest);
 
         //Dimensional weight is based on volume (the amount of space a package occupies in relation to its actual weight). 
@@ -619,6 +702,7 @@ public class UPSService
         //This algorithm devides total package volume by the UPS settings PackingPackageVolume so that no package requires dimensional weight; this could result in an under-charge.
 
         var totalPackagesBySizeLimit = 1;
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): totalPackagesBySizeLimit → {TotalPackagesBySizeLimit}", totalPackagesBySizeLimit);
         decimal width;
         decimal length;
         decimal height;
@@ -628,12 +712,14 @@ public class UPSService
         {
             //get dimensions and weight of the single cubic size of package
             var item = shippingOptionRequest.Items.FirstOrDefault();
+			_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): item → {Item}", item);
             (width, length, height) = await GetDimensionsForSingleItemAsync(item.ShoppingCartItem, item.Product);
         }
         else
         {
             //or try to get them
             var dimension = 0;
+			_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): dimension → {Dimension}", dimension);
 
             //get total volume of the package
             var totalVolume = await shippingOptionRequest.Items.SumAwaitAsync(async item =>
@@ -646,13 +732,16 @@ public class UPSService
             {
                 //use default value (in cubic inches) if not specified
                 var packageVolume = _upsSettings.PackingPackageVolume;
+				_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): packageVolume → {PackageVolume}", packageVolume);
                 if (packageVolume <= 0)
                     packageVolume = 5184;
 
                 //calculate cube root (floor)
                 dimension = Convert.ToInt32(Math.Floor(Math.Pow(Convert.ToDouble(packageVolume), 1.0 / 3.0)));
-                if (GetPackageSize(dimension, dimension, dimension) > await GetSizeLimitAsync())
+					_logger.LogError("Throwing NopException from GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>)");
+                if (GetPackageSize(dimension, dimension, dimension) > await GetSizeLimitAsync()) {
                     throw new NopException("PackingPackageVolume exceeds max package size");
+                }
 
                 //adjust package volume for dimensions calculated
                 packageVolume = dimension * dimension * dimension;
@@ -661,17 +750,22 @@ public class UPSService
             }
 
             width = length = height = dimension;
+			_logger.LogDebug("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): width → {Width}", width);
         }
 
         //get total packages number according to package limits
         var weight = await GetWeightAsync(shippingOptionRequest);
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): weight → {Weight}", weight);
         var weightLimit = await GetWeightLimitAsync();
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): weightLimit → {WeightLimit}", weightLimit);
         var totalPackagesByWeightLimit = weight > weightLimit
             ? Convert.ToInt32(Math.Ceiling(weight / weightLimit))
             : 1;
         var totalPackages = Math.Max(Math.Max(totalPackagesBySizeLimit, totalPackagesByWeightLimit), 1);
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): totalPackages → {TotalPackages}", totalPackages);
 
         var insuranceAmountPerPackage = 0;
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): insuranceAmountPerPackage → {InsuranceAmountPerPackage}", insuranceAmountPerPackage);
         if (_upsSettings.InsurePackage)
         {
             //The maximum declared amount per package: 50000 USD.
@@ -688,7 +782,9 @@ public class UPSService
 
         //create packages according to calculated value
         var package = await CreatePackageAsync(width, length, height, weight / totalPackages, insuranceAmountPerPackage);
+		_logger.LogError("GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>): package → {Package}", package);
 
+		_logger.LogWarning("<<< Exiting GetPackagesByCubicRootAsync(shippingOptionRequest=<redacted>)");
         return Enumerable.Repeat(package, totalPackages);
     }
 
@@ -719,8 +815,11 @@ public class UPSService
     {
         async Task<decimal> convertAndRoundDimensionAsync(decimal dimension)
         {
+			_logger.LogError(">>> Entering convertAndRoundDimensionAsync(dimension={Dimension})", dimension);
             dimension = await _measureService.ConvertFromPrimaryMeasureDimensionAsync(dimension, _measureDimension);
             dimension = Convert.ToInt32(Math.Ceiling(dimension));
+			_logger.LogError("convertAndRoundDimensionAsync(dimension={Dimension}): dimension → {Dimension1}", dimension, dimension);
+			_logger.LogWarning("<<< Exiting convertAndRoundDimensionAsync(dimension={Dimension})", dimension);
             return Math.Max(dimension, 1);
         }
 
@@ -744,12 +843,14 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetWeightForSingleItemAsync(ShoppingCartItem item, Customer customer, Product product)
     {
+		_logger.LogError(">>> Entering GetWeightForSingleItemAsync(item={Item},customer={Customer},product={Product})", item, customer, product);
         var shippingOptionRequest = new GetShippingOptionRequest
         {
             Customer = customer,
             Items = new[] { new GetShippingOptionRequest.PackageItem(item, product, 1) }
         };
 
+		_logger.LogWarning("<<< Exiting GetWeightForSingleItemAsync(item={Item},customer={Customer},product={Product})", item, customer, product);
         return await GetWeightAsync(shippingOptionRequest);
     }
 
@@ -763,9 +864,12 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetWeightAsync(GetShippingOptionRequest shippingOptionRequest)
     {
+		_logger.LogError(">>> Entering GetWeightAsync(shippingOptionRequest=<redacted>)");
         var weight = await _shippingService.GetTotalWeightAsync(shippingOptionRequest, ignoreFreeShippedItems: true);
         weight = await _measureService.ConvertFromPrimaryMeasureWeightAsync(weight, _measureWeight);
         weight = Convert.ToInt32(Math.Ceiling(weight));
+		_logger.LogError("GetWeightAsync(shippingOptionRequest=<redacted>): weight → {Weight}", weight);
+		_logger.LogWarning("<<< Exiting GetWeightAsync(shippingOptionRequest=<redacted>)");
         return Math.Max(weight, 1);
     }
 
@@ -778,7 +882,9 @@ public class UPSService
     /// <returns>Package size</returns>
     private decimal GetPackageSize(decimal width, decimal length, decimal height)
     {
+		_logger.LogError(">>> Entering GetPackageSize(width={Width},length={Length},height={Height})", width, length, height);
         //To measure ground packages use the following formula: Length + 2x Width +2x Height. Details: https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
+		_logger.LogWarning("<<< Exiting GetPackageSize(width={Width},length={Length},height={Height})", width, length, height);
         return length + width * 2 + height * 2;
     }
 
@@ -845,8 +951,10 @@ public class UPSService
     /// </returns>
     private async Task<IEnumerable<ShippingOption>> PrepareShippingOptionsAsync(RateResponse rateResponse)
     {
+		_logger.LogError(">>> Entering PrepareShippingOptionsAsync(rateResponse={RateResponse})", rateResponse);
         var shippingOptions = new List<ShippingOption>();
 
+		_logger.LogError("PrepareShippingOptionsAsync(rateResponse={RateResponse}): shippingOptions → {ShippingOptions}", rateResponse, shippingOptions);
         if (!rateResponse?.RatedShipment?.Any() ?? true)
             return shippingOptions;
 
@@ -856,6 +964,7 @@ public class UPSService
         var allServices = (await DeliveryService.Standard.ToSelectListAsync(false)).Select(item =>
         {
             var serviceCode = GetUpsCode((DeliveryService)int.Parse(item.Value));
+			_logger.LogError("PrepareShippingOptionsAsync(rateResponse={RateResponse}): serviceCode → {ServiceCode}", rateResponse, serviceCode);
             return new { Name = $"UPS {item.Text?.TrimStart('_')}", Code = serviceCode, Offered = servicesCodes.Contains(serviceCode) };
         }).ToList();
 
@@ -865,6 +974,7 @@ public class UPSService
             //weed out unwanted or unknown service rates
             var serviceCode = rate.Service?.Code;
             var deliveryService = allServices.FirstOrDefault(service => service.Code == serviceCode);
+			_logger.LogError("PrepareShippingOptionsAsync(rateResponse={RateResponse}): deliveryService → {DeliveryService}", rateResponse, deliveryService);
             if (!deliveryService?.Offered ?? true)
                 continue;
 
@@ -883,6 +993,7 @@ public class UPSService
             int? transitDays = null;
 
             var serviceSummary = rate.TimeInTransit?.ServiceSummary;
+			_logger.LogError("PrepareShippingOptionsAsync(rateResponse={RateResponse}): serviceSummary → {ServiceSummary}", rateResponse, serviceSummary);
 
             if (serviceSummary != null)
             {
@@ -892,6 +1003,7 @@ public class UPSService
                 else if (!string.IsNullOrEmpty(serviceSummary.EstimatedArrival.BusinessDaysInTransit) &&
                          int.TryParse(serviceSummary.EstimatedArrival.BusinessDaysInTransit, out var businessDaysInTransit))
                     transitDays = businessDaysInTransit;
+					_logger.LogError("PrepareShippingOptionsAsync(rateResponse={RateResponse}): transitDays → {TransitDays}", rateResponse, transitDays);
             }
 
             //add shipping option based on service rate
@@ -901,8 +1013,10 @@ public class UPSService
                 Name = deliveryService.Name,
                 TransitDays = transitDays
             });
+			_logger.LogDebug("PrepareShippingOptionsAsync(rateResponse={RateResponse}): TransitDays → {TransitDays}", rateResponse, TransitDays);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareShippingOptionsAsync(rateResponse={RateResponse})", rateResponse);
         return shippingOptions;
     }
 
@@ -917,6 +1031,8 @@ public class UPSService
     /// <returns>UPS code</returns>
     public string GetUpsCode(Enum enumValue)
     {
+		_logger.LogError(">>> Entering GetUpsCode(enumValue={EnumValue})", enumValue);
+        _logger.LogWarning("<<< Exiting GetUpsCode(enumValue={EnumValue})", enumValue);
         return GetAttributeValue<UPSCodeAttribute>(enumValue)?.Code;
     }
 
@@ -930,14 +1046,18 @@ public class UPSService
     /// </returns>
     public virtual async Task<IEnumerable<ShipmentStatusEvent>> GetShipmentEventsAsync(string trackingNumber)
     {
+		_logger.LogError(">>> Entering GetShipmentEventsAsync(trackingNumber={TrackingNumber})", trackingNumber);
         try
         {
             //get tracking info
             var response = await TrackAsync(trackingNumber);
+			_logger.LogError("GetShipmentEventsAsync(trackingNumber={TrackingNumber}): response → {Response}", trackingNumber, response);
 
             if (response.Shipment == null)
                 return null;
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogError("GetShipmentEventsAsync(trackingNumber)={TrackingNumber}: database query executed in {Arg1} ms", trackingNumber, __logStart.ElapsedMilliseconds);
             return await response.Shipment
                 .SelectMany(shipment => shipment.Package?
                     .SelectMany(package => package?.Activity)).Where(activity => activity != null)
@@ -947,8 +1067,10 @@ public class UPSService
         {
             //log errors
             var message = $"Error while getting UPS shipment tracking info - {trackingNumber}{Environment.NewLine}{exception.Message}";
+			_logger.LogError("GetShipmentEventsAsync(trackingNumber={TrackingNumber}): message → {Message}", trackingNumber, message);
             await _logger.ErrorAsync(message, exception, await _workContext.GetCurrentCustomerAsync());
 
+			_logger.LogWarning("<<< Exiting GetShipmentEventsAsync(trackingNumber={TrackingNumber})", trackingNumber);
             return new List<ShipmentStatusEvent>();
         }
     }

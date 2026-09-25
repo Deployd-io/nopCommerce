@@ -5,6 +5,7 @@ using Nop.Core.Infrastructure;
 using Nop.Plugin.Payments.PayPalCommerce.Factories;
 using Nop.Plugin.Payments.PayPalCommerce.Services;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Infrastructure;
 
@@ -13,6 +14,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Infrastructure;
 /// </summary>
 public class NopStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -20,11 +22,13 @@ public class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		_logger.LogError(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         services.AddHttpClient<OnboardingHttpClient>().WithProxy();
         services.AddHttpClient<PayPalCommerceHttpClient>().WithProxy();
         services.AddScoped<PayPalCommerceModelFactory>();
         services.AddScoped<PayPalCommerceServiceManager>();
         services.AddScoped<PayPalTokenService>();
+		_logger.LogWarning("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -33,6 +37,8 @@ public class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public void Configure(IApplicationBuilder application)
     {
+	_logger.LogError(">>> Entering Configure(application={Application})", application);
+    _logger.LogWarning("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

@@ -8,6 +8,7 @@ using Nop.Services.Messages;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Controllers;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Misc.Omnisend.Controllers;
 [AutoValidateAntiforgeryToken]
 public class OmnisendAdminController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ILocalizationService _localizationService;
@@ -34,11 +36,16 @@ public class OmnisendAdminController : BasePluginController
         OmnisendService omnisendService,
         OmnisendSettings omnisendSettings)
     {
+		_logger.LogError(">>> Entering OmnisendAdminController(localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings})", localizationService, notificationService, settingService, omnisendService, omnisendSettings);
         _localizationService = localizationService;
         _notificationService = notificationService;
+		_logger.LogDebug("OmnisendAdminController(localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _notificationService → {_notificationService}", localizationService, notificationService, settingService, omnisendService, omnisendSettings, _notificationService);
         _settingService = settingService;
+		_logger.LogDebug("OmnisendAdminController(localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _settingService → {_settingService}", localizationService, notificationService, settingService, omnisendService, omnisendSettings, _settingService);
         _omnisendService = omnisendService;
+		_logger.LogDebug("OmnisendAdminController(localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _omnisendService → {_omnisendService}", localizationService, notificationService, settingService, omnisendService, omnisendSettings, _omnisendService);
         _omnisendSettings = omnisendSettings;
+		_logger.LogDebug("OmnisendAdminController(localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _omnisendSettings → {_omnisendSettings}", localizationService, notificationService, settingService, omnisendService, omnisendSettings, _omnisendSettings);
     }
 
     #endregion
@@ -47,6 +54,7 @@ public class OmnisendAdminController : BasePluginController
 
     private async Task FillBatchesAsync(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering FillBatchesAsync(model={Model})", model);
         if (!_omnisendSettings.BatchesIds.Any())
             return;
 
@@ -58,12 +66,15 @@ public class OmnisendAdminController : BasePluginController
         }
 
         var batches = await _omnisendService.GetStoredBatchesAsync();
+		_logger.LogError("FillBatchesAsync(model={Model}): batches → {Batches}", model, batches);
         model.Batches = batches;
+		_logger.LogDebug("FillBatchesAsync(model={Model}): model.Batches → {Arg1}", model, model.Batches);
 
         model.BlockSyncContacts = model.Batches.Any(p => needBlock(p, OmnisendDefaults.ContactsEndpoint));
         model.BlockSyncOrders = model.Batches.Any(p => needBlock(p, OmnisendDefaults.OrdersEndpoint));
         model.BlockSyncProducts = model.Batches.Any(p => needBlock(p, OmnisendDefaults.ProductsEndpoint)) ||
             batches.Any(p => needBlock(p, OmnisendDefaults.CategoriesEndpoint));
+			_logger.LogWarning("<<< Exiting FillBatchesAsync(model={Model})", model);
     }
 
     #endregion
@@ -72,6 +83,7 @@ public class OmnisendAdminController : BasePluginController
 
     public async Task<IActionResult> Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ApiKey = _omnisendSettings.ApiKey,
@@ -80,6 +92,8 @@ public class OmnisendAdminController : BasePluginController
 
         await FillBatchesAsync(model);
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Misc.Omnisend/Views/Configure.cshtml", model);
     }
 
@@ -121,11 +135,13 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-contacts")]
     public async Task<IActionResult> SyncContacts()
     {
+		_logger.LogError(">>> Entering SyncContacts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncContactsAsync();
 
+		_logger.LogWarning("<<< Exiting SyncContacts()");
         return await Configure();
     }
 
@@ -133,12 +149,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-products")]
     public async Task<IActionResult> SyncProducts()
     {
+		_logger.LogError(">>> Entering SyncProducts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncCategoriesAsync();
         await _omnisendService.SyncProductsAsync();
 
+		_logger.LogWarning("<<< Exiting SyncProducts()");
         return await Configure();
     }
 
@@ -146,12 +164,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-orders")]
     public async Task<IActionResult> SyncOrders()
     {
+		_logger.LogError(">>> Entering SyncOrders()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncOrdersAsync();
         await _omnisendService.SyncCartsAsync();
 
+		_logger.LogWarning("<<< Exiting SyncOrders()");
         return await Configure();
     }
 

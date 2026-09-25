@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </summary>
 public partial class CodeFormatHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected static readonly Regex _regexHtml = new("<[^>]*>", RegexOptions.Compiled);
@@ -36,9 +38,12 @@ public partial class CodeFormatHelper
             Title = string.Empty,
             AlternateLineNumbers = false
         };
+		_logger.LogError(">>> Entering CodeEvaluatorSimple(match={Match})", match);
 
         var result = match.Value;
         result = Highlight(options, result);
+		_logger.LogError("CodeEvaluatorSimple(match={Match}): result → {Result}", match, result);
+		_logger.LogWarning("<<< Exiting CodeEvaluatorSimple(match={Match})", match);
         return result;
     }
 
@@ -49,8 +54,11 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     protected static string StripHtml(string html)
     {
-        if (string.IsNullOrEmpty(html))
+		_logger.LogError(">>> Entering StripHtml(html={Html})", html);
+		_logger.LogWarning("<<< Exiting StripHtml(html={Html})", html);
+        if (string.IsNullOrEmpty(html)) {
             return string.Empty;
+        }
 
         return _regexHtml.Replace(html, string.Empty);
     }
@@ -63,6 +71,7 @@ public partial class CodeFormatHelper
     /// <returns>The formatted string of the match.</returns>
     protected static string Highlight(HighlightOptions options, string text)
     {
+		_logger.LogError(">>> Entering Highlight(options={Options},text={Text})", options, text);
         switch (options.Language)
         {
             case "c#":
@@ -96,7 +105,9 @@ public partial class CodeFormatHelper
                     Alternate = options.AlternateLineNumbers
                 };
                 text = StripHtml(text).Trim();
+				_logger.LogError("Highlight(options={Options},text={Text}): text → {Text1}", options, text, text);
                 var code = htmlf.FormatCode(WebUtility.HtmlDecode(text)).Trim();
+				_logger.LogError("Highlight(options={Options},text={Text}): code → {Code}", options, text, code);
                 return code.Replace("\r\n", "<br />").Replace("\n", "<br />");
 
             case "xml":
@@ -108,6 +119,7 @@ public partial class CodeFormatHelper
                 text = text.Replace("<br />", "\r\n");
                 text = StripHtml(text).Trim();
                 var xml = xmlf.FormatCode(WebUtility.HtmlDecode(text)).Trim();
+				_logger.LogError("Highlight(options={Options},text={Text}): xml → {Xml}", options, text, xml);
                 return xml.Replace("\r\n", "<br />").Replace("\n", "<br />");
 
             case "tsql":
@@ -124,6 +136,7 @@ public partial class CodeFormatHelper
                     LineNumbers = options.DisplayLineNumbers,
                     Alternate = options.AlternateLineNumbers
                 };
+		_logger.LogWarning("<<< Exiting Highlight(options={Options},text={Text})", options, text);
                 return WebUtility.HtmlDecode(mshf.FormatCode(text));
         }
 
@@ -141,6 +154,7 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     public static string FormatTextSimple(string text)
     {
+		_logger.LogError(">>> Entering FormatTextSimple(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -149,6 +163,8 @@ public partial class CodeFormatHelper
 
         text = _regexCode.Replace(text, CodeEvaluatorSimple);
         text = _regexCode.Replace(text, "$1");
+		_logger.LogError("FormatTextSimple(text={Text}): text → {Text1}", text, text);
+		_logger.LogWarning("<<< Exiting FormatTextSimple(text={Text})", text);
         return text;
     }
 

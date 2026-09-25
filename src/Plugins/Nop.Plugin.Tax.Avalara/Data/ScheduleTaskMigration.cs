@@ -7,12 +7,14 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.ScheduleTasks;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Data;
 
 [NopMigration("2021-12-06 00:00:00", "Tax.Avalara 2.60. New schedule task", MigrationProcessType.Update)]
 public class ScheduleTaskMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -31,11 +33,16 @@ public class ScheduleTaskMigration : MigrationBase
         IScheduleTaskService scheduleTaskService,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering ScheduleTaskMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},scheduleTaskService={ScheduleTaskService},settingService={SettingService})", avalaraTaxSettings, languageService, localizationService, scheduleTaskService, settingService);
         _avalaraTaxSettings = avalaraTaxSettings;
         _languageService = languageService;
+		_logger.LogDebug("ScheduleTaskMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},scheduleTaskService={ScheduleTaskService},settingService={SettingService}): _languageService → {_languageService}", avalaraTaxSettings, languageService, localizationService, scheduleTaskService, settingService, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("ScheduleTaskMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},scheduleTaskService={ScheduleTaskService},settingService={SettingService}): _localizationService → {_localizationService}", avalaraTaxSettings, languageService, localizationService, scheduleTaskService, settingService, _localizationService);
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("ScheduleTaskMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},scheduleTaskService={ScheduleTaskService},settingService={SettingService}): _scheduleTaskService → {_scheduleTaskService}", avalaraTaxSettings, languageService, localizationService, scheduleTaskService, settingService, _scheduleTaskService);
         _settingService = settingService;
+		_logger.LogDebug("ScheduleTaskMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},scheduleTaskService={ScheduleTaskService},settingService={SettingService}): _settingService → {_settingService}", avalaraTaxSettings, languageService, localizationService, scheduleTaskService, settingService, _settingService);
     }
 
     #endregion
@@ -47,6 +54,7 @@ public class ScheduleTaskMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -62,11 +70,13 @@ public class ScheduleTaskMigration : MigrationBase
         //settings
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.UseTaxRateTables))
             _avalaraTaxSettings.UseTaxRateTables = true;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.UseTaxRateTables → {Arg0}", _avalaraTaxSettings.UseTaxRateTables);
         _settingService.SaveSetting(_avalaraTaxSettings);
 
         //in version 4.50 we added the LastEnabledUtc field to the ScheduleTask entity,
         //we need to make sure that these changes are applied before inserting new task into the database
         var scheduleTaskTableName = NameCompatibilityManager.GetTableName(typeof(ScheduleTask));
+		_logger.LogError("Up(): scheduleTaskTableName → {ScheduleTaskTableName}", scheduleTaskTableName);
 
         //add column if not exists
         if (!Schema.Table(scheduleTaskTableName).Column(nameof(ScheduleTask.LastEnabledUtc)).Exists())
@@ -83,6 +93,8 @@ public class ScheduleTaskMigration : MigrationBase
             Name = AvalaraTaxDefaults.DownloadTaxRatesTask.Name,
             Type = AvalaraTaxDefaults.DownloadTaxRatesTask.Type
         });
+		_logger.LogDebug("Up(): Type → {Type}", Type);
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -90,7 +102,9 @@ public class ScheduleTaskMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //nothing
+		_logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion
