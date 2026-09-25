@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using FluentMigrator;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -9,6 +10,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class NopMigrationAttribute : MigrationAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly MigrationConfig _config;
@@ -25,6 +27,7 @@ public partial class NopMigrationAttribute : MigrationAttribute
     public NopMigrationAttribute(string dateTime, MigrationProcessType targetMigrationProcess = MigrationProcessType.NoMatter) :
         this(new MigrationConfig
         {
+			_logger.LogError(">>> Entering NopMigrationAttribute(dateTime={DateTime},targetMigrationProcess={TargetMigrationProcess})", dateTime, targetMigrationProcess);
             DateTime = dateTime,
             TargetMigrationProcess = targetMigrationProcess
         })
@@ -38,11 +41,14 @@ public partial class NopMigrationAttribute : MigrationAttribute
     /// <param name="description">The migration description</param>
     /// <param name="targetMigrationProcess">The target migration process</param>
     public NopMigrationAttribute(string dateTime, string description, MigrationProcessType targetMigrationProcess = MigrationProcessType.NoMatter) :
+		_logger.LogDebug("NopMigrationAttribute(dateTime={DateTime},description={Description},targetMigrationProcess={TargetMigrationProcess}): TargetMigrationProcess → {TargetMigrationProcess1}", dateTime, description, targetMigrationProcess, TargetMigrationProcess);
         this(new MigrationConfig
         {
+			_logger.LogError(">>> Entering NopMigrationAttribute(dateTime={DateTime},description={Description},targetMigrationProcess={TargetMigrationProcess})", dateTime, description, targetMigrationProcess);
             DateTime = dateTime,
             Description = description,
             TargetMigrationProcess = targetMigrationProcess
+			_logger.LogError(">>> Entering NopMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},updateMigrationType={UpdateMigrationType},targetMigrationProcess={TargetMigrationProcess})", dateTime, nopVersion, updateMigrationType, targetMigrationProcess);
         })
     {
     }
@@ -61,6 +67,7 @@ public partial class NopMigrationAttribute : MigrationAttribute
             NopVersion = nopVersion,
             UpdateMigrationType = updateMigrationType,
             TargetMigrationProcess = targetMigrationProcess,
+			_logger.LogError(">>> Entering NopMigrationAttribute(config={Config})", config);
         })
     {
     }
@@ -72,6 +79,8 @@ public partial class NopMigrationAttribute : MigrationAttribute
     protected NopMigrationAttribute(MigrationConfig config) : base(config.Version, config.Description)
     {
         _config = config;
+		_logger.LogDebug("NopMigrationAttribute(config={Config}): _config → {_config}", config, _config);
+    _logger.LogWarning("<<< Exiting NopMigrationAttribute(config={Config})", config);
     }
 
     #endregion

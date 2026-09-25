@@ -5,12 +5,14 @@ using Nop.Core.Domain.Security;
 using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo480;
 
 [NopMigration("2023-11-07 12:00:00", "ACL. Added advanced permissions")]
 public class AclMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly IRepository<CustomerRole> _customerRoleRepository;
     protected readonly IRepository<Language> _languageRepository;
     protected readonly IRepository<LocaleStringResource> _localeStringRepository;
@@ -23,10 +25,16 @@ public class AclMigration : Migration
         IRepository<PermissionRecord> permissionRepository,
         IRepository<PermissionRecordCustomerRoleMapping> permissionRecordCustomerRoleMappingRepository)
     {
+		_logger.LogError(">>> Entering AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>)", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository);
         _customerRoleRepository = customerRoleRepository;
         _languageRepository = languageRepository;
+		_logger.LogDebug("AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>): _languageRepository → {_languageRepository}", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository, _languageRepository);
+		_logger.LogDebug("AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>): _customerRoleRepository → {_customerRoleRepository}", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository, _customerRoleRepository);
+    _logger.LogWarning("<<< Exiting AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>)", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository);
         _localeStringRepository = localeStringRepository;
+		_logger.LogDebug("AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>): _localeStringRepository → {_localeStringRepository}", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository, _localeStringRepository);
         _permissionRepository = permissionRepository;
+		_logger.LogDebug("AclMigration(customerRoleRepository={CustomerRoleRepository},languageRepository={LanguageRepository},localeStringRepository={LocaleStringRepository},permissionRepository={PermissionRepository},permissionRecordCustomerRoleMappingRepository=<redacted>): _permissionRepository → {_permissionRepository}", customerRoleRepository, languageRepository, localeStringRepository, permissionRepository, _permissionRepository);
         _permissionRecordCustomerRoleMappingRepository = permissionRecordCustomerRoleMappingRepository;
     }
 
@@ -37,9 +45,11 @@ public class AclMigration : Migration
     /// <returns>Permission record-customer role mapping</returns>
     protected virtual IList<PermissionRecordCustomerRoleMapping> GetMappingByPermissionRecordId(int permissionId)
     {
+		_logger.LogError(">>> Entering GetMappingByPermissionRecordId(permissionId={PermissionId})", permissionId);
         var records = _permissionRecordCustomerRoleMappingRepository.Table
             .Where(x => x.PermissionRecordId == permissionId);
 
+		_logger.LogWarning("<<< Exiting GetMappingByPermissionRecordId(permissionId={PermissionId})", permissionId);
         return records.ToList();
     }
 
@@ -48,6 +58,7 @@ public class AclMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         var dbPermissions = _permissionRepository.Table
             .OrderBy(pr => pr.Id)
             .ToList();
@@ -66,6 +77,7 @@ public class AclMigration : Migration
         void insertMappings(string oldPermissionSystemName, params string[] newPermissionSystemNames)
         {
             var record = getPermissionRecord(oldPermissionSystemName);
+			_logger.LogError("Up(): record → {Record}", record);
 
             if (record == null) 
                 return;
@@ -74,9 +86,11 @@ public class AclMigration : Migration
                 .Select(p => p.CustomerRoleId)
                 .ToList();
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             foreach (var systemName in newPermissionSystemNames)
             {
                 var newPermissionRecord = getPermissionRecord(systemName);
+				_logger.LogError("Up(): newPermissionRecord → {NewPermissionRecord}", newPermissionRecord);
 
                 if (newPermissionRecord == null)
                     continue;
@@ -90,14 +104,18 @@ public class AclMigration : Migration
                                 CustomerRoleId = role,
                                 PermissionRecordId = newPermissionRecord.Id
                             });
+							_logger.LogError("Up(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                     }
                     catch
                     {
+						_logger.LogDebug("Up(): PermissionRecordId → {PermissionRecordId}", PermissionRecordId);
                         //ignore
+						_logger.LogError("Exception in Up(): {Arg0}", ex.Message);
                     }
             }
 
             _permissionRepository.Delete(record);
+			_logger.LogError("Up(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
         
         insertMappings("AccessAdminPanel", StandardPermission.Security.ACCESS_ADMIN_PANEL);
@@ -164,6 +182,7 @@ public class AclMigration : Migration
         if (vendorRole is not null)
         {
             var viewDiscountsPermission = _permissionRepository.Table.FirstOrDefault(x => x.SystemName == StandardPermission.Promotions.DISCOUNTS_VIEW);
+			_logger.LogError("Up(): viewDiscountsPermission → {ViewDiscountsPermission}", viewDiscountsPermission);
             if (viewDiscountsPermission is not null && !_permissionRecordCustomerRoleMappingRepository.Table.Any(x => x.CustomerRoleId == vendorRole.Id && x.PermissionRecordId == viewDiscountsPermission.Id))
             {
                 _permissionRecordCustomerRoleMappingRepository.Insert(
@@ -175,6 +194,7 @@ public class AclMigration : Migration
             }
 
             var crudDiscountsPermission = _permissionRepository.Table.FirstOrDefault(x => x.SystemName == StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE);
+			_logger.LogError("Up(): crudDiscountsPermission → {CrudDiscountsPermission}", crudDiscountsPermission);
             if (crudDiscountsPermission is not null && !_permissionRecordCustomerRoleMappingRepository.Table.Any(x => x.CustomerRoleId == vendorRole.Id && x.PermissionRecordId == crudDiscountsPermission.Id))
             {
                 _permissionRecordCustomerRoleMappingRepository.Insert(
@@ -186,10 +206,13 @@ public class AclMigration : Migration
             }
 
         }
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 }

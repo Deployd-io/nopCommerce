@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Messages;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Messages.Caching;
 /// </summary>
 public partial class MessageTemplateCacheEventConsumer : CacheEventConsumer<MessageTemplate>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -15,6 +17,8 @@ public partial class MessageTemplateCacheEventConsumer : CacheEventConsumer<Mess
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(MessageTemplate entity)
     {
+		_logger.LogError(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopMessageDefaults.MessageTemplatesByNamePrefix, entity.Name);
+		_logger.LogWarning("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

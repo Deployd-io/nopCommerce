@@ -7,6 +7,7 @@ using Nop.Services.Localization;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -22,6 +24,8 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
     /// </summary>
     public NotNullValidationMessageAttribute() : base(typeof(NotNullValidationMessageFilter))
     {
+	_logger.LogError(">>> Entering NotNullValidationMessageAttribute()");
+    _logger.LogWarning("<<< Exiting NotNullValidationMessageAttribute()");
     }
 
     #endregion
@@ -33,6 +37,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
     /// </summary>
     private class NotNullValidationMessageFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly ILocalizationService _localizationService;
@@ -43,7 +48,10 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
 
         public NotNullValidationMessageFilter(ILocalizationService localizationService)
         {
+			_logger.LogError(">>> Entering NotNullValidationMessageFilter(localizationService={LocalizationService})", localizationService);
             _localizationService = localizationService;
+			_logger.LogDebug("NotNullValidationMessageFilter(localizationService={LocalizationService}): _localizationService → {_localizationService}", localizationService, _localizationService);
+        _logger.LogWarning("<<< Exiting NotNullValidationMessageFilter(localizationService={LocalizationService})", localizationService);
         }
 
         #endregion
@@ -57,6 +65,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckNotNullValidationAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering CheckNotNullValidationAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in POST requests
@@ -78,14 +87,21 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
                 return;
 
             //get model passed to the action
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var model = context.ActionArguments.Values.OfType<BaseNopModel>().FirstOrDefault();
-            if (model is null)
+				_logger.LogError("CheckNotNullValidationAsync(context={Context}): model → {Model}", context, model);
+				_logger.LogError("CheckNotNullValidationAsync(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
+            if (model is null) {
                 return;
+            }
 
             //get model properties that failed validation
             var modelType = model.GetType();
+			_logger.LogError("CheckNotNullValidationAsync(context={Context}): modelType → {ModelType}", context, modelType);
             var properties = modelType.GetProperties();
+			_logger.LogError("CheckNotNullValidationAsync(context={Context}): properties → {Properties}", context, properties);
             var locale = await _localizationService.GetResourceAsync(NopValidationDefaults.NotNullValidationLocaleName);
+			_logger.LogError("CheckNotNullValidationAsync(context={Context}): locale → {Locale}", context, locale);
             foreach (var modelState in nullModelValues)
             {
                 if (modelState.Value == null)
@@ -102,6 +118,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
                     .FirstOrDefault()?.ResourceKey;
                 
                 string resourceValue = null;
+				_logger.LogError("CheckNotNullValidationAsync(context={Context}): resourceValue → {ResourceValue}", context, resourceValue);
 
                 if (!string.IsNullOrEmpty(resourceName))
                     //get locale resource value
@@ -114,6 +131,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
                 modelState.Value.Errors.Clear();
                 modelState.Value.Errors.Add(string.Format(locale, resourceValue));
             }
+			_logger.LogWarning("<<< Exiting CheckNotNullValidationAsync(context={Context})", context);
         }
 
         #endregion
@@ -128,9 +146,11 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckNotNullValidationAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

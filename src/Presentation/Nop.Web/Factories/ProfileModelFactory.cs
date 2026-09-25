@@ -13,6 +13,7 @@ using Nop.Services.Media;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Profile;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -21,6 +22,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ProfileModelFactory : IProfileModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -51,16 +53,28 @@ public partial class ProfileModelFactory : IProfileModelFactory
         IWorkContext workContext,
         MediaSettings mediaSettings)
     {
+		_logger.LogError(">>> Entering ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings})", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings);
         _customerSettings = customerSettings;
         _forumSettings = forumSettings;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _forumSettings → {_forumSettings}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _forumSettings);
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _customerSettings → {_customerSettings}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _customerSettings);
+    _logger.LogWarning("<<< Exiting ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings})", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings);
         _countryService = countryService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _countryService → {_countryService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _customerService → {_customerService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _dateTimeHelper → {_dateTimeHelper}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _dateTimeHelper);
         _forumService = forumService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _forumService → {_forumService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _forumService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _genericAttributeService → {_genericAttributeService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _localizationService → {_localizationService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _localizationService);
         _pictureService = pictureService;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _pictureService → {_pictureService}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _pictureService);
         _workContext = workContext;
+		_logger.LogDebug("ProfileModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},pictureService={PictureService},workContext={WorkContext},mediaSettings={MediaSettings}): _workContext → {_workContext}", customerSettings, forumSettings, countryService, customerService, dateTimeHelper, forumService, genericAttributeService, localizationService, pictureService, workContext, mediaSettings, _workContext);
         _mediaSettings = mediaSettings;
     }
 
@@ -79,10 +93,13 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfileIndexModel> PrepareProfileIndexModelAsync(Customer customer, int? page)
     {
+		_logger.LogError(">>> Entering PrepareProfileIndexModelAsync(customer={Customer},page={Page})", customer, page);
         ArgumentNullException.ThrowIfNull(customer);
 
         var pagingPosts = false;
+		_logger.LogError("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): pagingPosts → {PagingPosts}", customer, page, pagingPosts);
         var postsPage = 0;
+		_logger.LogError("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): postsPage → {PostsPage}", customer, page, postsPage);
 
         if (page.HasValue)
         {
@@ -91,7 +108,9 @@ public partial class ProfileModelFactory : IProfileModelFactory
         }
 
         var name = await _customerService.FormatUsernameAsync(customer);
+		_logger.LogError("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): name → {Name}", customer, page, name);
         var title = string.Format(await _localizationService.GetResourceAsync("Profile.ProfileOf"), name);
+		_logger.LogError("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): title → {Title}", customer, page, title);
 
         var model = new ProfileIndexModel
         {
@@ -101,6 +120,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             CustomerProfileId = customer.Id,
             ForumsEnabled = _forumSettings.ForumsEnabled
         };
+		_logger.LogWarning("<<< Exiting PrepareProfileIndexModelAsync(customer={Customer},page={Page})", customer, page);
         return model;
     }
 
@@ -114,10 +134,12 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfileInfoModel> PrepareProfileInfoModelAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering PrepareProfileInfoModelAsync(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         //avatar
         var avatarUrl = "";
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): avatarUrl → {AvatarUrl}", customer, avatarUrl);
         if (_customerSettings.AllowCustomersToUploadAvatars)
         {
             avatarUrl = await _pictureService.GetPictureUrlAsync(
@@ -129,13 +151,16 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         //location
         var locationEnabled = false;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): locationEnabled → {LocationEnabled}", customer, locationEnabled);
         var location = string.Empty;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): location → {Location}", customer, location);
         if (_customerSettings.ShowCustomersLocation)
         {
             locationEnabled = true;
 
             var countryId = customer.CountryId;
             var country = await _countryService.GetCountryByIdAsync(countryId);
+			_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): country → {Country}", customer, country);
             if (country != null)
             {
                 location = await _localizationService.GetLocalizedAsync(country, x => x.Name);
@@ -148,10 +173,13 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         //private message
         var pmEnabled = _forumSettings.AllowPrivateMessages && !await _customerService.IsGuestAsync(customer);
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): pmEnabled → {PmEnabled}", customer, pmEnabled);
 
         //total forum posts
         var totalPostsEnabled = false;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): totalPostsEnabled → {TotalPostsEnabled}", customer, totalPostsEnabled);
         var totalPosts = 0;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): totalPosts → {TotalPosts}", customer, totalPosts);
         if (_forumSettings.ForumsEnabled && _forumSettings.ShowCustomersPostCount)
         {
             totalPostsEnabled = true;
@@ -160,7 +188,9 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         //registration date
         var joinDateEnabled = false;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): joinDateEnabled → {JoinDateEnabled}", customer, joinDateEnabled);
         var joinDate = string.Empty;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): joinDate → {JoinDate}", customer, joinDate);
 
         if (_customerSettings.ShowCustomersJoinDate)
         {
@@ -170,7 +200,9 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         //birth date
         var dateOfBirthEnabled = false;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): dateOfBirthEnabled → {DateOfBirthEnabled}", customer, dateOfBirthEnabled);
         var dateOfBirth = string.Empty;
+		_logger.LogError("PrepareProfileInfoModelAsync(customer={Customer}): dateOfBirth → {DateOfBirth}", customer, dateOfBirth);
         if (_customerSettings.DateOfBirthEnabled)
         {
             if (customer.DateOfBirth.HasValue)
@@ -195,6 +227,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             DateOfBirth = dateOfBirth,
         };
 
+		_logger.LogWarning("<<< Exiting PrepareProfileInfoModelAsync(customer={Customer})", customer);
         return model;
     }
 
@@ -209,6 +242,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfilePostsModel> PrepareProfilePostsModelAsync(Customer customer, int page)
     {
+		_logger.LogError(">>> Entering PrepareProfilePostsModelAsync(customer={Customer},page={Page})", customer, page);
         ArgumentNullException.ThrowIfNull(customer);
 
         if (page > 0)
@@ -219,8 +253,10 @@ public partial class ProfileModelFactory : IProfileModelFactory
         var pageSize = _forumSettings.LatestCustomerPostsPageSize;
 
         var list = await _forumService.GetAllPostsAsync(0, customer.Id, string.Empty, false, page, pageSize);
+		_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): list → {List}", customer, page, list);
 
         var latestPosts = new List<PostsModel>();
+		_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): latestPosts → {LatestPosts}", customer, page, latestPosts);
 
         foreach (var forumPost in list)
         {
@@ -228,15 +264,20 @@ public partial class ProfileModelFactory : IProfileModelFactory
             if (_forumSettings.RelativeDateTimeFormattingEnabled)
             {
                 var languageCode = (await _workContext.GetWorkingLanguageAsync()).LanguageCulture;
+				_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): languageCode → {LanguageCode}", customer, page, languageCode);
                 var postedAgo = forumPost.CreatedOnUtc.RelativeFormat(languageCode);
+				_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): postedAgo → {PostedAgo}", customer, page, postedAgo);
                 posted = string.Format(await _localizationService.GetResourceAsync("Common.RelativeDateTime.Past"), postedAgo);
+				_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): posted → {Posted}", customer, page, posted);
             }
             else
             {
                 posted = (await _dateTimeHelper.ConvertToUserTimeAsync(forumPost.CreatedOnUtc, DateTimeKind.Utc)).ToString("f");
+				_logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): posted → {Posted}", customer, page, posted);
             }
 
             var topic = await _forumService.GetTopicByIdAsync(forumPost.TopicId);
+			_logger.LogError("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): topic → {Topic}", customer, page, topic);
 
             latestPosts.Add(new PostsModel
             {
@@ -246,6 +287,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
                 ForumPostText = _forumService.FormatPostText(forumPost),
                 Posted = posted
             });
+			_logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): Posted → {Posted}", customer, page, Posted);
         }
 
         var pagerModel = new PagerModel(_localizationService)

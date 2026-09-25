@@ -4,6 +4,7 @@ using Nop.Core.Domain.Messages;
 using Nop.Core.Events;
 using Nop.Data;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -12,6 +13,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -30,10 +32,16 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
         IRepository<CustomerCustomerRoleMapping> customerCustomerRoleMappingRepository,
         IRepository<NewsLetterSubscription> subscriptionRepository)
     {
+		_logger.LogError(">>> Entering NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository})", customerService, eventPublisher, customerRepository, subscriptionRepository);
         _customerService = customerService;
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository}): _eventPublisher → {_eventPublisher}", customerService, eventPublisher, customerRepository, subscriptionRepository, _eventPublisher);
+		_logger.LogDebug("NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository}): _customerService → {_customerService}", customerService, eventPublisher, customerRepository, subscriptionRepository, _customerService);
+    _logger.LogWarning("<<< Exiting NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository})", customerService, eventPublisher, customerRepository, subscriptionRepository);
         _customerRepository = customerRepository;
+		_logger.LogDebug("NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository}): _customerRepository → {_customerRepository}", customerService, eventPublisher, customerRepository, subscriptionRepository, _customerRepository);
         _customerCustomerRoleMappingRepository = customerCustomerRoleMappingRepository;
+		_logger.LogDebug("NewsLetterSubscriptionService(customerService={CustomerService},eventPublisher={EventPublisher},customerRepository={CustomerRepository},customerCustomerRoleMappingRepository=<redacted>,subscriptionRepository={SubscriptionRepository}): _customerCustomerRoleMappingRepository → {_customerCustomerRoleMappingRepository}", customerService, eventPublisher, customerRepository, subscriptionRepository, _customerCustomerRoleMappingRepository);
         _subscriptionRepository = subscriptionRepository;
     }
 
@@ -50,6 +58,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PublishSubscriptionEventAsync(NewsLetterSubscription subscription, bool isSubscribe, bool publishSubscriptionEvents)
     {
+		_logger.LogError(">>> Entering PublishSubscriptionEventAsync(subscription={Subscription},isSubscribe={IsSubscribe},publishSubscriptionEvents={PublishSubscriptionEvents})", subscription, isSubscribe, publishSubscriptionEvents);
         if (!publishSubscriptionEvents)
             return;
 
@@ -57,6 +66,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
             await _eventPublisher.PublishNewsLetterSubscribeAsync(subscription);
         else
             await _eventPublisher.PublishNewsLetterUnsubscribeAsync(subscription);
+			_logger.LogWarning("<<< Exiting PublishSubscriptionEventAsync(subscription={Subscription},isSubscribe={IsSubscribe},publishSubscriptionEvents={PublishSubscriptionEvents})", subscription, isSubscribe, publishSubscriptionEvents);
     }
 
     #endregion
@@ -71,17 +81,21 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsLetterSubscriptionAsync(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
     {
+		_logger.LogError(">>> Entering InsertNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
         ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
         //Handle email
         newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
 
         //Persist
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("InsertNewsLetterSubscriptionAsync(newsLetterSubscription,publishSubscriptionEvents)={NewsLetterSubscription},{PublishSubscriptionEvents}: save query executed in {Arg2} ms", newsLetterSubscription, publishSubscriptionEvents, __logStart.ElapsedMilliseconds);
         await _subscriptionRepository.InsertAsync(newsLetterSubscription);
 
         //Publish the subscription event 
         if (newsLetterSubscription.Active)
             await PublishSubscriptionEventAsync(newsLetterSubscription, true, publishSubscriptionEvents);
+			_logger.LogWarning("<<< Exiting InsertNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
     }
 
     /// <summary>
@@ -92,14 +106,19 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsLetterSubscriptionAsync(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
     {
+		_logger.LogError(">>> Entering UpdateNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
         ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
         //Handle email
         newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
 
         //Get original subscription record
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var originalSubscription = await _subscriptionRepository.LoadOriginalCopyAsync(newsLetterSubscription);
 
+		_logger.LogError("UpdateNewsLetterSubscriptionAsync(newsLetterSubscription,publishSubscriptionEvents)={NewsLetterSubscription},{PublishSubscriptionEvents}: find query executed in {Arg2} ms", newsLetterSubscription, publishSubscriptionEvents, __logStart.ElapsedMilliseconds);
+		_logger.LogError("UpdateNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents}): originalSubscription → {OriginalSubscription}", newsLetterSubscription, publishSubscriptionEvents, originalSubscription);
+		_logger.LogError("UpdateNewsLetterSubscriptionAsync(newsLetterSubscription,publishSubscriptionEvents)={NewsLetterSubscription},{PublishSubscriptionEvents}: update query executed in {Arg2} ms", newsLetterSubscription, publishSubscriptionEvents, __logStart.ElapsedMilliseconds);
         //Persist
         await _subscriptionRepository.UpdateAsync(newsLetterSubscription);
 
@@ -121,6 +140,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
         if (originalSubscription.Active && !newsLetterSubscription.Active)
             //If the previous entry was true, but this one is false
             await PublishSubscriptionEventAsync(originalSubscription, false, publishSubscriptionEvents);
+			_logger.LogWarning("<<< Exiting UpdateNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
     }
 
     /// <summary>
@@ -131,12 +151,18 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsLetterSubscriptionAsync(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
     {
+		_logger.LogError(">>> Entering DeleteNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("DeleteNewsLetterSubscriptionAsync(newsLetterSubscription,publishSubscriptionEvents)={NewsLetterSubscription},{PublishSubscriptionEvents}: delete query executed in {Arg2} ms", newsLetterSubscription, publishSubscriptionEvents, __logStartDb.ElapsedMilliseconds);
         await _subscriptionRepository.DeleteAsync(newsLetterSubscription);
 
         //Publish the unsubscribe event 
         await PublishSubscriptionEventAsync(newsLetterSubscription, false, publishSubscriptionEvents);
+		_logger.LogError("DeleteNewsLetterSubscriptionAsync(newsLetterSubscription,publishSubscriptionEvents)={NewsLetterSubscription},{PublishSubscriptionEvents}: external service call took {Arg2} ms", newsLetterSubscription, publishSubscriptionEvents, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteNewsLetterSubscriptionAsync(newsLetterSubscription={NewsLetterSubscription},publishSubscriptionEvents={PublishSubscriptionEvents})", newsLetterSubscription, publishSubscriptionEvents);
     }
 
     /// <summary>
@@ -149,6 +175,9 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// </returns>
     public virtual async Task<NewsLetterSubscription> GetNewsLetterSubscriptionByIdAsync(int newsLetterSubscriptionId)
     {
+		_logger.LogError(">>> Entering GetNewsLetterSubscriptionByIdAsync(newsLetterSubscriptionId={NewsLetterSubscriptionId})", newsLetterSubscriptionId);
+		_logger.LogError("GetNewsLetterSubscriptionByIdAsync(newsLetterSubscriptionId)={NewsLetterSubscriptionId}: find query executing", newsLetterSubscriptionId);
+    _logger.LogWarning("<<< Exiting GetNewsLetterSubscriptionByIdAsync(newsLetterSubscriptionId={NewsLetterSubscriptionId})", newsLetterSubscriptionId);
         return await _subscriptionRepository.GetByIdAsync(newsLetterSubscriptionId, cache => default, useShortTermCache: true);
     }
 
@@ -162,6 +191,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     /// </returns>
     public virtual async Task<IList<NewsLetterSubscription>> GetNewsLetterSubscriptionsByGuidAsync(Guid newsLetterSubscriptionGuid)
     {
+		_logger.LogError(">>> Entering GetNewsLetterSubscriptionsByGuidAsync(newsLetterSubscriptionGuid={NewsLetterSubscriptionGuid})", newsLetterSubscriptionGuid);
         if (newsLetterSubscriptionGuid == Guid.Empty)
             return new List<NewsLetterSubscription>();
 
@@ -171,6 +201,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
             orderby nls.Id
             select nls;
 
+		_logger.LogWarning("<<< Exiting GetNewsLetterSubscriptionsByGuidAsync(newsLetterSubscriptionGuid={NewsLetterSubscriptionGuid})", newsLetterSubscriptionGuid);
         return await newsLetterSubscriptions.ToListAsync();
     }
 
@@ -188,10 +219,14 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
     public virtual async Task<IList<NewsLetterSubscription>> GetNewsLetterSubscriptionsByEmailAsync(string email,
         int storeId = 0, int subscriptionTypeId = 0, bool? isActive = null)
     {
+		_logger.LogError(">>> Entering GetNewsLetterSubscriptionsByEmailAsync(email={Email},storeId={StoreId},subscriptionTypeId={SubscriptionTypeId},isActive={IsActive})", email, storeId, subscriptionTypeId, isActive);
         email = email?.Trim();
-        if (!CommonHelper.IsValidEmail(email))
+			_logger.LogError("GetNewsLetterSubscriptionsByEmailAsync(email={Email},storeId={StoreId},subscriptionTypeId={SubscriptionTypeId},isActive={IsActive}): email → {Email1}", email, storeId, subscriptionTypeId, isActive, email);
+        if (!CommonHelper.IsValidEmail(email)) {
             return new List<NewsLetterSubscription>();
+        }
 
+		_logger.LogError("GetNewsLetterSubscriptionsByEmailAsync(email,storeId,subscriptionTypeId,isActive)={Email},{StoreId},{SubscriptionTypeId},{IsActive}: find query executing", email, storeId, subscriptionTypeId, isActive);
         return await _subscriptionRepository.GetAllAsync(query =>
         {
             if (!string.IsNullOrEmpty(email))
@@ -212,6 +247,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
                 .ThenBy(subscription => subscription.TypeId)
                 .ThenBy(subscription => subscription.Id);
 
+		_logger.LogWarning("<<< Exiting GetNewsLetterSubscriptionsByEmailAsync(email={Email},storeId={StoreId},subscriptionTypeId={SubscriptionTypeId},isActive={IsActive})", email, storeId, subscriptionTypeId, isActive);
             return query;
         });
     }
@@ -237,15 +273,19 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
         int storeId = 0, bool? isActive = null, int customerRoleId = 0, int subscriptionTypeId = 0,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllNewsLetterSubscriptionsAsync(email={Email},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},storeId={StoreId},isActive={IsActive},customerRoleId={CustomerRoleId},subscriptionTypeId={SubscriptionTypeId},pageIndex={PageIndex},pageSize={PageSize})", email, createdFromUtc, createdToUtc, storeId, isActive, customerRoleId, subscriptionTypeId, pageIndex, pageSize);
         if (customerRoleId == 0)
         {
             //do not filter by customer role
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var subscriptions = await _subscriptionRepository.GetAllPagedAsync(query =>
             {
                 if (!string.IsNullOrEmpty(email))
                     query = query.Where(nls => nls.Email.Contains(email));
-                if (createdFromUtc.HasValue)
+					_logger.LogError("GetAllNewsLetterSubscriptionsAsync(email={Email},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},storeId={StoreId},isActive={IsActive},customerRoleId={CustomerRoleId},subscriptionTypeId={SubscriptionTypeId},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", email, createdFromUtc, createdToUtc, storeId, isActive, customerRoleId, subscriptionTypeId, pageIndex, pageSize, query);
+                if (createdFromUtc.HasValue) {
                     query = query.Where(nls => nls.CreatedOnUtc >= createdFromUtc.Value);
+                }
                 if (createdToUtc.HasValue)
                     query = query.Where(nls => nls.CreatedOnUtc <= createdToUtc.Value);
                 if (storeId > 0)
@@ -258,6 +298,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
 
                 return query;
             }, pageIndex, pageSize);
+			_logger.LogError("GetAllNewsLetterSubscriptionsAsync(email,createdFromUtc,createdToUtc,storeId,isActive,customerRoleId,subscriptionTypeId,pageIndex,pageSize)={Email},{CreatedFromUtc},{CreatedToUtc},{StoreId},{IsActive},{CustomerRoleId},{SubscriptionTypeId},{PageIndex},{PageSize}: find query executed in {Arg9} ms", email, createdFromUtc, createdToUtc, storeId, isActive, customerRoleId, subscriptionTypeId, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
             return subscriptions;
         }
@@ -306,6 +347,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
 
                 if (!string.IsNullOrEmpty(email))
                     joindQuery = joindQuery.Where(x => x.NewsLetterSubscription.Email.Contains(email));
+					_logger.LogError("GetAllNewsLetterSubscriptionsAsync(email={Email},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},storeId={StoreId},isActive={IsActive},customerRoleId={CustomerRoleId},subscriptionTypeId={SubscriptionTypeId},pageIndex={PageIndex},pageSize={PageSize}): joindQuery → {JoindQuery}", email, createdFromUtc, createdToUtc, storeId, isActive, customerRoleId, subscriptionTypeId, pageIndex, pageSize, joindQuery);
                 if (createdFromUtc.HasValue)
                     joindQuery = joindQuery.Where(x => x.NewsLetterSubscription.CreatedOnUtc >= createdFromUtc.Value);
                 if (createdToUtc.HasValue)
@@ -322,6 +364,7 @@ public partial class NewsLetterSubscriptionService : INewsLetterSubscriptionServ
                 return joindQuery.Select(x => x.NewsLetterSubscription);
             }, pageIndex, pageSize);
 
+		_logger.LogWarning("<<< Exiting GetAllNewsLetterSubscriptionsAsync(email={Email},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},storeId={StoreId},isActive={IsActive},customerRoleId={CustomerRoleId},subscriptionTypeId={SubscriptionTypeId},pageIndex={PageIndex},pageSize={PageSize})", email, createdFromUtc, createdToUtc, storeId, isActive, customerRoleId, subscriptionTypeId, pageIndex, pageSize);
             return subscriptions;
         }
     }

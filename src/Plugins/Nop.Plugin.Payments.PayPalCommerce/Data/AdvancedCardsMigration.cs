@@ -7,12 +7,14 @@ using Nop.Plugin.Payments.PayPalCommerce.Services;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Data;
 
 [NopMigration("2024-06-06 00:00:01", "Payments.PayPalCommerce 4.70.10. Advanced cards", MigrationProcessType.Update)]
 public class AdvancedCardsMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ILocalizationService _localizationService;
@@ -31,11 +33,16 @@ public class AdvancedCardsMigration : MigrationBase
         PayPalCommerceServiceManager serviceManager,
         PayPalCommerceSettings settings)
     {
+		_logger.LogError(">>> Entering AdvancedCardsMigration(localizationService={LocalizationService},settingService={SettingService},httpClient={HttpClient},serviceManager={ServiceManager},settings={Settings})", localizationService, settingService, httpClient, serviceManager, settings);
         _localizationService = localizationService;
         _settingService = settingService;
+		_logger.LogDebug("AdvancedCardsMigration(localizationService={LocalizationService},settingService={SettingService},httpClient={HttpClient},serviceManager={ServiceManager},settings={Settings}): _settingService → {_settingService}", localizationService, settingService, httpClient, serviceManager, settings, _settingService);
         _httpClient = httpClient;
+		_logger.LogDebug("AdvancedCardsMigration(localizationService={LocalizationService},settingService={SettingService},httpClient={HttpClient},serviceManager={ServiceManager},settings={Settings}): _httpClient → {_httpClient}", localizationService, settingService, httpClient, serviceManager, settings, _httpClient);
         _serviceManager = serviceManager;
+		_logger.LogDebug("AdvancedCardsMigration(localizationService={LocalizationService},settingService={SettingService},httpClient={HttpClient},serviceManager={ServiceManager},settings={Settings}): _serviceManager → {_serviceManager}", localizationService, settingService, httpClient, serviceManager, settings, _serviceManager);
         _settings = settings;
+		_logger.LogDebug("AdvancedCardsMigration(localizationService={LocalizationService},settingService={SettingService},httpClient={HttpClient},serviceManager={ServiceManager},settings={Settings}): _settings → {_settings}", localizationService, settingService, httpClient, serviceManager, settings, _settings);
     }
 
     #endregion
@@ -47,6 +54,8 @@ public class AdvancedCardsMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -121,51 +130,67 @@ public class AdvancedCardsMigration : MigrationBase
 
         if (!_settingService.SettingExists(_settings, settings => settings.MerchantId))
             _settings.MerchantId = null;
+			_logger.LogDebug("Up(): _settings.MerchantId → {Arg0}", _settings.MerchantId);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseCardFields))
             _settings.UseCardFields = false;
+			_logger.LogDebug("Up(): _settings.UseCardFields → {Arg0}", _settings.UseCardFields);
 
         if (!_settingService.SettingExists(_settings, settings => settings.CustomerAuthenticationRequired))
             _settings.CustomerAuthenticationRequired = true;
+			_logger.LogDebug("Up(): _settings.CustomerAuthenticationRequired → {Arg0}", _settings.CustomerAuthenticationRequired);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseApplePay))
             _settings.UseApplePay = false;
+			_logger.LogDebug("Up(): _settings.UseApplePay → {Arg0}", _settings.UseApplePay);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseGooglePay))
             _settings.UseGooglePay = false;
+			_logger.LogDebug("Up(): _settings.UseGooglePay → {Arg0}", _settings.UseGooglePay);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseAlternativePayments))
             _settings.UseAlternativePayments = false;
+			_logger.LogDebug("Up(): _settings.UseAlternativePayments → {Arg0}", _settings.UseAlternativePayments);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseVault))
             _settings.UseVault = false;
+			_logger.LogDebug("Up(): _settings.UseVault → {Arg0}", _settings.UseVault);
 
         if (!_settingService.SettingExists(_settings, settings => settings.SkipOrderConfirmPage))
             _settings.SkipOrderConfirmPage = false;
+			_logger.LogDebug("Up(): _settings.SkipOrderConfirmPage → {Arg0}", _settings.SkipOrderConfirmPage);
 
         if (!_settingService.SettingExists(_settings, settings => settings.UseShipmentTracking))
             _settings.UseShipmentTracking = false;
+			_logger.LogDebug("Up(): _settings.UseShipmentTracking → {Arg0}", _settings.UseShipmentTracking);
 
         if (!_settingService.SettingExists(_settings, settings => settings.DisplayButtonsOnPaymentMethod))
             _settings.DisplayButtonsOnPaymentMethod = true;
+			_logger.LogDebug("Up(): _settings.DisplayButtonsOnPaymentMethod → {Arg0}", _settings.DisplayButtonsOnPaymentMethod);
 
         if (!_settingService.SettingExists(_settings, settings => settings.HideCheckoutButton))
             _settings.HideCheckoutButton = false;
+			_logger.LogDebug("Up(): _settings.HideCheckoutButton → {Arg0}", _settings.HideCheckoutButton);
 
         if (!_settingService.SettingExists(_settings, settings => settings.ImmediatePaymentRequired))
             _settings.ImmediatePaymentRequired = false;
+			_logger.LogDebug("Up(): _settings.ImmediatePaymentRequired → {Arg0}", _settings.ImmediatePaymentRequired);
 
         if (!_settingService.SettingExists(_settings, settings => settings.OrderValidityInterval))
             _settings.OrderValidityInterval = 300;
+			_logger.LogDebug("Up(): _settings.OrderValidityInterval → {Arg0}", _settings.OrderValidityInterval);
 
         if (!_settingService.SettingExists(_settings, settings => settings.ConfiguratorSupported))
             _settings.ConfiguratorSupported = false;
+			_logger.LogDebug("Up(): _settings.ConfiguratorSupported → {Arg0}", _settings.ConfiguratorSupported);
 
         if (!_settingService.SettingExists(_settings, settings => settings.PayLaterConfig))
             _settings.PayLaterConfig = null;
+			_logger.LogDebug("Up(): _settings.PayLaterConfig → {Arg0}", _settings.PayLaterConfig);
 
         if (!_settingService.SettingExists(_settings, settings => settings.MerchantIdRequired))
             _settings.MerchantIdRequired = false;
+			_logger.LogDebug("Up(): _settings.MerchantIdRequired → {Arg0}", _settings.MerchantIdRequired);
 
         try
         {
@@ -176,11 +201,14 @@ public class AdvancedCardsMigration : MigrationBase
                 _settings.MerchantIdRequired = true;
                 _settings.MerchantId = _httpClient.GetMerchantAsync(_settings.MerchantGuid).Result?.MerchantId;
                 _settings.MerchantIdRequired = string.IsNullOrEmpty(_settings.MerchantId);
+				_logger.LogError("Up(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
             }
         }
         catch { }
+		_logger.LogError("Exception in Up()");
 
         _settingService.SaveSetting(_settings);
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -188,6 +216,8 @@ public class AdvancedCardsMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+	_logger.LogError(">>> Entering Down()");
+    _logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion

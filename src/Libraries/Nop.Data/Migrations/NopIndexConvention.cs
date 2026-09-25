@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Conventions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -9,6 +10,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public class NopIndexConvention : IIndexConvention
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly INopDataProvider _dataProvider;
@@ -19,7 +21,11 @@ public class NopIndexConvention : IIndexConvention
 
     public NopIndexConvention(INopDataProvider dataProvider)
     {
+		_logger.LogError(">>> Entering NopIndexConvention(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("NopIndexConvention(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogError("NopIndexConvention(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogWarning("<<< Exiting NopIndexConvention(dataProvider={DataProvider})", dataProvider);
     }
 
     #endregion
@@ -33,6 +39,8 @@ public class NopIndexConvention : IIndexConvention
     /// <returns>Name of an index</returns>
     protected virtual string GetIndexName(IndexDefinition index)
     {
+		_logger.LogError(">>> Entering GetIndexName(index={Index})", index);
+		_logger.LogWarning("<<< Exiting GetIndexName(index={Index})", index);
         return _dataProvider.GetIndexName(index.TableName, string.Join('_', index.Columns.Select(c => c.Name)));
     }
 
@@ -47,9 +55,11 @@ public class NopIndexConvention : IIndexConvention
     /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
     public IIndexExpression Apply(IIndexExpression expression)
     {
+		_logger.LogError(">>> Entering Apply(expression={Expression})", expression);
         if (string.IsNullOrEmpty(expression.Index.Name))
             expression.Index.Name = GetIndexName(expression.Index);
 
+		_logger.LogWarning("<<< Exiting Apply(expression={Expression})", expression);
         return expression;
     }
 

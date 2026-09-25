@@ -2,16 +2,21 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Data;
 using Nop.Web.Framework.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Install;
 
 public partial record InstallModel : INopConnectionStringInfo
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public InstallModel()
     {
+		_logger.LogError(">>> Entering InstallModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableDataProviders = new List<SelectListItem>();
+		_logger.LogError("InstallModel(): AvailableDataProviders → {AvailableDataProviders}", AvailableDataProviders);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("InstallModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     [DataType(DataType.EmailAddress)]

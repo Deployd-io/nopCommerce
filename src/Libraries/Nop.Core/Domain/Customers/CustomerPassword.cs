@@ -1,13 +1,18 @@
-﻿namespace Nop.Core.Domain.Customers;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Customers;
 
 /// <summary>
 /// Represents a customer password
 /// </summary>
 public partial class CustomerPassword : BaseEntity
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerPassword()
     {
+		_logger.LogError(">>> Entering CustomerPassword()");
         PasswordFormat = PasswordFormat.Clear;
+		_logger.LogDebug("CustomerPassword(): PasswordFormat → {PasswordFormat}", PasswordFormat);
+    _logger.LogWarning("<<< Exiting CustomerPassword()");
     }
 
     /// <summary>

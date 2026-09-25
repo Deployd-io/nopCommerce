@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 namespace Nop.Services.Authentication.External;
 
 /// <summary>
@@ -6,9 +7,14 @@ namespace Nop.Services.Authentication.External;
 [Serializable]
 public partial class ExternalAuthenticationParameters
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ExternalAuthenticationParameters()
     {
+		_logger.LogError(">>> Entering ExternalAuthenticationParameters()");
         Claims = new List<ExternalAuthenticationClaim>();
+		_logger.LogDebug("ExternalAuthenticationParameters(): Claims → {Claims}", Claims);
+    _logger.LogError("ExternalAuthenticationParameters(): Claims → {Claims}", Claims);
+    _logger.LogWarning("<<< Exiting ExternalAuthenticationParameters()");
     }
 
     /// <summary>

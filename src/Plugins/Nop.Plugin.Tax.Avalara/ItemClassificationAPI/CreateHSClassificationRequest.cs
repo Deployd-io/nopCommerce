@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.ItemClassificationAPI;
 
@@ -8,9 +9,13 @@ namespace Nop.Plugin.Tax.Avalara.ItemClassificationAPI;
 /// </summary>
 public class CreateHSClassificationRequest : Request
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CreateHSClassificationRequest(string companyId)
     {
+		_logger.LogError(">>> Entering CreateHSClassificationRequest(companyId={CompanyId})", companyId);
         CompanyId = companyId;
+		_logger.LogDebug("CreateHSClassificationRequest(companyId={CompanyId}): CompanyId → {CompanyId1}", companyId, CompanyId);
+    _logger.LogWarning("<<< Exiting CreateHSClassificationRequest(companyId={CompanyId})", companyId);
     }
 
     /// <summary>

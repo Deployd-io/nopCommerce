@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core.Domain.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-doc-reference", Attributes = STRING_RESOURCE_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopDocReferenceTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string STRING_RESOURCE_ATTRIBUTE_NAME = "asp-string-resource";
@@ -26,7 +28,10 @@ public partial class NopDocReferenceTagHelper : TagHelper
 
     public NopDocReferenceTagHelper(AdminAreaSettings adminAreaSettings)
     {
+		_logger.LogError(">>> Entering NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings})", adminAreaSettings);
         _adminAreaSettings = adminAreaSettings;
+		_logger.LogDebug("NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, _adminAreaSettings);
+    _logger.LogWarning("<<< Exiting NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings})", adminAreaSettings);
     }
 
     #endregion
@@ -41,6 +46,7 @@ public partial class NopDocReferenceTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -54,14 +60,18 @@ public partial class NopDocReferenceTagHelper : TagHelper
             if (AddWrapper)
             {
                 output.TagName = "div";
+				_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
                 output.TagMode = TagMode.StartTagAndEndTag;
+				_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
                 output.Attributes.SetAttribute("class", "documentation-reference");
             }
 
             var hintHtml = $"<span>{StringResource}</span>";
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): hintHtml → {HintHtml}", context, output, hintHtml);
             output.Content.AppendHtml(hintHtml);
         }
 
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

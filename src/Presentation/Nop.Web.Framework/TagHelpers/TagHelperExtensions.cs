@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.TagHelpers;
 /// </summary>
 public static class TagHelperExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,12 +21,15 @@ public static class TagHelperExtensions
     /// <returns>Matching name</returns>
     public static async Task<string> GetAttributeValueAsync(this TagHelperOutput output, string attributeName)
     {
+	_logger.LogError(">>> Entering GetAttributeValueAsync(output={Output},attributeName={AttributeName})", output, attributeName);
 
         if (string.IsNullOrEmpty(attributeName) || !output.Attributes.TryGetAttribute(attributeName, out var attr))
             return null;
 
-        if (attr.Value is string stringValue)
+		_logger.LogWarning("<<< Exiting GetAttributeValueAsync(output={Output},attributeName={AttributeName})", output, attributeName);
+        if (attr.Value is string stringValue) {
             return stringValue;
+        }
 
         return attr.Value switch
         {

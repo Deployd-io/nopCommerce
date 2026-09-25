@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Helpers;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Helpers;
 /// </summary>
 public partial class DateTimeHelper : IDateTimeHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly DateTimeSettings _dateTimeSettings;
@@ -21,8 +23,11 @@ public partial class DateTimeHelper : IDateTimeHelper
     public DateTimeHelper(DateTimeSettings dateTimeSettings,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering DateTimeHelper(dateTimeSettings={DateTimeSettings},workContext={WorkContext})", dateTimeSettings, workContext);
         _dateTimeSettings = dateTimeSettings;
         _workContext = workContext;
+		_logger.LogDebug("DateTimeHelper(dateTimeSettings={DateTimeSettings},workContext={WorkContext}): _dateTimeSettings → {_dateTimeSettings}", dateTimeSettings, workContext, _dateTimeSettings);
+    _logger.LogWarning("<<< Exiting DateTimeHelper(dateTimeSettings={DateTimeSettings},workContext={WorkContext})", dateTimeSettings, workContext);
     }
 
     #endregion
@@ -36,6 +41,8 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// <returns>A System.TimeZoneInfo object whose identifier is the value of the id parameter.</returns>
     protected virtual TimeZoneInfo FindTimeZoneById(string id)
     {
+		_logger.LogError(">>> Entering FindTimeZoneById(id={Id})", id);
+        _logger.LogWarning("<<< Exiting FindTimeZoneById(id={Id})", id);
         return TimeZoneInfo.FindSystemTimeZoneById(id);
     }
 
@@ -49,6 +56,8 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// <returns>A read-only collection of System.TimeZoneInfo objects.</returns>
     public virtual ReadOnlyCollection<TimeZoneInfo> GetSystemTimeZones()
     {
+		_logger.LogError(">>> Entering GetSystemTimeZones()");
+        _logger.LogWarning("<<< Exiting GetSystemTimeZones()");
         return TimeZoneInfo.GetSystemTimeZones();
     }
 
@@ -62,6 +71,9 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// </returns>
     public virtual async Task<DateTime> ConvertToUserTimeAsync(DateTime dt)
     {
+		_logger.LogError(">>> Entering ConvertToUserTimeAsync(dt={Dt})", dt);
+        _logger.LogWarning("<<< Exiting ConvertToUserTimeAsync(dt={Dt})", dt);
+		_logger.LogWarning("<<< Exiting ConvertToUserTimeAsync(dt={Dt},sourceDateTimeKind={SourceDateTimeKind})", dt, sourceDateTimeKind);
         return await ConvertToUserTimeAsync(dt, dt.Kind);
     }
 
@@ -93,8 +105,11 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// <returns>A DateTime value that represents time that corresponds to the dateTime parameter in customer time zone.</returns>
     public virtual DateTime ConvertToUserTime(DateTime dt, TimeZoneInfo sourceTimeZone, TimeZoneInfo destinationTimeZone)
     {
-        if (sourceTimeZone.IsInvalidTime(dt))
+		_logger.LogError(">>> Entering ConvertToUserTime(dt={Dt},sourceTimeZone={SourceTimeZone},destinationTimeZone={DestinationTimeZone})", dt, sourceTimeZone, destinationTimeZone);
+		_logger.LogWarning("<<< Exiting ConvertToUserTime(dt={Dt},sourceTimeZone={SourceTimeZone},destinationTimeZone={DestinationTimeZone})", dt, sourceTimeZone, destinationTimeZone);
+        if (sourceTimeZone.IsInvalidTime(dt)) {
             return dt;
+        }
 
         return TimeZoneInfo.ConvertTime(dt, sourceTimeZone, destinationTimeZone);
     }
@@ -106,6 +121,10 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// <returns>A DateTime value that represents the Coordinated Universal Time (UTC) that corresponds to the dateTime parameter. The DateTime value's Kind property is always set to DateTimeKind.Utc.</returns>
     public virtual DateTime ConvertToUtcTime(DateTime dt)
     {
+		_logger.LogError(">>> Entering ConvertToUtcTime(dt={Dt})", dt);
+		_logger.LogWarning("<<< Exiting ConvertToUtcTime(dt={Dt})", dt);
+		_logger.LogWarning("<<< Exiting ConvertToUtcTime(dt={Dt},sourceDateTimeKind={SourceDateTimeKind})", dt, sourceDateTimeKind);
+		_logger.LogWarning("<<< Exiting ConvertToUtcTime(dt={Dt},sourceTimeZone={SourceTimeZone})", dt, sourceTimeZone);
         return ConvertToUtcTime(dt, dt.Kind);
     }
 
@@ -118,8 +137,9 @@ public partial class DateTimeHelper : IDateTimeHelper
     public virtual DateTime ConvertToUtcTime(DateTime dt, DateTimeKind sourceDateTimeKind)
     {
         dt = DateTime.SpecifyKind(dt, sourceDateTimeKind);
-        if (sourceDateTimeKind == DateTimeKind.Local && TimeZoneInfo.Local.IsInvalidTime(dt))
+        if (sourceDateTimeKind == DateTimeKind.Local && TimeZoneInfo.Local.IsInvalidTime(dt)) {
             return dt;
+        }
 
         return TimeZoneInfo.ConvertTimeToUtc(dt);
     }
@@ -151,12 +171,15 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// </returns>
     public virtual Task<TimeZoneInfo> GetCustomerTimeZoneAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering GetCustomerTimeZoneAsync(customer={Customer})", customer);
         if (!_dateTimeSettings.AllowCustomersToSetTimeZone)
             return Task.FromResult(DefaultStoreTimeZone);
 
         TimeZoneInfo timeZoneInfo = null;
+		_logger.LogError("GetCustomerTimeZoneAsync(customer={Customer}): timeZoneInfo → {TimeZoneInfo}", customer, timeZoneInfo);
 
         var timeZoneId = string.Empty;
+		_logger.LogError("GetCustomerTimeZoneAsync(customer={Customer}): timeZoneId → {TimeZoneId}", customer, timeZoneId);
         if (customer != null)
             timeZoneId = customer.TimeZoneId;
 
@@ -167,9 +190,11 @@ public partial class DateTimeHelper : IDateTimeHelper
         }
         catch
         {
+			_logger.LogError("Exception in GetCustomerTimeZoneAsync(customer={Customer}): {Arg1}", customer, ex.Message);
             //ignore
         }
 
+		_logger.LogWarning("<<< Exiting GetCustomerTimeZoneAsync(customer={Customer})", customer);
         return Task.FromResult(timeZoneInfo ?? DefaultStoreTimeZone);
     }
 
@@ -182,6 +207,8 @@ public partial class DateTimeHelper : IDateTimeHelper
     /// </returns>
     public virtual async Task<TimeZoneInfo> GetCurrentTimeZoneAsync()
     {
+		_logger.LogError(">>> Entering GetCurrentTimeZoneAsync()");
+        _logger.LogWarning("<<< Exiting GetCurrentTimeZoneAsync()");
         return await GetCustomerTimeZoneAsync(await _workContext.GetCurrentCustomerAsync());
     }
 

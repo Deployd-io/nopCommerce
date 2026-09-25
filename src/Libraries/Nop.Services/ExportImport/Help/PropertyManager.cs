@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.ExportImport.Help;
 
@@ -12,6 +13,7 @@ namespace Nop.Services.ExportImport.Help;
 /// <typeparam name="T">Object type</typeparam>
 public partial class PropertyManager<T>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Default properties
     /// </summary>
@@ -41,18 +43,28 @@ public partial class PropertyManager<T>
     /// <param name="languages">Languages</param>
     public PropertyManager(IEnumerable<PropertyByName<T>> defaultProperties, CatalogSettings catalogSettings, IEnumerable<PropertyByName<T>> localizedProperties = null, IList<Language> languages = null)
     {
+		_logger.LogError(">>> Entering PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages})", defaultProperties, catalogSettings, localizedProperties, languages);
         _defaultProperties = new Dictionary<string, PropertyByName<T>>();
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _defaultProperties → {_defaultProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _defaultProperties);
+		_logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _catalogSettings → {_catalogSettings}", defaultProperties, catalogSettings, localizedProperties, languages, _catalogSettings);
         _localizedProperties = new Dictionary<string, PropertyByName<T>>();
+		_logger.LogError("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _localizedProperties → {_localizedProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _localizedProperties);
         _languages = new List<Language>();
+		_logger.LogError("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _languages → {_languages}", defaultProperties, catalogSettings, localizedProperties, languages, _languages);
 
-        if (languages != null)
+			_logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _localizedProperties → {_localizedProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _localizedProperties);
+        if (languages != null) {
             _languages = languages;
+        }
 
+		_logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _languages → {_languages}", defaultProperties, catalogSettings, localizedProperties, languages, _languages);
         var poz = 1;
         foreach (var propertyByName in defaultProperties.Where(p => !p.Ignore))
         {
+			_logger.LogError("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _defaultProperties → {_defaultProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _defaultProperties);
             propertyByName.PropertyOrderPosition = poz;
+			_logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): propertyByName.PropertyOrderPosition → {Arg4}", defaultProperties, catalogSettings, localizedProperties, languages, propertyByName.PropertyOrderPosition);
             poz++;
             _defaultProperties.Add(propertyByName.PropertyName, propertyByName);
         }
@@ -67,6 +79,7 @@ public partial class PropertyManager<T>
                 _localizedProperties.Add(propertyByName.PropertyName, propertyByName);
             }
         }
+		_logger.LogWarning("<<< Exiting PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages})", defaultProperties, catalogSettings, localizedProperties, languages);
     }
 
     /// <summary>
@@ -76,10 +89,12 @@ public partial class PropertyManager<T>
     /// <param name="value">The cell value</param>
     protected virtual void SetCellValue(IXLCell cell, object value)
     {
+		_logger.LogError(">>> Entering SetCellValue(cell={Cell},value={Value})", cell, value);
         if (value == null)
         {
             cell.SetValue(Blank.Value);
 
+		_logger.LogDebug("SetCellValue(cell={Cell},value={Value}): cell.Value → {Arg2}", cell, value, cell.Value);
             return;
         }
 
@@ -93,6 +108,7 @@ public partial class PropertyManager<T>
             float floatValue => floatValue,
             _ => value.ToString()
         };
+		_logger.LogWarning("<<< Exiting SetCellValue(cell={Cell},value={Value})", cell, value);
     }
 
     /// <summary>
@@ -106,8 +122,10 @@ public partial class PropertyManager<T>
     /// </returns>
     public virtual async Task<byte[]> ExportToXlsxAsync(IEnumerable<T> itemsToExport)
     {
+		_logger.LogError(">>> Entering ExportToXlsxAsync(itemsToExport={ItemsToExport})", itemsToExport);
         await using var stream = new MemoryStream();
         // ok, we can run the real code of the sample now
+		_logger.LogError("ExportToXlsxAsync(itemsToExport={ItemsToExport}): stream → {Stream}", itemsToExport, stream);
         using (var workbook = new XLWorkbook())
         {
             // uncomment this line if you want the XML written out to the outputDir
@@ -152,6 +170,8 @@ public partial class PropertyManager<T>
         }
 
         CurrentObject = default;
+		_logger.LogDebug("ExportToXlsxAsync(itemsToExport={ItemsToExport}): CurrentObject → {CurrentObject}", itemsToExport, CurrentObject);
+		_logger.LogWarning("<<< Exiting ExportToXlsxAsync(itemsToExport={ItemsToExport})", itemsToExport);
         return stream.ToArray();
     }
 
@@ -172,8 +192,11 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual int GetIndex(string propertyName)
     {
-        if (!_defaultProperties.TryGetValue(propertyName, out var value))
+		_logger.LogError(">>> Entering GetIndex(propertyName={PropertyName})", propertyName);
+		_logger.LogWarning("<<< Exiting GetIndex(propertyName={PropertyName})", propertyName);
+        if (!_defaultProperties.TryGetValue(propertyName, out var value)) {
             return -1;
+        }
 
         return value.PropertyOrderPosition;
     }
@@ -184,7 +207,9 @@ public partial class PropertyManager<T>
     /// <param name="propertyName">Property name</param>
     public virtual void Remove(string propertyName)
     {
+		_logger.LogError(">>> Entering Remove(propertyName={PropertyName})", propertyName);
         _defaultProperties.Remove(propertyName);
+		_logger.LogWarning("<<< Exiting Remove(propertyName={PropertyName})", propertyName);
     }
 
     /// <summary>
@@ -197,20 +222,25 @@ public partial class PropertyManager<T>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WriteDefaultToXlsxAsync(IXLWorksheet worksheet, int row, int cellOffset = 0, IXLWorksheet fWorksheet = null)
     {
+		_logger.LogError(">>> Entering WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
         if (CurrentObject == null)
             return;
 
         var xlRrow = worksheet.Row(row);
+		_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): xlRrow → {XlRrow}", worksheet, row, cellOffset, fWorksheet, xlRrow);
         xlRrow.Style.Alignment.WrapText = false;
         foreach (var prop in _defaultProperties.Values)
         {
             var cell = xlRrow.Cell(prop.PropertyOrderPosition + cellOffset);
+			_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): cell → {Cell}", worksheet, row, cellOffset, fWorksheet, cell);
             if (prop.IsDropDownCell && _catalogSettings.ExportImportRelatedEntitiesByName)
             {
                 var dropDownElements = prop.GetDropDownElements();
+				_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): dropDownElements → {DropDownElements}", worksheet, row, cellOffset, fWorksheet, dropDownElements);
                 if (!dropDownElements.Any())
                 {
                     cell.Value = string.Empty;
+					_logger.LogDebug("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): cell.Value → {Arg4}", worksheet, row, cellOffset, fWorksheet, cell.Value);
                     continue;
                 }
 
@@ -220,9 +250,12 @@ public partial class PropertyManager<T>
                     continue;
 
                 var validator = cell.GetDataValidation();
+				_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator → {Validator}", worksheet, row, cellOffset, fWorksheet, validator);
                 validator.InCellDropdown = true;
+				_logger.LogDebug("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator.InCellDropdown → {Arg4}", worksheet, row, cellOffset, fWorksheet, validator.InCellDropdown);
 
                 validator.IgnoreBlanks = prop.AllowBlank;
+				_logger.LogDebug("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator.IgnoreBlanks → {Arg4}", worksheet, row, cellOffset, fWorksheet, validator.IgnoreBlanks);
 
                 if (fWorksheet == null)
                     continue;
@@ -231,11 +264,13 @@ public partial class PropertyManager<T>
                 foreach (var dropDownElement in dropDownElements)
                 {
                     var fCell = fWorksheet.Row(fRow++).Cell(prop.PropertyOrderPosition);
+					_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): fCell → {FCell}", worksheet, row, cellOffset, fWorksheet, fCell);
 
                     if (!fCell.IsEmpty() && fCell.Value.ToString() == dropDownElement)
                         break;
 
                     fCell.Value = dropDownElement;
+					_logger.LogDebug("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): fCell.Value → {Arg4}", worksheet, row, cellOffset, fWorksheet, fCell.Value);
                 }
 
                 validator.List(fWorksheet.Range(1, prop.PropertyOrderPosition, dropDownElements.Length, prop.PropertyOrderPosition), true);
@@ -243,9 +278,11 @@ public partial class PropertyManager<T>
             else
             {
                 var value = await prop.GetProperty(CurrentObject, CurrentLanguage);
+				_logger.LogError("WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): value → {Value}", worksheet, row, cellOffset, fWorksheet, value);
                 SetCellValue(cell, value);
             }
             cell.Style.Alignment.WrapText = false;
+		_logger.LogWarning("<<< Exiting WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
         }
     }
 
@@ -259,20 +296,25 @@ public partial class PropertyManager<T>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WriteLocalizedToXlsxAsync(IXLWorksheet worksheet, int row, int cellOffset = 0, IXLWorksheet fWorksheet = null)
     {
+		_logger.LogError(">>> Entering WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
         if (CurrentObject == null)
             return;
 
         var xlRrow = worksheet.Row(row);
+		_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): xlRrow → {XlRrow}", worksheet, row, cellOffset, fWorksheet, xlRrow);
         xlRrow.Style.Alignment.WrapText = false;
         foreach (var prop in _localizedProperties.Values)
         {
             var cell = xlRrow.Cell(prop.PropertyOrderPosition + cellOffset);
+			_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): cell → {Cell}", worksheet, row, cellOffset, fWorksheet, cell);
             if (prop.IsDropDownCell && _catalogSettings.ExportImportRelatedEntitiesByName)
             {
                 var dropDownElements = prop.GetDropDownElements();
+				_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): dropDownElements → {DropDownElements}", worksheet, row, cellOffset, fWorksheet, dropDownElements);
                 if (!dropDownElements.Any())
                 {
                     cell.Value = string.Empty;
+					_logger.LogDebug("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): cell.Value → {Arg4}", worksheet, row, cellOffset, fWorksheet, cell.Value);
                     continue;
                 }
 
@@ -282,9 +324,12 @@ public partial class PropertyManager<T>
                     continue;
 
                 var validator = cell.GetDataValidation();
+				_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator → {Validator}", worksheet, row, cellOffset, fWorksheet, validator);
                 validator.InCellDropdown = true;
+				_logger.LogDebug("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator.InCellDropdown → {Arg4}", worksheet, row, cellOffset, fWorksheet, validator.InCellDropdown);
 
                 validator.IgnoreBlanks = prop.AllowBlank;
+				_logger.LogDebug("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): validator.IgnoreBlanks → {Arg4}", worksheet, row, cellOffset, fWorksheet, validator.IgnoreBlanks);
 
                 if (fWorksheet == null)
                     continue;
@@ -293,11 +338,13 @@ public partial class PropertyManager<T>
                 foreach (var dropDownElement in dropDownElements)
                 {
                     var fCell = fWorksheet.Row(fRow++).Cell(prop.PropertyOrderPosition);
+					_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): fCell → {FCell}", worksheet, row, cellOffset, fWorksheet, fCell);
 
                     if (!fCell.IsEmpty() && fCell.Value.ToString() == dropDownElement)
                         break;
 
                     fCell.Value = dropDownElement;
+					_logger.LogDebug("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): fCell.Value → {Arg4}", worksheet, row, cellOffset, fWorksheet, fCell.Value);
                 }
 
                 validator.List(fWorksheet.Range(1, prop.PropertyOrderPosition, dropDownElements.Length, prop.PropertyOrderPosition), true);
@@ -305,9 +352,11 @@ public partial class PropertyManager<T>
             else
             {
                 var value = await prop.GetProperty(CurrentObject, CurrentLanguage);
+				_logger.LogError("WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet}): value → {Value}", worksheet, row, cellOffset, fWorksheet, value);
                 SetCellValue(cell, value);
             }
             cell.Style.Alignment.WrapText = false;
+		_logger.LogWarning("<<< Exiting WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
         }
     }
 
@@ -319,6 +368,7 @@ public partial class PropertyManager<T>
     /// /// <param name="cellOffset">Cell offset</param>
     public virtual void ReadDefaultFromXlsx(IXLWorksheet worksheet, int row, int cellOffset = 0)
     {
+		_logger.LogError(">>> Entering ReadDefaultFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
         if (worksheet?.Cells() == null)
             return;
 
@@ -326,6 +376,7 @@ public partial class PropertyManager<T>
         {
             prop.PropertyValue = worksheet.Row(row).Cell(prop.PropertyOrderPosition + cellOffset).Value;
         }
+		_logger.LogWarning("<<< Exiting ReadDefaultFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -336,6 +387,7 @@ public partial class PropertyManager<T>
     /// /// <param name="cellOffset">Cell offset</param>
     public virtual void ReadLocalizedFromXlsx(IXLWorksheet worksheet, int row, int cellOffset = 0)
     {
+		_logger.LogError(">>> Entering ReadLocalizedFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
         if (worksheet?.Cells() == null)
             return;
 
@@ -343,6 +395,7 @@ public partial class PropertyManager<T>
         {
             prop.PropertyValue = worksheet.Row(row).Cell(prop.PropertyOrderPosition + cellOffset).Value;
         }
+		_logger.LogWarning("<<< Exiting ReadLocalizedFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -353,13 +406,16 @@ public partial class PropertyManager<T>
     /// <param name="cellOffset">Cell offset</param>
     public virtual void WriteDefaultCaption(IXLWorksheet worksheet, int row = 1, int cellOffset = 0)
     {
+		_logger.LogError(">>> Entering WriteDefaultCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
         foreach (var caption in _defaultProperties.Values)
         {
             var cell = worksheet.Row(row).Cell(caption.PropertyOrderPosition + cellOffset);
+			_logger.LogError("WriteDefaultCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset}): cell → {Cell}", worksheet, row, cellOffset, cell);
             cell.Value = caption.ToString();
 
             SetCaptionStyle(cell);
         }
+		_logger.LogWarning("<<< Exiting WriteDefaultCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -370,13 +426,16 @@ public partial class PropertyManager<T>
     /// <param name="cellOffset">Cell offset</param>
     public virtual void WriteLocalizedCaption(IXLWorksheet worksheet, int row = 1, int cellOffset = 0)
     {
+		_logger.LogError(">>> Entering WriteLocalizedCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
         foreach (var caption in _localizedProperties.Values)
         {
             var cell = worksheet.Row(row).Cell(caption.PropertyOrderPosition + cellOffset);
+			_logger.LogError("WriteLocalizedCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset}): cell → {Cell}", worksheet, row, cellOffset, cell);
             cell.Value = caption.ToString();
 
             SetCaptionStyle(cell);
         }
+		_logger.LogWarning("<<< Exiting WriteLocalizedCaption(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -385,9 +444,11 @@ public partial class PropertyManager<T>
     /// <param name="cell">Excel cell</param>
     public virtual void SetCaptionStyle(IXLCell cell)
     {
+		_logger.LogError(">>> Entering SetCaptionStyle(cell={Cell})", cell);
         cell.Style.Fill.PatternType = XLFillPatternValues.Solid;
         cell.Style.Fill.BackgroundColor = XLColor.FromColor(Color.FromArgb(184, 204, 228));
         cell.Style.Font.Bold = true;
+		_logger.LogWarning("<<< Exiting SetCaptionStyle(cell={Cell})", cell);
     }
 
     /// <summary>
@@ -402,6 +463,8 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual PropertyByName<T> GetDefaultProperty(string propertyName)
     {
+		_logger.LogError(">>> Entering GetDefaultProperty(propertyName={PropertyName})", propertyName);
+        _logger.LogWarning("<<< Exiting GetDefaultProperty(propertyName={PropertyName})", propertyName);
         return _defaultProperties.TryGetValue(propertyName, out var value) ? value : null;
     }
 
@@ -412,6 +475,8 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual PropertyByName<T> GetLocalizedProperty(string propertyName)
     {
+		_logger.LogError(">>> Entering GetLocalizedProperty(propertyName={PropertyName})", propertyName);
+        _logger.LogWarning("<<< Exiting GetLocalizedProperty(propertyName={PropertyName})", propertyName);
         return _localizedProperties.TryGetValue(propertyName, out var value) ? value : null;
     }
 
@@ -432,7 +497,11 @@ public partial class PropertyManager<T>
     /// <param name="list">SelectList</param>
     public virtual void SetSelectList(string propertyName, SelectList list)
     {
+		_logger.LogError(">>> Entering SetSelectList(propertyName={PropertyName},list={List})", propertyName, list);
         var tempProperty = GetDefaultProperty(propertyName);
+		_logger.LogWarning("<<< Exiting SetSelectList(propertyName={PropertyName},list={List})", propertyName, list);
+		_logger.LogError("SetSelectList(propertyName={PropertyName},list={List}): tempProperty → {TempProperty}", propertyName, list, tempProperty);
+		_logger.LogDebug("SetSelectList(propertyName={PropertyName},list={List}): tempProperty.DropDownElements → {Arg2}", propertyName, list, tempProperty.DropDownElements);
         if (tempProperty != null)
             tempProperty.DropDownElements = list;
     }

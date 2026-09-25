@@ -9,6 +9,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptionModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -41,13 +43,22 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
         INewsLetterSubscriptionTypeService newsLetterSubscriptionTypeService,
         IStoreService storeService)
     {
+		_logger.LogError(">>> Entering NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService})", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService);
         _catalogSettings = catalogSettings;
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _baseAdminModelFactory);
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _catalogSettings → {_catalogSettings}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _catalogSettings);
+    _logger.LogWarning("<<< Exiting NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService})", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _dateTimeHelper → {_dateTimeHelper}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _dateTimeHelper);
         _languageService = languageService;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _languageService → {_languageService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _localizationService → {_localizationService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _localizationService);
         _newsLetterSubscriptionService = newsLetterSubscriptionService;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _newsLetterSubscriptionService → {_newsLetterSubscriptionService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _newsLetterSubscriptionService);
         _newsLetterSubscriptionTypeService = newsLetterSubscriptionTypeService;
+		_logger.LogDebug("NewsLetterSubscriptionModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},localizationService={LocalizationService},newsLetterSubscriptionService={NewsLetterSubscriptionService},newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},storeService={StoreService}): _newsLetterSubscriptionTypeService → {_newsLetterSubscriptionTypeService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, localizationService, newsLetterSubscriptionService, newsLetterSubscriptionTypeService, storeService, _newsLetterSubscriptionTypeService);
         _storeService = storeService;
     }
 
@@ -65,6 +76,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionSearchModel> PrepareNewsLetterSubscriptionSearchModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -82,6 +94,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             Value = "0",
             Text = await _localizationService.GetResourceAsync("Admin.Promotions.NewsLetterSubscriptions.List.SearchActive.All")
         });
+			_logger.LogDebug("PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel}): Text → {Text}", searchModel, Text);
         searchModel.ActiveList.Add(new SelectListItem
         {
             Value = "1",
@@ -98,6 +111,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -111,10 +125,12 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionListModel> PrepareNewsLetterSubscriptionListModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter newsletter subscriptions
         var isActivatedOnly = searchModel.ActiveId == 0 ? null : searchModel.ActiveId == 1 ? true : (bool?)false;
+		_logger.LogError("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): isActivatedOnly → {IsActivatedOnly}", searchModel, isActivatedOnly);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -131,6 +147,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
         var types = await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync(searchModel.StoreId);
+		_logger.LogError("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): types → {Types}", searchModel, types);
 
         //prepare list model
         var model = await new NewsLetterSubscriptionListModel().PrepareToGridAsync(searchModel, newsletterSubscriptions, () =>
@@ -139,6 +156,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             {
                 //fill in model values from the entity
                 var subscriptionModel = subscription.ToModel<NewsLetterSubscriptionModel>();
+				_logger.LogError("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): subscriptionModel → {SubscriptionModel}", searchModel, subscriptionModel);
 
                 //convert dates to the user time
                 subscriptionModel.CreatedOn = (await _dateTimeHelper.ConvertToUserTimeAsync(subscription.CreatedOnUtc, DateTimeKind.Utc)).ToString();
@@ -153,6 +171,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -169,6 +188,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     public virtual async Task<NewsLetterSubscriptionModel> PrepareNewsLetterSubscriptionModelAsync(NewsLetterSubscriptionModel model,
         NewsLetterSubscription subscription, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareNewsLetterSubscriptionModelAsync(model={Model},subscription={Subscription},excludeProperties={ExcludeProperties})", model, subscription, excludeProperties);
         if (subscription != null)
         {
             //fill in model values from the entity
@@ -184,7 +204,10 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             {
                 //prepare model newsletter subscriptions
                 model.SelectedNewsLetterSubscriptionTypeId = subscription.TypeId;
+				_logger.LogDebug("PrepareNewsLetterSubscriptionModelAsync(model={Model},subscription={Subscription},excludeProperties={ExcludeProperties}): model.SelectedNewsLetterSubscriptionTypeId → {Arg3}", model, subscription, excludeProperties, model.SelectedNewsLetterSubscriptionTypeId);
+				_logger.LogDebug("PrepareNewsLetterSubscriptionModelAsync(model={Model},subscription={Subscription},excludeProperties={ExcludeProperties}): model.SelectedNewsLetterSubscriptionLanguageId → {Arg3}", model, subscription, excludeProperties, model.SelectedNewsLetterSubscriptionLanguageId);
                 model.SelectedNewsLetterSubscriptionStoreId = subscription.StoreId;
+				_logger.LogDebug("PrepareNewsLetterSubscriptionModelAsync(model={Model},subscription={Subscription},excludeProperties={ExcludeProperties}): model.SelectedNewsLetterSubscriptionStoreId → {Arg3}", model, subscription, excludeProperties, model.SelectedNewsLetterSubscriptionStoreId);
                 model.SelectedNewsLetterSubscriptionLanguageId = subscription.LanguageId;
             }
         }
@@ -198,6 +221,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
         //prepare model languages for newsletter subscription
         await _baseAdminModelFactory.PrepareLanguagesAsync(model.AvailableNewsLetterSubscriptionLanguages, false);
 
+		_logger.LogWarning("<<< Exiting PrepareNewsLetterSubscriptionModelAsync(model={Model},subscription={Subscription},excludeProperties={ExcludeProperties})", model, subscription, excludeProperties);
         return model;
     }
 

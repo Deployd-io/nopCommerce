@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public partial class CacheKey
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -16,7 +18,11 @@ public partial class CacheKey
     /// <param name="key">Key</param>
     public CacheKey(string key)
     {
+		_logger.LogError(">>> Entering CacheKey(key={Key})", key);
         Key = key;
+		_logger.LogWarning("CacheKey(key={Key}): Key → {Key1}", key, Key);
+    _logger.LogError("CacheKey(key={Key}): Key → {Key1}", key, Key);
+    _logger.LogWarning("<<< Exiting CacheKey(key={Key})", key);
     }
 
     #endregion
@@ -31,13 +37,16 @@ public partial class CacheKey
     /// <returns>Cache key</returns>
     public virtual CacheKey Create(Func<object, object> createCacheKeyParameters, params object[] keyObjects)
     {
+		_logger.LogError(">>> Entering Create(createCacheKeyParameters={CreateCacheKeyParameters},keyObjects={KeyObjects})", createCacheKeyParameters, keyObjects);
         var cacheKey = new CacheKey(Key);
 
+		_logger.LogError("Create(createCacheKeyParameters={CreateCacheKeyParameters},keyObjects={KeyObjects}): cacheKey → {CacheKey}", createCacheKeyParameters, keyObjects, cacheKey);
         if (!keyObjects.Any())
             return cacheKey;
 
         cacheKey.Key = string.Format(cacheKey.Key, keyObjects.Select(createCacheKeyParameters).ToArray());
 
+		_logger.LogWarning("<<< Exiting Create(createCacheKeyParameters={CreateCacheKeyParameters},keyObjects={KeyObjects})", createCacheKeyParameters, keyObjects);
         return cacheKey;
     }
 

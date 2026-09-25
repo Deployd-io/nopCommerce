@@ -4,6 +4,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -12,11 +13,16 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class GetShippingOptionRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GetShippingOptionRequest()
     {
+		_logger.LogError(">>> Entering GetShippingOptionRequest()");
         Items = new List<PackageItem>();
+		_logger.LogDebug("GetShippingOptionRequest(): Items → {Items}", Items);
+    _logger.LogError("GetShippingOptionRequest(): Items → {Items}", Items);
+    _logger.LogWarning("<<< Exiting GetShippingOptionRequest()");
     }
 
     #endregion
@@ -87,6 +93,7 @@ public partial class GetShippingOptionRequest
     /// </summary>
     public partial class PackageItem
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -95,8 +102,12 @@ public partial class GetShippingOptionRequest
         /// <param name="qty">Override "Quantity" property of shopping cart item</param>
         public PackageItem(ShoppingCartItem sci, Product product, int? qty = null)
         {
+			_logger.LogError(">>> Entering PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
             ShoppingCartItem = sci;
             Product = product;
+			_logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): Product → {Product1}", sci, product, qty, Product);
+			_logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): ShoppingCartItem → {ShoppingCartItem}", sci, product, qty, ShoppingCartItem);
+        _logger.LogWarning("<<< Exiting PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
             OverriddenQuantity = qty;
         }
 
@@ -121,8 +132,11 @@ public partial class GetShippingOptionRequest
         /// <returns></returns>
         public int GetQuantity()
         {
-            if (OverriddenQuantity.HasValue)
+			_logger.LogError(">>> Entering GetQuantity()");
+			_logger.LogWarning("<<< Exiting GetQuantity()");
+            if (OverriddenQuantity.HasValue) {
                 return OverriddenQuantity.Value;
+            }
 
             return ShoppingCartItem.Quantity;
         }

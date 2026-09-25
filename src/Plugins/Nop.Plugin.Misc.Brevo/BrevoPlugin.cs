@@ -11,6 +11,7 @@ using Nop.Services.Plugins;
 using Nop.Services.ScheduleTasks;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.Brevo;
 /// </summary>
 public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IEmailAccountService _emailAccountService;
@@ -45,15 +47,24 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         IWebHelper webHelper,
         WidgetSettings widgetSettings)
     {
+		_logger.LogError(">>> Entering BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings})", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings);
         _emailAccountService = emailAccountService;
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _genericAttributeService → {_genericAttributeService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _localizationService);
         _messageTemplateService = messageTemplateService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _messageTemplateService → {_messageTemplateService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _messageTemplateService);
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _scheduleTaskService → {_scheduleTaskService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _scheduleTaskService);
         _settingService = settingService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _settingService → {_settingService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _settingService);
         _storeService = storeService;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _storeService → {_storeService}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _storeService);
         _webHelper = webHelper;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _webHelper → {_webHelper}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _webHelper);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("BrevoPlugin(emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},messageTemplateService={MessageTemplateService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeService={StoreService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", emailAccountService, genericAttributeService, localizationService, messageTemplateService, scheduleTaskService, settingService, storeService, webHelper, widgetSettings, _widgetSettings);
     }
 
     #endregion
@@ -69,6 +80,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogError(">>> Entering GetWidgetZonesAsync()");
+        _logger.LogWarning("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.HeadHtmlTag });
     }
 
@@ -79,6 +92,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogError(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+        _logger.LogWarning("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(WidgetsBrevoViewComponent);
     }
 
@@ -87,6 +102,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/Brevo/Configure";
     }
 
@@ -96,17 +113,20 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new BrevoSettings
         {
             //prepopulate a tracking script
             TrackingScript = $@"<!-- Brevo tracking code -->
                 <script>
+				_logger.LogDebug("InstallAsync(): TrackingScript → {TrackingScript}", TrackingScript);
                     (function() {{
                         window.sib = {{ equeue: [], client_key: '{BrevoDefaults.TrackingScriptId}' }};
                         window.sib.email_id = '{BrevoDefaults.TrackingScriptCustomerEmail}';
                         window.sendinblue = {{}}; for (var j = ['track', 'identify', 'trackLink', 'page'], i = 0; i < j.length; i++) {{ (function(k) {{ window.sendinblue[k] = function() {{ var arg = Array.prototype.slice.call(arguments); (window.sib[k] || function() {{ var t = {{}}; t[k] = arg; window.sib.equeue.push(t);}})(arg[0], arg[1], arg[2]);}};}})(j[i]);}}var n = document.createElement('script'),i = document.getElementsByTagName('script')[0]; n.type = 'text/javascript', n.id = 'sendinblue-js', n.async = !0, n.src = 'https://sibautomation.com/sa.js?key=' + window.sib.client_key, i.parentNode.insertBefore(n, i), window.sendinblue.page();
                     }})();
+					_logger.LogDebug("InstallAsync(): window.sib → {Arg0}", window.sib);
                 </script>"
         });
 
@@ -189,6 +209,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -197,12 +218,16 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         //smtp accounts
         foreach (var store in await _storeService.GetAllStoresAsync())
         {
             var key = $"{nameof(BrevoSettings)}.{nameof(BrevoSettings.EmailAccountId)}";
+			_logger.LogError("UninstallAsync(): key → {Key}", key);
             var emailAccountId = await _settingService.GetSettingByKeyAsync<int>(key, storeId: store.Id, loadSharedValueIfNotFound: true);
+			_logger.LogError("UninstallAsync(): emailAccountId → {EmailAccountId}", emailAccountId);
             var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(emailAccountId);
+			_logger.LogError("UninstallAsync(): emailAccount → {EmailAccount}", emailAccount);
             if (emailAccount != null)
                 await _emailAccountService.DeleteEmailAccountAsync(emailAccount);
         }
@@ -219,6 +244,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         foreach (var store in await _storeService.GetAllStoresAsync())
         {
             var messageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(store.Id);
+			_logger.LogError("UninstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
             foreach (var messageTemplate in messageTemplates)
             {
                 await _genericAttributeService.SaveAttributeAsync<int?>(messageTemplate, BrevoDefaults.TemplateIdAttribute, null);
@@ -227,6 +253,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 
         //schedule task
         var task = await _scheduleTaskService.GetTaskByTypeAsync(BrevoDefaults.SynchronizationTask);
+		_logger.LogError("UninstallAsync(): task → {Task}", task);
         if (task != null)
             await _scheduleTaskService.DeleteTaskAsync(task);
 
@@ -234,6 +261,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.Brevo");
 
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

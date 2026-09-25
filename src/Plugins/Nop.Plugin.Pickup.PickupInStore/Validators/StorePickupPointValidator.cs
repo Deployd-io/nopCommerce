@@ -2,13 +2,16 @@
 using Nop.Plugin.Pickup.PickupInStore.Models;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Validators;
 
 public class StorePickupPointValidator : BaseNopValidator<StorePickupPointModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public StorePickupPointValidator(ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering StorePickupPointValidator(localizationService={LocalizationService})", localizationService);
         // Latitude
         RuleFor(model => model.Latitude)
             .InclusiveBetween(-90, 90)
@@ -34,5 +37,6 @@ public class StorePickupPointValidator : BaseNopValidator<StorePickupPointModel>
         RuleFor(model => model.Longitude)
             .PrecisionScale(18, 8, false)
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Pickup.PickupInStore.Fields.Longitude.InvalidPrecision"));
+			_logger.LogWarning("<<< Exiting StorePickupPointValidator(localizationService={LocalizationService})", localizationService);
     }
 }

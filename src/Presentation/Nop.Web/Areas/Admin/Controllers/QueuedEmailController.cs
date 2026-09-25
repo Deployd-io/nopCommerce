@@ -9,11 +9,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class QueuedEmailController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -34,12 +36,18 @@ public partial class QueuedEmailController : BaseAdminController
         IQueuedEmailModelFactory queuedEmailModelFactory,
         IQueuedEmailService queuedEmailService)
     {
+		_logger.LogError(">>> Entering QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService})", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService);
         _dateTimeHelper = dateTimeHelper;
         _localizationService = localizationService;
+		_logger.LogDebug("QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService}): _localizationService → {_localizationService}", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService}): _notificationService → {_notificationService}", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService}): _permissionService → {_permissionService}", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService, _permissionService);
         _queuedEmailModelFactory = queuedEmailModelFactory;
+		_logger.LogDebug("QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService}): _queuedEmailModelFactory → {_queuedEmailModelFactory}", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService, _queuedEmailModelFactory);
         _queuedEmailService = queuedEmailService;
+		_logger.LogDebug("QueuedEmailController(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},queuedEmailModelFactory={QueuedEmailModelFactory},queuedEmailService={QueuedEmailService}): _queuedEmailService → {_queuedEmailService}", dateTimeHelper, localizationService, notificationService, permissionService, queuedEmailModelFactory, queuedEmailService, _queuedEmailService);
     }
 
     #endregion
@@ -48,15 +56,20 @@ public partial class QueuedEmailController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _queuedEmailModelFactory.PrepareQueuedEmailSearchModelAsync(new QueuedEmailSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
         return View(model);
     }
 
@@ -64,9 +77,12 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> QueuedEmailList(QueuedEmailSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering QueuedEmailList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _queuedEmailModelFactory.PrepareQueuedEmailListModelAsync(searchModel);
+		_logger.LogError("QueuedEmailList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting QueuedEmailList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -74,10 +90,14 @@ public partial class QueuedEmailController : BaseAdminController
     [FormValueRequired("go-to-email-by-number")]
     public virtual async Task<IActionResult> GoToEmailByNumber(QueuedEmailSearchModel model)
     {
+		_logger.LogError(">>> Entering GoToEmailByNumber(model={Model})", model);
         //try to get a queued email with the specified id
         var queuedEmail = await _queuedEmailService.GetQueuedEmailByIdAsync(model.GoDirectlyToNumber);
-        if (queuedEmail == null)
+		_logger.LogError("GoToEmailByNumber(model={Model}): queuedEmail → {QueuedEmail}", model, queuedEmail);
+		_logger.LogWarning("<<< Exiting GoToEmailByNumber(model={Model})", model);
+        if (queuedEmail == null) {
             return await List();
+        }
 
         return RedirectToAction("Edit", "QueuedEmail", new { id = queuedEmail.Id });
     }
@@ -85,14 +105,19 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a queued email with the specified id
         var email = await _queuedEmailService.GetQueuedEmailByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): email → {Email}", id, email);
         if (email == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _queuedEmailModelFactory.PrepareQueuedEmailModelAsync(null, email);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -130,8 +155,10 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> Requeue(QueuedEmailModel queuedEmailModel)
     {
+		_logger.LogError(">>> Entering Requeue(queuedEmailModel={QueuedEmailModel})", queuedEmailModel);
         //try to get a queued email with the specified id
         var queuedEmail = await _queuedEmailService.GetQueuedEmailByIdAsync(queuedEmailModel.Id);
+		_logger.LogError("Requeue(queuedEmailModel={QueuedEmailModel}): queuedEmail → {QueuedEmail}", queuedEmailModel, queuedEmail);
         if (queuedEmail == null)
             return RedirectToAction("List");
 
@@ -160,6 +187,7 @@ public partial class QueuedEmailController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.System.QueuedEmails.Requeued"));
 
+		_logger.LogWarning("<<< Exiting Requeue(queuedEmailModel={QueuedEmailModel})", queuedEmailModel);
         return RedirectToAction("Edit", new { id = requeuedEmail.Id });
     }
 
@@ -167,8 +195,10 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a queued email with the specified id
         var email = await _queuedEmailService.GetQueuedEmailByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): email → {Email}", id, email);
         if (email == null)
             return RedirectToAction("List");
 
@@ -176,6 +206,7 @@ public partial class QueuedEmailController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.System.QueuedEmails.Deleted"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -183,11 +214,13 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         await _queuedEmailService.DeleteQueuedEmailsAsync(await _queuedEmailService.GetQueuedEmailsByIdsAsync(selectedIds.ToArray()));
 
+		_logger.LogWarning("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -196,10 +229,12 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> DeleteAll()
     {
+		_logger.LogError(">>> Entering DeleteAll()");
         await _queuedEmailService.DeleteAllEmailsAsync();
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.System.QueuedEmails.DeletedAll"));
 
+		_logger.LogWarning("<<< Exiting DeleteAll()");
         return RedirectToAction("List");
     }
 
@@ -207,16 +242,19 @@ public partial class QueuedEmailController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MESSAGE_QUEUE)]
     public virtual async Task<IActionResult> RequeueSelected(int[] selectedIds)
     {
+		_logger.LogError(">>> Entering RequeueSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || selectedIds.Length == 0)
             return NoContent();
 
         var emailsToRequeue = await _queuedEmailService.GetQueuedEmailsByIdsAsync(selectedIds);
+		_logger.LogError("RequeueSelected(selectedIds={SelectedIds}): emailsToRequeue → {EmailsToRequeue}", selectedIds, emailsToRequeue);
 
         if (!emailsToRequeue.Any())
             return NotFound();
 
         await _queuedEmailService.RequeueQueuedEmailsAsync(emailsToRequeue);
 
+		_logger.LogWarning("<<< Exiting RequeueSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 

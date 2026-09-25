@@ -11,11 +11,13 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ProductReviewController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -48,18 +50,30 @@ public partial class ProductReviewController : BaseAdminController
         IWorkContext workContext,
         IWorkflowMessageService workflowMessageService)
     {
+		_logger.LogError(">>> Entering ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService})", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService);
         _catalogSettings = catalogSettings;
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _customerActivityService → {_customerActivityService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _customerActivityService);
         _customerService = customerService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _customerService → {_customerService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _customerService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _eventPublisher → {_eventPublisher}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _eventPublisher);
         _localizationService = localizationService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _localizationService → {_localizationService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _notificationService → {_notificationService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _permissionService → {_permissionService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _permissionService);
         _productReviewModelFactory = productReviewModelFactory;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _productReviewModelFactory → {_productReviewModelFactory}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _productReviewModelFactory);
         _productReviewService = productReviewService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _productReviewService → {_productReviewService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _productReviewService);
         _productService = productService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _productService → {_productService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _productService);
         _workContext = workContext;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _workContext → {_workContext}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _workContext);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("ProductReviewController(catalogSettings={CatalogSettings},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productReviewModelFactory={ProductReviewModelFactory},productReviewService={ProductReviewService},productService={ProductService},workContext={WorkContext},workflowMessageService={WorkflowMessageService}): _workflowMessageService → {_workflowMessageService}", catalogSettings, customerActivityService, customerService, eventPublisher, localizationService, notificationService, permissionService, productReviewModelFactory, productReviewService, productService, workContext, workflowMessageService, _workflowMessageService);
     }
 
     #endregion
@@ -68,15 +82,21 @@ public partial class ProductReviewController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewSearchModelAsync(new ProductReviewSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
+		_logger.LogWarning("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -93,19 +113,25 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a product review with the specified id
         var productReview = await _productReviewService.GetProductReviewByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): productReview → {ProductReview}", id, productReview);
         if (productReview == null)
             return RedirectToAction("List");
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("Edit(id={Id}): currentVendor → {CurrentVendor}", id, currentVendor);
         if (currentVendor != null && (await _productService.GetProductByIdAsync(productReview.ProductId)).VendorId != currentVendor.Id)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewModelAsync(null, productReview);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -185,8 +211,10 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a product review with the specified id
         var productReview = await _productReviewService.GetProductReviewByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): productReview → {ProductReview}", id, productReview);
         if (productReview == null)
             return RedirectToAction("List");
 
@@ -201,12 +229,14 @@ public partial class ProductReviewController : BaseAdminController
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteProductReview"), productReview.Id), productReview);
 
         var product = await _productService.GetProductByIdAsync(productReview.ProductId);
+		_logger.LogError("Delete(id={Id}): product → {Product}", id, product);
 
         //update product totals
         await _productReviewService.UpdateProductReviewTotalsAsync(product);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.ProductReviews.Deleted"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -214,6 +244,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ApproveSelected(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -223,6 +254,7 @@ public partial class ProductReviewController : BaseAdminController
 
         //filter not approved reviews
         var productReviews = (await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray())).Where(review => !review.IsApproved);
+		_logger.LogError("ApproveSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
 
         foreach (var productReview in productReviews)
         {
@@ -230,6 +262,7 @@ public partial class ProductReviewController : BaseAdminController
             await _productReviewService.UpdateProductReviewAsync(productReview);
 
             var product = await _productService.GetProductByIdAsync(productReview.ProductId);
+			_logger.LogError("ApproveSelected(selectedIds={SelectedIds}): product → {Product}", selectedIds, product);
 
             //update product totals
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
@@ -238,6 +271,7 @@ public partial class ProductReviewController : BaseAdminController
             await _eventPublisher.PublishAsync(new ProductReviewApprovedEvent(productReview));
         }
 
+		_logger.LogWarning("<<< Exiting ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -245,6 +279,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DisapproveSelected(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -254,6 +289,7 @@ public partial class ProductReviewController : BaseAdminController
 
         //filter approved reviews
         var productReviews = (await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray())).Where(review => review.IsApproved);
+		_logger.LogError("DisapproveSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
 
         foreach (var productReview in productReviews)
         {
@@ -261,11 +297,13 @@ public partial class ProductReviewController : BaseAdminController
             await _productReviewService.UpdateProductReviewAsync(productReview);
 
             var product = await _productService.GetProductByIdAsync(productReview.ProductId);
+			_logger.LogError("DisapproveSelected(selectedIds={SelectedIds}): product → {Product}", selectedIds, product);
 
             //update product totals
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
         }
 
+		_logger.LogWarning("<<< Exiting DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -273,6 +311,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -281,12 +320,15 @@ public partial class ProductReviewController : BaseAdminController
             return NoContent();
 
         var productReviews = await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray());
+		_logger.LogError("DeleteSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
         var products = await _productService.GetProductsByIdsAsync(productReviews.Select(p => p.ProductId).Distinct().ToArray());
+		_logger.LogError("DeleteSelected(selectedIds={SelectedIds}): products → {Products}", selectedIds, products);
 
         await _productReviewService.DeleteProductReviewsAsync(productReviews);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteProductReview");
+		_logger.LogError("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
         await _customerActivityService.InsertActivitiesAsync("DeleteProductReview", productReviews, productReview => string.Format(activityLogFormat, productReview.Id));
 
         //update product totals
@@ -295,6 +337,7 @@ public partial class ProductReviewController : BaseAdminController
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
         }
 
+		_logger.LogWarning("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -302,12 +345,15 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> ProductReviewReviewTypeMappingList(ProductReviewReviewTypeMappingSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering ProductReviewReviewTypeMappingList(searchModel={SearchModel})", searchModel);
         var productReview = await _productReviewService.GetProductReviewByIdAsync(searchModel.ProductReviewId)
             ?? throw new ArgumentException("No product review found with the specified id");
 
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewReviewTypeMappingListModelAsync(searchModel, productReview);
+		_logger.LogError("ProductReviewReviewTypeMappingList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting ProductReviewReviewTypeMappingList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

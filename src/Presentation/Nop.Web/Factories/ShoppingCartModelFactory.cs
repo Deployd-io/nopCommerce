@@ -33,6 +33,7 @@ using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -41,6 +42,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -214,11 +216,15 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     protected virtual async Task<IList<ShoppingCartModel.CheckoutAttributeModel>> PrepareCheckoutAttributeModelsAsync(
         IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering PrepareCheckoutAttributeModelsAsync(cart={Cart})", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         var model = new List<ShoppingCartModel.CheckoutAttributeModel>();
+		_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): model → {Model}", cart, model);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): store → {Store}", cart, store);
         var excludeShippableAttributes = !await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
+		_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): excludeShippableAttributes → {ExcludeShippableAttributes}", cart, excludeShippableAttributes);
         var checkoutAttributes =
             await _checkoutAttributeService.GetAllAttributesAsync(_staticCacheManager, _storeMappingService, store.Id, excludeShippableAttributes);
         foreach (var attribute in checkoutAttributes)
@@ -237,12 +243,14 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 attributeModel.AllowedFileExtensions = attribute.ValidationFileAllowedExtensions
                     .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
+					_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeModel.AllowedFileExtensions → {Arg1}", cart, attributeModel.AllowedFileExtensions);
             }
 
             if (attribute.ShouldHaveValues)
             {
                 //values
                 var attributeValues = await _checkoutAttributeService.GetAttributeValuesAsync(attribute.Id);
+				_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeValues → {AttributeValues}", cart, attributeValues);
                 foreach (var attributeValue in attributeValues)
                 {
                     var attributeValueModel = new ShoppingCartModel.CheckoutAttributeValueModel
@@ -283,11 +291,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 case AttributeControlType.ColorSquares:
                 case AttributeControlType.ImageSquares:
                 {
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
                     if (!string.IsNullOrEmpty(selectedCheckoutAttributes))
                     {
                         //clear default selection
                         foreach (var item in attributeModel.Values)
                             item.IsPreSelected = false;
+							_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): item.IsPreSelected → {Arg1}", cart, item.IsPreSelected);
 
                         //select new values
                         var selectedValues =
@@ -297,6 +307,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                             if (attributeValue.Id == item.Id)
                                 item.IsPreSelected = true;
                     }
+					_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart)={Cart}: database query executed in {Arg1} ms", cart, __logStart.ElapsedMilliseconds);
                 }
 
                     break;
@@ -316,6 +327,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                             _checkoutAttributeParser.ParseValues(selectedCheckoutAttributes, attribute.Id);
                         if (enteredText.Any())
                             attributeModel.DefaultValue = enteredText[0];
+							_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeModel.DefaultValue → {Arg1}", cart, attributeModel.DefaultValue);
                     }
                 }
 
@@ -332,7 +344,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                         {
                             //successfully parsed
                             attributeModel.SelectedDay = selectedDate.Day;
+							_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeModel.SelectedDay → {Arg1}", cart, attributeModel.SelectedDay);
+							_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeModel.SelectedYear → {Arg1}", cart, attributeModel.SelectedYear);
                             attributeModel.SelectedMonth = selectedDate.Month;
+							_logger.LogDebug("PrepareCheckoutAttributeModelsAsync(cart={Cart}): attributeModel.SelectedMonth → {Arg1}", cart, attributeModel.SelectedMonth);
                             attributeModel.SelectedYear = selectedDate.Year;
                         }
                     }
@@ -346,7 +361,9 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                         var downloadGuidStr = _checkoutAttributeParser
                             .ParseValues(selectedCheckoutAttributes, attribute.Id).FirstOrDefault();
                         _ = Guid.TryParse(downloadGuidStr, out var downloadGuid);
+						_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): _ → {_}", cart, _);
                         var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
+						_logger.LogError("PrepareCheckoutAttributeModelsAsync(cart={Cart}): download → {Download}", cart, download);
                         if (download != null)
                             attributeModel.DefaultValue = download.DownloadGuid.ToString();
                     }
@@ -360,6 +377,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             model.Add(attributeModel);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareCheckoutAttributeModelsAsync(cart={Cart})", cart);
         return model;
     }
 
@@ -374,11 +392,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     protected virtual async Task<ShoppingCartModel.ShoppingCartItemModel> PrepareShoppingCartItemModelAsync(IList<ShoppingCartItem> cart, ShoppingCartItem sci)
     {
+		_logger.LogError(">>> Entering PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci})", cart, sci);
         ArgumentNullException.ThrowIfNull(cart);
 
         ArgumentNullException.ThrowIfNull(sci);
 
         var product = await _productService.GetProductByIdAsync(sci.ProductId);
+		_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): product → {Product}", cart, sci, product);
 
         var cartItemModel = new ShoppingCartModel.ShoppingCartItemModel
         {
@@ -402,6 +422,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                                          (!string.IsNullOrEmpty(cartItemModel.AttributeInfo) ||
                                           product.IsGiftCard) &&
                                          product.VisibleIndividually;
+										_logger.LogDebug("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): cartItemModel.AllowItemEditing → {Arg2}", cart, sci, cartItemModel.AllowItemEditing);
 
         //disable removal?
         //1. do other items require this one?
@@ -409,6 +430,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //allowed quantities
         var allowedQuantities = _productService.ParseAllowedQuantities(product);
+		_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): allowedQuantities → {AllowedQuantities}", cart, sci, allowedQuantities);
         foreach (var qty in allowedQuantities)
         {
             cartItemModel.AllowedQuantities.Add(new SelectListItem
@@ -440,17 +462,20 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //unit prices
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): currentCurrency → {CurrentCurrency}", cart, sci, currentCurrency);
         if (product.CallForPrice &&
             //also check whether the current user is impersonated
             (!_orderSettings.AllowAdminsToBuyCallForPriceProducts || _workContext.OriginalCustomerIfImpersonated == null))
         {
             cartItemModel.UnitPrice = await _localizationService.GetResourceAsync("Products.CallForPrice");
             cartItemModel.UnitPriceValue = 0;
+			_logger.LogDebug("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): cartItemModel.UnitPriceValue → {Arg2}", cart, sci, cartItemModel.UnitPriceValue);
         }
         else
         {
             var (shoppingCartUnitPriceWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, (await _shoppingCartService.GetUnitPriceAsync(sci, true)).unitPrice);
             var shoppingCartUnitPriceWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartUnitPriceWithDiscountBase, currentCurrency);
+			_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): shoppingCartUnitPriceWithDiscount → {ShoppingCartUnitPriceWithDiscount}", cart, sci, shoppingCartUnitPriceWithDiscount);
             cartItemModel.UnitPrice = await _priceFormatter.FormatPriceAsync(shoppingCartUnitPriceWithDiscount);
             cartItemModel.UnitPriceValue = shoppingCartUnitPriceWithDiscount;
         }
@@ -461,6 +486,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         {
             cartItemModel.SubTotal = await _localizationService.GetResourceAsync("Products.CallForPrice");
             cartItemModel.SubTotalValue = 0;
+			_logger.LogDebug("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): cartItemModel.SubTotalValue → {Arg2}", cart, sci, cartItemModel.SubTotalValue);
         }
         else
         {
@@ -468,9 +494,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             var (subTotal, shoppingCartItemDiscountBase, _, maximumDiscountQty) = await _shoppingCartService.GetSubTotalAsync(sci, true);
             var (shoppingCartItemSubTotalWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, subTotal);
             var shoppingCartItemSubTotalWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartItemSubTotalWithDiscountBase, currentCurrency);
+			_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): shoppingCartItemSubTotalWithDiscount → {ShoppingCartItemSubTotalWithDiscount}", cart, sci, shoppingCartItemSubTotalWithDiscount);
             cartItemModel.SubTotal = await _priceFormatter.FormatPriceAsync(shoppingCartItemSubTotalWithDiscount);
             cartItemModel.SubTotalValue = shoppingCartItemSubTotalWithDiscount;
             cartItemModel.MaximumDiscountedQty = maximumDiscountQty;
+			_logger.LogDebug("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): cartItemModel.MaximumDiscountedQty → {Arg2}", cart, sci, cartItemModel.MaximumDiscountedQty);
 
             //display an applied discount amount
             if (shoppingCartItemDiscountBase > decimal.Zero)
@@ -479,8 +507,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 if (shoppingCartItemDiscountBase > decimal.Zero)
                 {
                     var shoppingCartItemDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartItemDiscountBase, currentCurrency);
+					_logger.LogError("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): shoppingCartItemDiscount → {ShoppingCartItemDiscount}", cart, sci, shoppingCartItemDiscount);
                     cartItemModel.Discount = await _priceFormatter.FormatPriceAsync(shoppingCartItemDiscount);
                     cartItemModel.DiscountValue = shoppingCartItemDiscount;
+					_logger.LogDebug("PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci}): cartItemModel.DiscountValue → {Arg2}", cart, sci, cartItemModel.DiscountValue);
                 }
             }
         }
@@ -508,6 +538,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         foreach (var warning in itemWarnings)
             cartItemModel.Warnings.Add(warning);
 
+		_logger.LogWarning("<<< Exiting PrepareShoppingCartItemModelAsync(cart={Cart},sci={Sci})", cart, sci);
         return cartItemModel;
     }
 
@@ -521,9 +552,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     protected virtual async Task<WishlistModel.ShoppingCartItemModel> PrepareWishlistItemModelAsync(ShoppingCartItem sci)
     {
+		_logger.LogError(">>> Entering PrepareWishlistItemModelAsync(sci={Sci})", sci);
         ArgumentNullException.ThrowIfNull(sci);
 
         var product = await _productService.GetProductByIdAsync(sci.ProductId);
+		_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): product → {Product}", sci, product);
 
         var cartItemModel = new WishlistModel.ShoppingCartItemModel
         {
@@ -546,9 +579,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                                          (!string.IsNullOrEmpty(cartItemModel.AttributeInfo) ||
                                           product.IsGiftCard) &&
                                          product.VisibleIndividually;
+										_logger.LogDebug("PrepareWishlistItemModelAsync(sci={Sci}): cartItemModel.AllowItemEditing → {Arg1}", sci, cartItemModel.AllowItemEditing);
 
         //allowed quantities
         var allowedQuantities = _productService.ParseAllowedQuantities(product);
+		_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): allowedQuantities → {AllowedQuantities}", sci, allowedQuantities);
         foreach (var qty in allowedQuantities)
         {
             cartItemModel.AllowedQuantities.Add(new SelectListItem
@@ -580,17 +615,20 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //unit prices
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): currentCurrency → {CurrentCurrency}", sci, currentCurrency);
         if (product.CallForPrice &&
             //also check whether the current user is impersonated
             (!_orderSettings.AllowAdminsToBuyCallForPriceProducts || _workContext.OriginalCustomerIfImpersonated == null))
         {
             cartItemModel.UnitPrice = await _localizationService.GetResourceAsync("Products.CallForPrice");
             cartItemModel.UnitPriceValue = 0;
+			_logger.LogDebug("PrepareWishlistItemModelAsync(sci={Sci}): cartItemModel.UnitPriceValue → {Arg1}", sci, cartItemModel.UnitPriceValue);
         }
         else
         {
             var (shoppingCartUnitPriceWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, (await _shoppingCartService.GetUnitPriceAsync(sci, true)).unitPrice);
             var shoppingCartUnitPriceWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartUnitPriceWithDiscountBase, currentCurrency);
+			_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): shoppingCartUnitPriceWithDiscount → {ShoppingCartUnitPriceWithDiscount}", sci, shoppingCartUnitPriceWithDiscount);
             cartItemModel.UnitPrice = await _priceFormatter.FormatPriceAsync(shoppingCartUnitPriceWithDiscount);
             cartItemModel.UnitPriceValue = shoppingCartUnitPriceWithDiscount;
         }
@@ -601,6 +639,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         {
             cartItemModel.SubTotal = await _localizationService.GetResourceAsync("Products.CallForPrice");
             cartItemModel.SubTotalValue = 0;
+			_logger.LogDebug("PrepareWishlistItemModelAsync(sci={Sci}): cartItemModel.SubTotalValue → {Arg1}", sci, cartItemModel.SubTotalValue);
         }
         else
         {
@@ -608,9 +647,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             var (subTotal, shoppingCartItemDiscountBase, _, maximumDiscountQty) = await _shoppingCartService.GetSubTotalAsync(sci, true);
             var (shoppingCartItemSubTotalWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, subTotal);
             var shoppingCartItemSubTotalWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartItemSubTotalWithDiscountBase, currentCurrency);
+			_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): shoppingCartItemSubTotalWithDiscount → {ShoppingCartItemSubTotalWithDiscount}", sci, shoppingCartItemSubTotalWithDiscount);
             cartItemModel.SubTotal = await _priceFormatter.FormatPriceAsync(shoppingCartItemSubTotalWithDiscount);
             cartItemModel.SubTotalValue = shoppingCartItemSubTotalWithDiscount;
             cartItemModel.MaximumDiscountedQty = maximumDiscountQty;
+			_logger.LogDebug("PrepareWishlistItemModelAsync(sci={Sci}): cartItemModel.MaximumDiscountedQty → {Arg1}", sci, cartItemModel.MaximumDiscountedQty);
 
             //display an applied discount amount
             if (shoppingCartItemDiscountBase > decimal.Zero)
@@ -619,8 +660,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 if (shoppingCartItemDiscountBase > decimal.Zero)
                 {
                     var shoppingCartItemDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartItemDiscountBase, currentCurrency);
+					_logger.LogError("PrepareWishlistItemModelAsync(sci={Sci}): shoppingCartItemDiscount → {ShoppingCartItemDiscount}", sci, shoppingCartItemDiscount);
                     cartItemModel.Discount = await _priceFormatter.FormatPriceAsync(shoppingCartItemDiscount);
                     cartItemModel.DiscountValue = shoppingCartItemDiscount;
+					_logger.LogDebug("PrepareWishlistItemModelAsync(sci={Sci}): cartItemModel.DiscountValue → {Arg1}", sci, cartItemModel.DiscountValue);
                 }
             }
         }
@@ -648,6 +691,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         foreach (var warning in itemWarnings)
             cartItemModel.Warnings.Add(warning);
 
+		_logger.LogWarning("<<< Exiting PrepareWishlistItemModelAsync(sci={Sci})", sci);
         return cartItemModel;
     }
 
@@ -661,6 +705,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     protected virtual async Task<ShoppingCartModel.OrderReviewDataModel> PrepareOrderReviewDataModelAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering PrepareOrderReviewDataModelAsync(cart={Cart})", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         var model = new ShoppingCartModel.OrderReviewDataModel
@@ -670,8 +715,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //billing info
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): customer → {Customer}", cart, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): store → {Store}", cart, store);
         var billingAddress = await _customerService.GetCustomerBillingAddressAsync(customer);
+		_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): billingAddress → {BillingAddress}", cart, billingAddress);
         if (billingAddress != null)
         {
             await _addressModelFactory.PrepareAddressModelAsync(model.BillingAddress,
@@ -684,6 +732,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         if (await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart))
         {
             model.IsShippable = true;
+			_logger.LogDebug("PrepareOrderReviewDataModelAsync(cart={Cart}): model.IsShippable → {Arg1}", cart, model.IsShippable);
 
             var pickupPoint = await _genericAttributeService.GetAttributeAsync<PickupPoint>(customer,
                 NopCustomerDefaults.SelectedPickupPointAttribute, store.Id);
@@ -701,7 +750,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             else
             {
                 var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(pickupPoint.CountryCode);
+				_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): country → {Country}", cart, country);
+				_logger.LogDebug("PrepareOrderReviewDataModelAsync(cart={Cart}): model.PickupAddress → {Arg1}", cart, model.PickupAddress);
                 var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(pickupPoint.StateAbbreviation, country?.Id);
+				_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): state → {State}", cart, state);
 
                 model.PickupAddress = new AddressModel
                 {
@@ -726,6 +778,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     ZipPostalCode = model.PickupAddress.ZipPostalCode
                 };
                 var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+				_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): languageId → {LanguageId}", cart, languageId);
                 var (_, addressFields) = await _addressService.FormatAddressAsync(address, languageId);
 
                 model.PickupAddress.AddressFields = addressFields;
@@ -736,10 +789,12 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 NopCustomerDefaults.SelectedShippingOptionAttribute, store.Id);
             if (shippingOption != null)
                 model.ShippingMethod = shippingOption.Name;
+				_logger.LogDebug("PrepareOrderReviewDataModelAsync(cart={Cart}): model.ShippingMethod → {Arg1}", cart, model.ShippingMethod);
         }
 
         //payment info
         var selectedPaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
+		_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): selectedPaymentMethodSystemName → {SelectedPaymentMethodSystemName}", cart, selectedPaymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager
             .LoadPluginBySystemNameAsync(selectedPaymentMethodSystemName, customer, store.Id);
         model.PaymentMethod = paymentMethod != null
@@ -748,8 +803,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //custom values
         var processPaymentRequest = await _orderProcessingService.GetProcessPaymentRequestAsync();
+		_logger.LogError("PrepareOrderReviewDataModelAsync(cart={Cart}): processPaymentRequest → {ProcessPaymentRequest}", cart, processPaymentRequest);
         model.CustomValues.AddRange(processPaymentRequest?.CustomValues?.Where(value => value.DisplayToCustomer).ToList() ?? new());
 
+		_logger.LogWarning("<<< Exiting PrepareOrderReviewDataModelAsync(cart={Cart})", cart);
         return model;
     }
 
@@ -768,6 +825,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<EstimateShippingModel> PrepareEstimateShippingModelAsync(IList<ShoppingCartItem> cart, bool setEstimateShippingDefaultAddress = true)
     {
+		_logger.LogError(">>> Entering PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>)", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         var model = new EstimateShippingModel
@@ -779,6 +837,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         if (model.Enabled)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>): customer → {Customer}", cart, customer);
             var shippingAddress = await _customerService.GetCustomerShippingAddressAsync(customer) ?? await (await _customerService.GetAddressesByCustomerIdAsync(customer.Id))
                 //enabled for the current store
                 .FirstOrDefaultAwaitAsync(async a => a.CountryId == null || await _storeMappingService.AuthorizeAsync(await _countryService.GetCountryByAddressAsync(a)));
@@ -791,9 +850,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             {
                 Text = await _localizationService.GetResourceAsync("Address.SelectCountry"),
                 Value = "0"
+				_logger.LogDebug("PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>): Value → {Value}", cart, Value);
             });
 
             var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+			_logger.LogError("PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>): currentLanguage → {CurrentLanguage}", cart, currentLanguage);
             foreach (var c in await _countryService.GetAllCountriesForShippingAsync(currentLanguage.Id))
                 model.AvailableCountries.Add(new SelectListItem
                 {
@@ -836,9 +897,12 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     model.ZipPostalCode = shippingAddress.ZipPostalCode;
                 else
                     model.City = shippingAddress.City;
+					_logger.LogDebug("PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>): model.ZipPostalCode → {Arg2}", cart, model.ZipPostalCode);
+					_logger.LogDebug("PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>): model.City → {Arg2}", cart, model.City);
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareEstimateShippingModelAsync(cart={Cart},setEstimateShippingDefaultAddress=<redacted>)", cart);
         return model;
     }
 
@@ -955,6 +1019,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             model.OrderReviewData = await PrepareOrderReviewDataModelAsync(cart);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareShoppingCartModelAsync(model={Model},cart={Cart},isEditable={IsEditable},validateCheckoutAttributes={ValidateCheckoutAttributes},prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData})", model, cart, isEditable, validateCheckoutAttributes, prepareAndDisplayOrderReviewData);
         return model;
     }
 
@@ -971,21 +1036,30 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<WishlistModel> PrepareWishlistModelAsync(WishlistModel model, IList<ShoppingCartItem> cart, bool isEditable = true, int? list = null)
     {
+		_logger.LogError(">>> Entering PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List})", model, cart, isEditable, list);
         ArgumentNullException.ThrowIfNull(cart);
         ArgumentNullException.ThrowIfNull(model);
 
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): currentCustomer → {CurrentCustomer}", model, cart, isEditable, list, currentCustomer);
         var isGuest = await _customerService.IsGuestAsync(currentCustomer);
+		_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): isGuest → {IsGuest}", model, cart, isEditable, list, isGuest);
 
         model.EmailWishlistEnabled = _shoppingCartSettings.EmailWishlistEnabled;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.EmailWishlistEnabled → {Arg4}", model, cart, isEditable, list, model.EmailWishlistEnabled);
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.AllowMultipleWishlist → {Arg4}", model, cart, isEditable, list, model.AllowMultipleWishlist);
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.IsEditable → {Arg4}", model, cart, isEditable, list, model.IsEditable);
         model.ListId = list;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.ListId → {Arg4}", model, cart, isEditable, list, model.ListId);
         model.AllowMultipleWishlist = _shoppingCartSettings.AllowMultipleWishlist && !isGuest;
         model.IsEditable = isEditable;
         model.DisplayAddToCart = await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART);
         model.DisplayTaxShippingInfo = _catalogSettings.DisplayTaxShippingInfoWishlist;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.DisplayTaxShippingInfo → {Arg4}", model, cart, isEditable, list, model.DisplayTaxShippingInfo);
 
         //custom wishlist items
         var currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(currentCustomer.Id);
+		_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): currentWishlists → {CurrentWishlists}", model, cart, isEditable, list, currentWishlists);
         foreach (var wishlist in currentWishlists)
         {
             var customWishlistModel = new CustomWishlistModel
@@ -999,8 +1073,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         if (list != null)
         {
             var customWishlist = await _customWishlistService.GetCustomWishlistByIdAsync(list.Value);
+			_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): customWishlist → {CustomWishlist}", model, cart, isEditable, list, customWishlist);
             if (customWishlist != null)
                 model.CustomWishlistName = customWishlist.Name;
+				_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.CustomWishlistName → {Arg4}", model, cart, isEditable, list, model.CustomWishlistName);
         }
 
         if (!cart.Any())
@@ -1008,14 +1084,19 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //simple properties
         var customer = await _customerService.GetShoppingCartCustomerAsync(cart);
+		_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): customer → {Customer}", model, cart, isEditable, list, customer);
 
         model.CustomerGuid = customer.CustomerGuid;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.CustomerGuid → {Arg4}", model, cart, isEditable, list, model.CustomerGuid);
         model.CustomerFullname = await _customerService.GetCustomerFullNameAsync(customer);
         model.ShowProductImages = _shoppingCartSettings.ShowProductImagesOnWishList;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.ShowProductImages → {Arg4}", model, cart, isEditable, list, model.ShowProductImages);
         model.ShowSku = _catalogSettings.ShowSkuOnProductDetailsPage;
+		_logger.LogDebug("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): model.ShowSku → {Arg4}", model, cart, isEditable, list, model.ShowSku);
 
         //cart warnings
         var cartWarnings = await _shoppingCartService.GetShoppingCartWarningsAsync(cart, string.Empty, false);
+		_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): cartWarnings → {CartWarnings}", model, cart, isEditable, list, cartWarnings);
         foreach (var warning in cartWarnings)
             model.Warnings.Add(warning);
 
@@ -1023,6 +1104,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         foreach (var sci in cart)
         {
             var cartItemModel = await PrepareWishlistItemModelAsync(sci);
+			_logger.LogError("PrepareWishlistModelAsync(model={Model},cart={Cart},isEditable={IsEditable},list={List}): cartItemModel → {CartItemModel}", model, cart, isEditable, list, cartItemModel);
             model.Items.Add(cartItemModel);
         }
 
@@ -1038,7 +1120,9 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<MiniShoppingCartModel> PrepareMiniShoppingCartModelAsync()
     {
+		_logger.LogError(">>> Entering PrepareMiniShoppingCartModelAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareMiniShoppingCartModelAsync(): customer → {Customer}", customer);
         var model = new MiniShoppingCartModel
         {
             ShowProductImages = _shoppingCartSettings.ShowProductImagesInMiniShoppingCart,
@@ -1052,7 +1136,9 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         if (customer.HasShoppingCartItems)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("PrepareMiniShoppingCartModelAsync(): store → {Store}", store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogError("PrepareMiniShoppingCartModelAsync(): cart → {Cart}", cart);
 
             if (cart.Any())
             {
@@ -1060,14 +1146,19 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
                 //subtotal
                 var subTotalIncludingTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax && !_taxSettings.ForceTaxExclusionFromOrderSubtotal;
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): subTotalIncludingTax → {SubTotalIncludingTax}", subTotalIncludingTax);
                 var (_, _, subTotalWithoutDiscountBase, _, _) = await _orderTotalCalculationService.GetShoppingCartSubTotalAsync(cart, subTotalIncludingTax);
                 var subtotalBase = subTotalWithoutDiscountBase;
                 var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): currentCurrency → {CurrentCurrency}", currentCurrency);
                 var subtotal = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(subtotalBase, currentCurrency);
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): subtotal → {Subtotal}", subtotal);
                 model.SubTotal = await _priceFormatter.FormatPriceAsync(subtotal, false, currentCurrency, (await _workContext.GetWorkingLanguageAsync()).Id, subTotalIncludingTax);
                 model.SubTotalValue = subtotal;
+				_logger.LogDebug("PrepareMiniShoppingCartModelAsync(): model.SubTotalValue → {Arg0}", model.SubTotalValue);
 
                 var requiresShipping = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): requiresShipping → {RequiresShipping}", requiresShipping);
                 //a customer should visit the shopping cart page (hide checkout button) before going to checkout if:
                 //1. "terms of service" are enabled
                 //2. min order sub-total is OK
@@ -1077,8 +1168,10 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     .Any();
 
                 var minOrderSubtotalAmountOk = await _orderProcessingService.ValidateMinOrderSubtotalAmountAsync(cart);
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): minOrderSubtotalAmountOk → {MinOrderSubtotalAmountOk}", minOrderSubtotalAmountOk);
 
                 var cartProductIds = cart.Select(ci => ci.ProductId).ToArray();
+				_logger.LogError("PrepareMiniShoppingCartModelAsync(): cartProductIds → {CartProductIds}", cartProductIds);
 
                 var downloadableProductsRequireRegistration =
                     _customerSettings.RequireRegistrationForDownloadableProducts && await _productService.HasAnyDownloadableProductAsync(cartProductIds);
@@ -1088,6 +1181,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                                               !checkoutAttributesExist &&
                                               !(downloadableProductsRequireRegistration
                                                 && await _customerService.IsGuestAsync(customer));
+												_logger.LogDebug("PrepareMiniShoppingCartModelAsync(): model.DisplayCheckoutButton → {Arg0}", model.DisplayCheckoutButton);
 
                 //products. sort descending (recently added products)
                 foreach (var sci in cart
@@ -1096,6 +1190,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                              .ToList())
                 {
                     var product = await _productService.GetProductByIdAsync(sci.ProductId);
+					_logger.LogError("PrepareMiniShoppingCartModelAsync(): product → {Product}", product);
 
                     var cartItemModel = new MiniShoppingCartModel.ShoppingCartItemModel
                     {
@@ -1114,11 +1209,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     {
                         cartItemModel.UnitPrice = await _localizationService.GetResourceAsync("Products.CallForPrice");
                         cartItemModel.UnitPriceValue = 0;
+						_logger.LogDebug("PrepareMiniShoppingCartModelAsync(): cartItemModel.UnitPriceValue → {Arg0}", cartItemModel.UnitPriceValue);
                     }
                     else
                     {
                         var (shoppingCartUnitPriceWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, (await _shoppingCartService.GetUnitPriceAsync(sci, true)).unitPrice);
                         var shoppingCartUnitPriceWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartUnitPriceWithDiscountBase, currentCurrency);
+						_logger.LogError("PrepareMiniShoppingCartModelAsync(): shoppingCartUnitPriceWithDiscount → {ShoppingCartUnitPriceWithDiscount}", shoppingCartUnitPriceWithDiscount);
                         cartItemModel.UnitPrice = await _priceFormatter.FormatPriceAsync(shoppingCartUnitPriceWithDiscount);
                         cartItemModel.UnitPriceValue = shoppingCartUnitPriceWithDiscount;
                     }
@@ -1135,6 +1232,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareMiniShoppingCartModelAsync()");
         return model;
     }
 
@@ -1147,11 +1245,15 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<string> FormatSelectedCheckoutAttributesAsync()
     {
+		_logger.LogError(">>> Entering FormatSelectedCheckoutAttributesAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("FormatSelectedCheckoutAttributesAsync(): store → {Store}", store);
         var checkoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(customer,
             NopCustomerDefaults.CheckoutAttributes, store.Id);
+			_logger.LogError("FormatSelectedCheckoutAttributesAsync(): customer → {Customer}", customer);
 
+		_logger.LogWarning("<<< Exiting FormatSelectedCheckoutAttributesAsync()");
         return await _checkoutAttributeFormatter.FormatAttributesAsync(checkoutAttributesXml, customer);
     }
 
@@ -1166,6 +1268,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<OrderTotalsModel> PrepareOrderTotalsModelAsync(IList<ShoppingCartItem> cart, bool isEditable)
     {
+		_logger.LogError(">>> Entering PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable})", cart, isEditable);
         var model = new OrderTotalsModel
         {
             IsEditable = isEditable
@@ -1175,29 +1278,38 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         {
             //subtotal
             var subTotalIncludingTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax && !_taxSettings.ForceTaxExclusionFromOrderSubtotal;
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): subTotalIncludingTax → {SubTotalIncludingTax}", cart, isEditable, subTotalIncludingTax);
             var (orderSubTotalDiscountAmountBase, _, subTotalWithoutDiscountBase, _, _) = await _orderTotalCalculationService.GetShoppingCartSubTotalAsync(cart, subTotalIncludingTax);
             var subtotalBase = subTotalWithoutDiscountBase;
             var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): currentCurrency → {CurrentCurrency}", cart, isEditable, currentCurrency);
             var subtotal = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(subtotalBase, currentCurrency);
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): subtotal → {Subtotal}", cart, isEditable, subtotal);
             var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): currentLanguage → {CurrentLanguage}", cart, isEditable, currentLanguage);
             model.SubTotal = await _priceFormatter.FormatPriceAsync(subtotal, true, currentCurrency, currentLanguage.Id, subTotalIncludingTax);
 
             if (orderSubTotalDiscountAmountBase > decimal.Zero)
             {
                 var orderSubTotalDiscountAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(orderSubTotalDiscountAmountBase, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): orderSubTotalDiscountAmount → {OrderSubTotalDiscountAmount}", cart, isEditable, orderSubTotalDiscountAmount);
                 model.SubTotalDiscount = await _priceFormatter.FormatPriceAsync(-orderSubTotalDiscountAmount, true, currentCurrency, currentLanguage.Id, subTotalIncludingTax);
             }
 
             //shipping info
             model.RequiresShipping = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): customer → {Customer}", cart, isEditable, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): store → {Store}", cart, isEditable, store);
             if (model.RequiresShipping)
             {
                 var shoppingCartShippingBase = await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): shoppingCartShippingBase → {ShoppingCartShippingBase}", cart, isEditable, shoppingCartShippingBase);
                 if (shoppingCartShippingBase.HasValue)
                 {
                     var shoppingCartShipping = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartShippingBase.Value, currentCurrency);
+					_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): shoppingCartShipping → {ShoppingCartShipping}", cart, isEditable, shoppingCartShipping);
                     model.Shipping = await _priceFormatter.FormatShippingPriceAsync(shoppingCartShipping, true);
 
                     //selected shipping method
@@ -1205,20 +1317,25 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                         NopCustomerDefaults.SelectedShippingOptionAttribute, store.Id);
                     if (shippingOption != null)
                         model.SelectedShippingMethod = shippingOption.Name;
+						_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): model.SelectedShippingMethod → {Arg2}", cart, isEditable, model.SelectedShippingMethod);
                 }
             }
             else
             {
                 model.HideShippingTotal = _shippingSettings.HideShippingTotal;
+				_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): model.HideShippingTotal → {Arg2}", cart, isEditable, model.HideShippingTotal);
             }
 
             //payment method fee
             var paymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): paymentMethodSystemName → {PaymentMethodSystemName}", cart, isEditable, paymentMethodSystemName);
             var paymentMethodAdditionalFee = await _paymentService.GetAdditionalHandlingFeeAsync(cart, paymentMethodSystemName);
+			_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): paymentMethodAdditionalFee → {PaymentMethodAdditionalFee}", cart, isEditable, paymentMethodAdditionalFee);
             var (paymentMethodAdditionalFeeWithTaxBase, _) = await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFee, customer);
             if (paymentMethodAdditionalFeeWithTaxBase > decimal.Zero)
             {
                 var paymentMethodAdditionalFeeWithTax = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(paymentMethodAdditionalFeeWithTaxBase, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): paymentMethodAdditionalFeeWithTax → {PaymentMethodAdditionalFeeWithTax}", cart, isEditable, paymentMethodAdditionalFeeWithTax);
                 model.PaymentMethodAdditionalFee = await _priceFormatter.FormatPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFeeWithTax, true);
             }
 
@@ -1228,12 +1345,17 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             if (_taxSettings.HideTaxInOrderSummary && await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax)
             {
                 displayTax = false;
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): displayTax → {DisplayTax}", cart, isEditable, displayTax);
                 displayTaxRates = false;
+				_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): displayTaxRates → {DisplayTaxRates}", cart, isEditable, displayTaxRates);
             }
             else
             {
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): displayTaxRates → {DisplayTaxRates}", cart, isEditable, displayTaxRates);
+				_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): displayTax → {DisplayTax}", cart, isEditable, displayTax);
                 var (shoppingCartTaxBase, taxRates) = await _orderTotalCalculationService.GetTaxTotalAsync(cart);
                 var shoppingCartTax = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartTaxBase, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): shoppingCartTax → {ShoppingCartTax}", cart, isEditable, shoppingCartTax);
 
                 if (shoppingCartTaxBase == 0 && _taxSettings.HideZeroTax)
                 {
@@ -1258,13 +1380,16 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             }
 
             model.DisplayTaxRates = displayTaxRates;
+			_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): model.DisplayTaxRates → {Arg2}", cart, isEditable, model.DisplayTaxRates);
             model.DisplayTax = displayTax;
+			_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): model.DisplayTax → {Arg2}", cart, isEditable, model.DisplayTax);
 
             //total
             var (shoppingCartTotalBase, orderTotalDiscountAmountBase, _, appliedGiftCards, redeemedRewardPoints, redeemedRewardPointsAmount) = await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart);
             if (shoppingCartTotalBase.HasValue)
             {
                 var shoppingCartTotal = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shoppingCartTotalBase.Value, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): shoppingCartTotal → {ShoppingCartTotal}", cart, isEditable, shoppingCartTotal);
                 model.OrderTotal = await _priceFormatter.FormatPriceAsync(shoppingCartTotal, true, false);
             }
 
@@ -1272,6 +1397,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             if (orderTotalDiscountAmountBase > decimal.Zero)
             {
                 var orderTotalDiscountAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(orderTotalDiscountAmountBase, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): orderTotalDiscountAmount → {OrderTotalDiscountAmount}", cart, isEditable, orderTotalDiscountAmount);
                 model.OrderTotalDiscount = await _priceFormatter.FormatPriceAsync(-orderTotalDiscountAmount, true, false);
             }
 
@@ -1286,10 +1412,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                         CouponCode = appliedGiftCard.GiftCard.GiftCardCouponCode,
                     };
                     var amountCanBeUsed = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(appliedGiftCard.AmountCanBeUsed, currentCurrency);
+					_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): amountCanBeUsed → {AmountCanBeUsed}", cart, isEditable, amountCanBeUsed);
                     gcModel.Amount = await _priceFormatter.FormatPriceAsync(-amountCanBeUsed, true, false);
 
                     var remainingAmountBase = await _giftCardService.GetGiftCardRemainingAmountAsync(appliedGiftCard.GiftCard) - appliedGiftCard.AmountCanBeUsed;
+					_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): remainingAmountBase → {RemainingAmountBase}", cart, isEditable, remainingAmountBase);
                     var remainingAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(remainingAmountBase, currentCurrency);
+					_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): remainingAmount → {RemainingAmount}", cart, isEditable, remainingAmount);
                     gcModel.Remaining = await _priceFormatter.FormatPriceAsync(remainingAmount, true, false);
 
                     model.GiftCards.Add(gcModel);
@@ -1300,7 +1429,9 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             if (redeemedRewardPointsAmount > decimal.Zero)
             {
                 var redeemedRewardPointsAmountInCustomerCurrency = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(redeemedRewardPointsAmount, currentCurrency);
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): redeemedRewardPointsAmountInCustomerCurrency → {RedeemedRewardPointsAmountInCustomerCurrency}", cart, isEditable, redeemedRewardPointsAmountInCustomerCurrency);
                 model.RedeemedRewardPoints = redeemedRewardPoints;
+				_logger.LogDebug("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): model.RedeemedRewardPoints → {Arg2}", cart, isEditable, model.RedeemedRewardPoints);
                 model.RedeemedRewardPointsAmount = await _priceFormatter.FormatPriceAsync(-redeemedRewardPointsAmountInCustomerCurrency, true, false);
             }
 
@@ -1309,6 +1440,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             {
                 //get shipping total
                 var shippingBaseInclTax = !model.RequiresShipping ? 0 : (await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart, true)).shippingTotal ?? 0;
+				_logger.LogError("PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable}): shippingBaseInclTax → {ShippingBaseInclTax}", cart, isEditable, shippingBaseInclTax);
 
                 //get total for reward points
                 var totalForRewardPoints = _orderTotalCalculationService
@@ -1318,6 +1450,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareOrderTotalsModelAsync(cart={Cart},isEditable={IsEditable})", cart, isEditable);
         return model;
     }
 
@@ -1333,9 +1466,11 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<EstimateShippingResultModel> PrepareEstimateShippingResultModelAsync(IList<ShoppingCartItem> cart, EstimateShippingModel request, bool cacheShippingOptions)
     {
+		_logger.LogError(">>> Entering PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>)", cart, request);
         ArgumentNullException.ThrowIfNull(request);
 
         var model = new EstimateShippingResultModel();
+		_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): model → {Model}", cart, request, model);
 
         if (await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart))
         {
@@ -1348,9 +1483,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             };
 
             var rawShippingOptions = new List<ShippingOption>();
+			_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): rawShippingOptions → {RawShippingOptions}", cart, request, rawShippingOptions);
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): customer → {Customer}", cart, request, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): store → {Store}", cart, request, store);
             var getShippingOptionResponse = await _shippingService.GetShippingOptionsAsync(cart, address, customer, storeId: store.Id);
+			_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): getShippingOptionResponse → {GetShippingOptionResponse}", cart, request, getShippingOptionResponse);
             if (getShippingOptionResponse.Success)
             {
                 if (getShippingOptionResponse.ShippingOptions.Any())
@@ -1365,6 +1504,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                             TransitDays = shippingOption.TransitDays,
                             ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName
                         });
+						_logger.LogDebug("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): ShippingRateComputationMethodSystemName → {ShippingRateComputationMethodSystemName}", cart, request, ShippingRateComputationMethodSystemName);
                     }
                 }
             }
@@ -1375,6 +1515,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             }
 
             var pickupPointsNumber = 0;
+			_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): pickupPointsNumber → {PickupPointsNumber}", cart, request, pickupPointsNumber);
             if (_shippingSettings.AllowPickupInStore)
             {
                 var pickupPointsResponse = await _shippingService.GetPickupPointsAsync(cart, address,
@@ -1385,6 +1526,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     {
                         pickupPointsNumber = pickupPointsResponse.PickupPoints.Count;
                         var pickupPoint = pickupPointsResponse.PickupPoints.OrderBy(p => p.PickupFee).First();
+						_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): pickupPoint → {PickupPoint}", cart, request, pickupPoint);
 
                         rawShippingOptions.Add(new ShippingOption
                         {
@@ -1395,6 +1537,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                             ShippingRateComputationMethodSystemName = pickupPoint.ProviderSystemName,
                             IsPickupInStore = true
                         });
+						_logger.LogDebug("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): IsPickupInStore → {IsPickupInStore}", cart, request, IsPickupInStore);
                     }
                 }
                 else
@@ -1426,16 +1569,22 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                     var (shippingRate, _) = await _orderTotalCalculationService.AdjustShippingRateAsync(option.Rate, cart, option.IsPickupInStore);
                     (shippingRate, _) = await _taxService.GetShippingPriceAsync(shippingRate, customer);
                     shippingRate = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(shippingRate, await _workContext.GetWorkingCurrencyAsync());
+					_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): shippingRate → {ShippingRate}", cart, request, shippingRate);
+					_logger.LogDebug("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): shippingRate → {ShippingRate}", cart, request, shippingRate);
                     var shippingRateString = await _priceFormatter.FormatShippingPriceAsync(shippingRate, true);
+					_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): shippingRateString → {ShippingRateString}", cart, request, shippingRateString);
 
                     if (option.IsPickupInStore && pickupPointsNumber > 1)
                         shippingRateString = string.Format(await _localizationService.GetResourceAsync("Shipping.EstimateShippingPopUp.Pickup.PriceFrom"), shippingRateString);
 
                     string deliveryDateFormat = null;
+					_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): deliveryDateFormat → {DeliveryDateFormat}", cart, request, deliveryDateFormat);
                     if (option.TransitDays.HasValue)
                     {
                         var currentCulture = CultureInfo.GetCultureInfo((await _workContext.GetWorkingLanguageAsync()).LanguageCulture);
+						_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): currentCulture → {CurrentCulture}", cart, request, currentCulture);
                         var customerDateTime = await _dateTimeHelper.ConvertToUserTimeAsync(DateTime.Now);
+						_logger.LogError("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): customerDateTime → {CustomerDateTime}", cart, request, customerDateTime);
                         deliveryDateFormat = customerDateTime.AddDays(option.TransitDays.Value).ToString("d", currentCulture);
                     }
 
@@ -1457,6 +1606,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                         DeliveryDateFormat = deliveryDateFormat,
                         Selected = selected
                     });
+					_logger.LogDebug("PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>): Selected → {Selected}", cart, request, Selected);
                 }
 
                 //sort shipping methods
@@ -1475,6 +1625,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareEstimateShippingResultModelAsync(cart={Cart},request={Request},cacheShippingOptions=<redacted>)", cart, request);
         return model;
     }
 
@@ -1490,17 +1641,23 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<WishlistEmailAFriendModel> PrepareWishlistEmailAFriendModelAsync(WishlistEmailAFriendModel model, bool excludeProperties, int? wishlistId = null)
     {
+		_logger.LogError(">>> Entering PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId})", model, excludeProperties, wishlistId);
         ArgumentNullException.ThrowIfNull(model);
 
         model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnEmailWishlistToFriendPage;
+		_logger.LogDebug("PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId}): model.DisplayCaptcha → {Arg3}", model, excludeProperties, wishlistId, model.DisplayCaptcha);
         if (!excludeProperties)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId}): customer → {Customer}", model, excludeProperties, wishlistId, customer);
             model.YourEmailAddress = customer.Email;
+			_logger.LogDebug("PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId}): model.YourEmailAddress → {Arg3}", model, excludeProperties, wishlistId, model.YourEmailAddress);
         }
 
         model.ListId = wishlistId;
+		_logger.LogDebug("PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId}): model.ListId → {Arg3}", model, excludeProperties, wishlistId, model.ListId);
 
+		_logger.LogWarning("<<< Exiting PrepareWishlistEmailAFriendModelAsync(model={Model},excludeProperties={ExcludeProperties},wishlistId={WishlistId})", model, excludeProperties, wishlistId);
         return model;
     }
 
@@ -1517,12 +1674,16 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<PictureModel> PrepareCartItemPictureModelAsync(ShoppingCartItem sci, int pictureSize, bool showDefaultPicture, string productName)
     {
+		_logger.LogError(">>> Entering PrepareCartItemPictureModelAsync(sci={Sci},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName})", sci, pictureSize, showDefaultPicture, productName);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = await _shortTermCacheManager.GetAsync(async () =>
         {
             var product = await _productService.GetProductByIdAsync(sci.ProductId);
+			_logger.LogError("PrepareCartItemPictureModelAsync(sci={Sci},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): product → {Product}", sci, pictureSize, showDefaultPicture, productName, product);
 
             //shopping cart item picture
             var sciPicture = await _pictureService.GetProductPictureAsync(product, sci.AttributesXml);
+			_logger.LogError("PrepareCartItemPictureModelAsync(sci={Sci},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): sciPicture → {SciPicture}", sci, pictureSize, showDefaultPicture, productName, sciPicture);
 
             return new PictureModel
             {
@@ -1533,6 +1694,8 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             };
         }, NopModelCacheDefaults.CartPictureModelKey, sci, pictureSize, true, await _workContext.GetWorkingLanguageAsync(), _webHelper.IsCurrentConnectionSecured(), await _storeContext.GetCurrentStoreAsync());
 
+		_logger.LogError("PrepareCartItemPictureModelAsync(sci,pictureSize,showDefaultPicture,productName)={Sci},{PictureSize},{ShowDefaultPicture},{ProductName}: external service call took {Arg4} ms", sci, pictureSize, showDefaultPicture, productName, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareCartItemPictureModelAsync(sci={Sci},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName})", sci, pictureSize, showDefaultPicture, productName);
         return model;
     }
 

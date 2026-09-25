@@ -13,6 +13,7 @@ using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Customers;
 
@@ -21,6 +22,7 @@ namespace Nop.Services.Customers;
 /// </summary>
 public partial class CustomerRegistrationService : ICustomerRegistrationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -69,25 +71,46 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         IWorkflowMessageService workflowMessageService,
         RewardPointsSettings rewardPointsSettings)
     {
+		_logger.LogError(">>> Entering CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings})", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings);
         _customerSettings = customerSettings;
         _actionContextAccessor = actionContextAccessor;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _actionContextAccessor → {_actionContextAccessor}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _actionContextAccessor);
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _customerSettings → {_customerSettings}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _customerSettings);
+    _logger.LogWarning("<<< Exiting CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings})", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings);
         _authenticationService = authenticationService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _authenticationService → {_authenticationService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _authenticationService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _customerActivityService → {_customerActivityService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _customerActivityService);
         _customerService = customerService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _customerService → {_customerService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _customerService);
         _encryptionService = encryptionService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _encryptionService → {_encryptionService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _encryptionService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _eventPublisher → {_eventPublisher}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _eventPublisher);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _genericAttributeService → {_genericAttributeService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _localizationService → {_localizationService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _localizationService);
         _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _multiFactorAuthenticationPluginManager);
         _newsLetterSubscriptionService = newsLetterSubscriptionService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _newsLetterSubscriptionService → {_newsLetterSubscriptionService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _newsLetterSubscriptionService);
         _notificationService = notificationService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _notificationService → {_notificationService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _permissionService → {_permissionService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _permissionService);
         _rewardPointService = rewardPointService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _rewardPointService → {_rewardPointService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _rewardPointService);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _shoppingCartService → {_shoppingCartService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _shoppingCartService);
         _storeContext = storeContext;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _storeContext → {_storeContext}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _storeContext);
         _urlHelperFactory = urlHelperFactory;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _urlHelperFactory → {_urlHelperFactory}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _urlHelperFactory);
         _workContext = workContext;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _workContext → {_workContext}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _workContext);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("CustomerRegistrationService(customerSettings={CustomerSettings},actionContextAccessor={ActionContextAccessor},authenticationService={AuthenticationService},customerActivityService={CustomerActivityService},customerService={CustomerService},encryptionService={EncryptionService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},newsLetterSubscriptionService={NewsLetterSubscriptionService},notificationService={NotificationService},permissionService={PermissionService},rewardPointService={RewardPointService},shoppingCartService=<redacted>,storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},rewardPointsSettings={RewardPointsSettings}): _workflowMessageService → {_workflowMessageService}", customerSettings, actionContextAccessor, authenticationService, customerActivityService, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, permissionService, rewardPointService, storeContext, urlHelperFactory, workContext, workflowMessageService, rewardPointsSettings, _workflowMessageService);
         _rewardPointsSettings = rewardPointsSettings;
     }
 
@@ -103,10 +126,12 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// <returns>True if passwords match; otherwise false</returns>
     protected bool PasswordsMatch(CustomerPassword customerPassword, string enteredPassword)
     {
+		_logger.LogError(">>> Entering PasswordsMatch(customerPassword=<redacted>,enteredPassword=<redacted>)");
         if (customerPassword == null || string.IsNullOrEmpty(enteredPassword))
             return false;
 
         var savedPassword = string.Empty;
+		_logger.LogError("PasswordsMatch(customerPassword=<redacted>,enteredPassword=<redacted>): savedPassword → {SavedPassword}", savedPassword);
         switch (customerPassword.PasswordFormat)
         {
             case PasswordFormat.Clear:
@@ -120,8 +145,10 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                 break;
         }
 
-        if (customerPassword.Password == null)
+		_logger.LogWarning("<<< Exiting PasswordsMatch(customerPassword=<redacted>,enteredPassword=<redacted>)");
+        if (customerPassword.Password == null) {
             return false;
+        }
 
         return customerPassword.Password.Equals(savedPassword);
     }
@@ -141,6 +168,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<CustomerLoginResults> ValidateCustomerAsync(string usernameOrEmail, string password)
     {
+		_logger.LogError(">>> Entering ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>)", usernameOrEmail);
         var customer = _customerSettings.UsernamesEnabled ?
             await _customerService.GetCustomerByUsernameAsync(usernameOrEmail) :
             await _customerService.GetCustomerByEmailAsync(usernameOrEmail);
@@ -169,6 +197,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                 customer.CannotLoginUntilDateUtc = DateTime.UtcNow.AddMinutes(_customerSettings.FailedPasswordLockoutMinutes);
                 //reset the counter
                 customer.FailedLoginAttempts = 0;
+				_logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): customer.FailedLoginAttempts → {Arg2}", usernameOrEmail, customer.FailedLoginAttempts);
             }
 
             await _customerService.UpdateCustomerAsync(customer);
@@ -180,7 +209,9 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             ? await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute)
             : null;
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): store → {Store}", usernameOrEmail, store);
         var methodIsActive = await _multiFactorAuthenticationPluginManager.IsPluginActiveAsync(selectedProvider, customer, store.Id);
+		_logger.LogError("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): methodIsActive → {MethodIsActive}", usernameOrEmail, methodIsActive);
         if (methodIsActive)
             return CustomerLoginResults.MultiFactorAuthenticationRequired;
 
@@ -190,10 +221,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         //update login details
         customer.FailedLoginAttempts = 0;
         customer.CannotLoginUntilDateUtc = null;
+		_logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): customer.CannotLoginUntilDateUtc → {Arg2}", usernameOrEmail, customer.CannotLoginUntilDateUtc);
+		_logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): customer.LastLoginDateUtc → {Arg2}", usernameOrEmail, customer.LastLoginDateUtc);
         customer.RequireReLogin = false;
+		_logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>): customer.RequireReLogin → {Arg2}", usernameOrEmail, customer.RequireReLogin);
         customer.LastLoginDateUtc = DateTime.UtcNow;
         await _customerService.UpdateCustomerAsync(customer);
 
+		_logger.LogWarning("<<< Exiting ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password=<redacted>)", usernameOrEmail);
         return CustomerLoginResults.Successful;
     }
 
@@ -207,12 +242,16 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<CustomerRegistrationResult> RegisterCustomerAsync(CustomerRegistrationRequest request)
     {
+		_logger.LogError(">>> Entering RegisterCustomerAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.Customer == null)
+			_logger.LogError("Throwing ArgumentException from RegisterCustomerAsync(request={Request})", request);
+        if (request.Customer == null) {
             throw new ArgumentException("Can't load current customer");
+        }
 
         var result = new CustomerRegistrationResult();
+		_logger.LogError("RegisterCustomerAsync(request={Request}): result → {Result}", request, result);
         if (request.Customer.IsSearchEngineAccount())
         {
             result.AddError("Search engine can't be registered");
@@ -282,13 +321,16 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.Password;
+				_logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.Password);
                 break;
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
+				_logger.LogError("RegisterCustomerAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
                 customerPassword.PasswordSalt = saltKey;
+				_logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.Password, saltKey, _customerSettings.HashedPasswordFormat);
                 break;
         }
@@ -299,6 +341,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         //add to 'Registered' role
         var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName) ?? throw new NopException("'Registered' role could not be loaded");
+		_logger.LogError("RegisterCustomerAsync(request={Request}): registeredRole → {RegisteredRole}", request, registeredRole);
 
         await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = request.Customer.Id, CustomerRoleId = registeredRole.Id });
 
@@ -306,6 +349,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         if (await _customerService.IsGuestAsync(request.Customer))
         {
             var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
+			_logger.LogError("RegisterCustomerAsync(request={Request}): guestRole → {GuestRole}", request, guestRole);
             await _customerService.RemoveCustomerRoleMappingAsync(request.Customer, guestRole);
         }
 
@@ -320,6 +364,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         await _customerService.UpdateCustomerAsync(request.Customer);
 
+		_logger.LogWarning("<<< Exiting RegisterCustomerAsync(request={Request})", request);
         return result;
     }
 
@@ -333,9 +378,11 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<ChangePasswordResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
+		_logger.LogError(">>> Entering ChangePasswordAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         var result = new ChangePasswordResult();
+		_logger.LogError("ChangePasswordAsync(request={Request}): result → {Result}", request, result);
         if (string.IsNullOrWhiteSpace(request.Email))
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailIsNotProvided"));
@@ -349,6 +396,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         }
 
         var customer = await _customerService.GetCustomerByEmailAsync(request.Email);
+		_logger.LogError("ChangePasswordAsync(request={Request}): customer → {Customer}", request, customer);
         if (customer == null)
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailNotFound"));
@@ -367,8 +415,10 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             //get some of previous passwords
             var previousPasswords = await _customerService.GetCustomerPasswordsAsync(customer.Id, passwordsToReturn: _customerSettings.UnduplicatedPasswordsNumber);
+			_logger.LogError("ChangePasswordAsync(request={Request}): previousPasswords → {PreviousPasswords}", request, previousPasswords);
 
             var newPasswordMatchesWithPrevious = previousPasswords.Any(password => PasswordsMatch(password, request.NewPassword));
+			_logger.LogError("ChangePasswordAsync(request={Request}): newPasswordMatchesWithPrevious → {NewPasswordMatchesWithPrevious}", request, newPasswordMatchesWithPrevious);
             if (newPasswordMatchesWithPrevious)
             {
                 result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.PasswordMatchesWithPrevious"));
@@ -387,13 +437,16 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.NewPassword;
+				_logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.NewPassword);
                 break;
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
+				_logger.LogError("ChangePasswordAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
                 customerPassword.PasswordSalt = saltKey;
+				_logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.NewPassword, saltKey,
                     request.HashedPasswordFormat ?? _customerSettings.HashedPasswordFormat);
                 break;
@@ -404,12 +457,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         if (customer.MustChangePassword)
         {
             customer.MustChangePassword = false;
+			_logger.LogDebug("ChangePasswordAsync(request={Request}): customer.MustChangePassword → {Arg1}", request, customer.MustChangePassword);
             await _customerService.UpdateCustomerAsync(customer);
         }
 
         //publish event
         await _eventPublisher.PublishAsync(new CustomerPasswordChangedEvent(customerPassword));
 
+		_logger.LogWarning("<<< Exiting ChangePasswordAsync(request={Request})", request);
         return result;
     }
 
@@ -425,12 +480,15 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<IActionResult> SignInCustomerAsync(Customer customer, string returnUrl, bool isPersist = false)
     {
+		_logger.LogError(">>> Entering SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist})", customer, returnUrl, isPersist);
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist}): currentCustomer → {CurrentCustomer}", customer, returnUrl, isPersist, currentCustomer);
         if (currentCustomer?.Id != customer.Id)
         {
             if (currentCustomer.AffiliateId != 0)
             {
                 customer.AffiliateId = currentCustomer.AffiliateId;
+				_logger.LogDebug("SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist}): customer.AffiliateId → {Arg3}", customer, returnUrl, isPersist, customer.AffiliateId);
                 await _customerService.UpdateCustomerAsync(customer);
             }
             //migrate shopping cart
@@ -444,6 +502,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         //raise event
         var guestCustomer = await _customerService.IsGuestAsync(currentCustomer) && currentCustomer?.Id != customer.Id ? currentCustomer : null;
+		_logger.LogError("SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist}): guestCustomer → {GuestCustomer}", customer, returnUrl, isPersist, guestCustomer);
         await _eventPublisher.PublishAsync(new CustomerLoggedinEvent(customer, guestCustomer));
 
         //activity log
@@ -451,10 +510,13 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             await _localizationService.GetResourceAsync("ActivityLog.PublicStore.Login.Success"), customer);
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+		_logger.LogError("SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist}): urlHelper → {UrlHelper}", customer, returnUrl, isPersist, urlHelper);
 
         //redirect to the return URL if it's specified
-        if (!string.IsNullOrEmpty(returnUrl) && urlHelper.IsLocalUrl(returnUrl))
+		_logger.LogWarning("<<< Exiting SignInCustomerAsync(customer={Customer},returnUrl={ReturnUrl},isPersist={IsPersist})", customer, returnUrl, isPersist);
+        if (!string.IsNullOrEmpty(returnUrl) && urlHelper.IsLocalUrl(returnUrl)) {
             return new RedirectResult(returnUrl);
+        }
 
         return new RedirectToRouteResult(NopRouteNames.General.HOMEPAGE, null);
     }
@@ -468,12 +530,16 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetEmailAsync(Customer customer, string newEmail, bool requireValidation)
     {
+		_logger.LogError(">>> Entering SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation})", customer, newEmail, requireValidation);
         ArgumentNullException.ThrowIfNull(customer);
 
-        if (newEmail == null)
+			_logger.LogError("Throwing NopException from SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation})", customer, newEmail, requireValidation);
+        if (newEmail == null) {
             throw new NopException("Email cannot be null");
+        }
 
         newEmail = newEmail.Trim();
+		_logger.LogError("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): newEmail → {NewEmail1}", customer, newEmail, requireValidation, newEmail);
         var oldEmail = customer.Email;
 
         if (!CommonHelper.IsValidEmail(newEmail))
@@ -483,6 +549,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             throw new NopException(await _localizationService.GetResourceAsync("Account.EmailUsernameErrors.EmailTooLong"));
 
         var customer2 = await _customerService.GetCustomerByEmailAsync(newEmail);
+		_logger.LogError("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): customer2 → {Customer2}", customer, newEmail, requireValidation, customer2);
         if (customer2 != null && customer.Id != customer2.Id)
             throw new NopException(await _localizationService.GetResourceAsync("Account.EmailUsernameErrors.EmailAlreadyExists"));
 
@@ -490,6 +557,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             //re-validate email
             customer.EmailToRevalidate = newEmail;
+			_logger.LogDebug("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): customer.EmailToRevalidate → {Arg3}", customer, newEmail, requireValidation, customer.EmailToRevalidate);
             await _customerService.UpdateCustomerAsync(customer);
 
             //email re-validation message
@@ -499,6 +567,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         else
         {
             customer.Email = newEmail;
+			_logger.LogDebug("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): customer.Email → {Arg3}", customer, newEmail, requireValidation, customer.Email);
             await _customerService.UpdateCustomerAsync(customer);
 
             if (string.IsNullOrEmpty(oldEmail) || oldEmail.Equals(newEmail, StringComparison.InvariantCultureIgnoreCase))
@@ -506,7 +575,9 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
             //copy active newsletter subscriptions and deactivate the old
             var subscriptions = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(oldEmail, isActive: true);
+			_logger.LogError("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): subscriptions → {Subscriptions}", customer, newEmail, requireValidation, subscriptions);
             var subscriptionGuid = Guid.NewGuid();
+			_logger.LogError("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): subscriptionGuid → {SubscriptionGuid}", customer, newEmail, requireValidation, subscriptionGuid);
             foreach (var subscription in subscriptions)
             {
                 await _newsLetterSubscriptionService.InsertNewsLetterSubscriptionAsync(new()
@@ -519,11 +590,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                     LanguageId = subscription.LanguageId,
                     CreatedOnUtc = DateTime.UtcNow
                 });
+				_logger.LogDebug("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): CreatedOnUtc → {CreatedOnUtc}", customer, newEmail, requireValidation, CreatedOnUtc);
 
                 subscription.Active = false;
+				_logger.LogDebug("SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation}): subscription.Active → {Arg3}", customer, newEmail, requireValidation, subscription.Active);
                 await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
             }
         }
+		_logger.LogWarning("<<< Exiting SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation})", customer, newEmail, requireValidation);
     }
 
     /// <summary>
@@ -534,21 +608,29 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetUsernameAsync(Customer customer, string newUsername)
     {
+		_logger.LogError(">>> Entering SetUsernameAsync(customer={Customer},newUsername={NewUsername})", customer, newUsername);
         ArgumentNullException.ThrowIfNull(customer);
 
-        if (!_customerSettings.UsernamesEnabled)
+			_logger.LogError("Throwing NopException from SetUsernameAsync(customer={Customer},newUsername={NewUsername})", customer, newUsername);
+        if (!_customerSettings.UsernamesEnabled) {
             throw new NopException("Usernames are disabled");
+        }
 
         newUsername = newUsername.Trim();
+		_logger.LogError("SetUsernameAsync(customer={Customer},newUsername={NewUsername}): newUsername → {NewUsername1}", customer, newUsername, newUsername);
 
         if (newUsername.Length > NopCustomerServicesDefaults.CustomerUsernameLength)
             throw new NopException(await _localizationService.GetResourceAsync("Account.EmailUsernameErrors.UsernameTooLong"));
 
         var user2 = await _customerService.GetCustomerByUsernameAsync(newUsername);
-        if (user2 != null && customer.Id != user2.Id)
+		_logger.LogError("SetUsernameAsync(customer={Customer},newUsername={NewUsername}): user2 → {User2}", customer, newUsername, user2);
+			_logger.LogWarning("<<< Exiting SetUsernameAsync(customer={Customer},newUsername={NewUsername})", customer, newUsername);
+        if (user2 != null && customer.Id != user2.Id) {
             throw new NopException(await _localizationService.GetResourceAsync("Account.EmailUsernameErrors.UsernameAlreadyExists"));
+        }
 
         customer.Username = newUsername;
+		_logger.LogDebug("SetUsernameAsync(customer={Customer},newUsername={NewUsername}): customer.Username → {Arg2}", customer, newUsername, customer.Username);
         await _customerService.UpdateCustomerAsync(customer);
     }
 

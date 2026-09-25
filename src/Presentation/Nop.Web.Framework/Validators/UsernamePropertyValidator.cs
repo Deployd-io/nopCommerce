@@ -2,6 +2,7 @@
 using FluentValidation;
 using FluentValidation.Validators;
 using Nop.Core.Domain.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Validators;
 /// </summary>
 public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator<T, TProperty>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly CustomerSettings _customerSettings;
 
     public override string Name => "UsernamePropertyValidator";
@@ -19,7 +21,10 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
     /// </summary>
     public UsernamePropertyValidator(CustomerSettings customerSettings)
     {
+		_logger.LogError(">>> Entering UsernamePropertyValidator(customerSettings={CustomerSettings})", customerSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("UsernamePropertyValidator(customerSettings={CustomerSettings}): _customerSettings → {_customerSettings}", customerSettings, _customerSettings);
+    _logger.LogWarning("<<< Exiting UsernamePropertyValidator(customerSettings={CustomerSettings})", customerSettings);
     }
 
     /// <summary>
@@ -29,6 +34,9 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		_logger.LogError(">>> Entering IsValid(context={Context},value={Value})", context, value);
+		_logger.LogWarning("<<< Exiting IsValid(context={Context},value={Value})", context, value);
+		_logger.LogWarning("<<< Exiting IsValid(username={Username},customerSettings={CustomerSettings})", username, customerSettings);
         return IsValid(value as string, _customerSettings);
     }
 
@@ -43,13 +51,19 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
         if (!customerSettings.UsernameValidationEnabled || string.IsNullOrEmpty(customerSettings.UsernameValidationRule))
             return true;
 
-        if (string.IsNullOrEmpty(username))
+        if (string.IsNullOrEmpty(username)) {
             return false;
+        }
 
         return customerSettings.UsernameValidationUseRegex
             ? Regex.IsMatch(username, customerSettings.UsernameValidationRule, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)
             : username.All(l => customerSettings.UsernameValidationRule.Contains(l));
     }
 
-    protected override string GetDefaultMessageTemplate(string errorCode) => "Username is not valid";
+    protected override string GetDefaultMessageTemplate(string errorCode)
+    {
+        _logger.LogError(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        _logger.LogWarning("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        return "Username is not valid";
+    }
 }

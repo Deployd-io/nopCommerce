@@ -4,11 +4,13 @@ using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.WebOptimizer;
 
 public partial class WebOptimizerConfig : IWebOptimizerOptions, IConfig
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -41,7 +43,12 @@ public partial class WebOptimizerConfig : IWebOptimizerOptions, IConfig
     /// Gets an order of configuration
     /// </summary>
     /// <returns>Order</returns>
-    public int GetOrder() => 2;
+    public int GetOrder()
+    {
+        _logger.LogError(">>> Entering GetOrder()");
+        _logger.LogWarning("<<< Exiting GetOrder()");
+        return 2;
+    }
 
     #region WebOptimizer options
 

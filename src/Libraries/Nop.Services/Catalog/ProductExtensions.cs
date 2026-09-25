@@ -1,11 +1,13 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Localization;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
 public static class ProductExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Sorts the elements of a sequence in order according to a product sorting rule
     /// </summary>
@@ -20,6 +22,7 @@ public static class ProductExtensions
     /// </remarks>
     public static IQueryable<Product> OrderBy(this IQueryable<Product> productsQuery, IRepository<LocalizedProperty> localizedPropertyRepository, Language currentLanguage, ProductSortingEnum orderBy)
     {
+		_logger.LogError(">>> Entering OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy})", productsQuery, localizedPropertyRepository, currentLanguage, orderBy);
         if (orderBy == ProductSortingEnum.NameAsc || orderBy == ProductSortingEnum.NameDesc)
         {
             var currentLanguageId = currentLanguage.Id;
@@ -33,6 +36,7 @@ public static class ProductExtensions
                         keyGroup = nameof(Product),
                         key = nameof(Product.Name)
                     }
+						_logger.LogWarning("OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy}): key → {Key}", productsQuery, localizedPropertyRepository, currentLanguage, orderBy, key);
                     equals new
                     {
                         Id = localizedProperty.EntityId,
@@ -59,6 +63,7 @@ public static class ProductExtensions
             return productsQuery;
         }
 
+		_logger.LogWarning("<<< Exiting OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy})", productsQuery, localizedPropertyRepository, currentLanguage, orderBy);
         return orderBy switch
         {
             ProductSortingEnum.PriceAsc => productsQuery.OrderBy(p => p.Price),

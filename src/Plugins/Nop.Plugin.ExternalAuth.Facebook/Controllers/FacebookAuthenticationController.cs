@@ -14,12 +14,14 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.ExternalAuth.Facebook.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public class FacebookAuthenticationController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FacebookExternalAuthSettings _facebookExternalAuthSettings;
@@ -48,15 +50,26 @@ public class FacebookAuthenticationController : BasePluginController
         IStoreContext storeContext,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext})", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext);
         _facebookExternalAuthSettings = facebookExternalAuthSettings;
         _authenticationPluginManager = authenticationPluginManager;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _authenticationPluginManager → {_authenticationPluginManager}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _authenticationPluginManager);
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _facebookExternalAuthSettings → {_facebookExternalAuthSettings}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _facebookExternalAuthSettings);
+    _logger.LogWarning("<<< Exiting FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext})", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext);
         _externalAuthenticationService = externalAuthenticationService;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _externalAuthenticationService → {_externalAuthenticationService}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _externalAuthenticationService);
         _localizationService = localizationService;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _localizationService → {_localizationService}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _notificationService → {_notificationService}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _notificationService);
         _optionsCache = optionsCache;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _optionsCache → {_optionsCache}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _optionsCache);
         _permissionService = permissionService;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _permissionService → {_permissionService}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _settingService → {_settingService}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("FacebookAuthenticationController(facebookExternalAuthSettings={FacebookExternalAuthSettings},authenticationPluginManager={AuthenticationPluginManager},externalAuthenticationService={ExternalAuthenticationService},localizationService={LocalizationService},notificationService={NotificationService},optionsCache={OptionsCache},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},workContext={WorkContext}): _storeContext → {_storeContext}", facebookExternalAuthSettings, authenticationPluginManager, externalAuthenticationService, localizationService, notificationService, optionsCache, permissionService, settingService, storeContext, workContext, _storeContext);
         _workContext = workContext;
     }
 
@@ -69,12 +82,15 @@ public class FacebookAuthenticationController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EXTERNAL_AUTHENTICATION_METHODS)]
     public IActionResult Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ClientId = _facebookExternalAuthSettings.ClientKeyIdentifier,
             ClientSecret = _facebookExternalAuthSettings.ClientSecret
         };
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/ExternalAuth.Facebook/Views/Configure.cshtml", model);
     }
 
@@ -102,11 +118,15 @@ public class FacebookAuthenticationController : BasePluginController
 
     public async Task<IActionResult> Login(string returnUrl)
     {
+		_logger.LogError(">>> Entering Login(returnUrl={ReturnUrl})", returnUrl);
         var store = await _storeContext.GetCurrentStoreAsync();
         var methodIsAvailable = await _authenticationPluginManager
             .IsPluginActiveAsync(FacebookAuthenticationDefaults.SystemName, await _workContext.GetCurrentCustomerAsync(), store.Id);
-        if (!methodIsAvailable)
+			_logger.LogError("Login(returnUrl={ReturnUrl}): store → {Store}", returnUrl, store);
+			_logger.LogError("Throwing NopException from Login(returnUrl={ReturnUrl})", returnUrl);
+        if (!methodIsAvailable) {
             throw new NopException("Facebook authentication module cannot be loaded");
+        }
 
         if (string.IsNullOrEmpty(_facebookExternalAuthSettings.ClientKeyIdentifier) ||
             string.IsNullOrEmpty(_facebookExternalAuthSettings.ClientSecret))
@@ -121,13 +141,16 @@ public class FacebookAuthenticationController : BasePluginController
         };
         authenticationProperties.SetString(FacebookAuthenticationDefaults.ErrorCallback, Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl }));
 
+		_logger.LogWarning("<<< Exiting Login(returnUrl={ReturnUrl})", returnUrl);
         return Challenge(authenticationProperties, FacebookDefaults.AuthenticationScheme);
     }
 
     public async Task<IActionResult> LoginCallback(string returnUrl)
     {
+		_logger.LogError(">>> Entering LoginCallback(returnUrl={ReturnUrl})", returnUrl);
         //authenticate Facebook user
         var authenticateResult = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
+		_logger.LogError("LoginCallback(returnUrl={ReturnUrl}): authenticateResult → {AuthenticateResult}", returnUrl, authenticateResult);
         if (!authenticateResult.Succeeded || !authenticateResult.Principal.Claims.Any())
             return RedirectToRoute(NopRouteNames.General.LOGIN);
 
@@ -143,17 +166,22 @@ public class FacebookAuthenticationController : BasePluginController
         };
 
         //authenticate Nop user
+		_logger.LogWarning("<<< Exiting LoginCallback(returnUrl={ReturnUrl})", returnUrl);
         return await _externalAuthenticationService.AuthenticateAsync(authenticationParameters, returnUrl);
     }
 
     public async Task<IActionResult> DataDeletionStatusCheck(int earId)
     {
+		_logger.LogError(">>> Entering DataDeletionStatusCheck(earId={EarId})", earId);
         var externalAuthenticationRecord = await _externalAuthenticationService.GetExternalAuthenticationRecordByIdAsync(earId);
-        if (externalAuthenticationRecord is not null)
+			_logger.LogError("DataDeletionStatusCheck(earId={EarId}): externalAuthenticationRecord → {ExternalAuthenticationRecord}", earId, externalAuthenticationRecord);
+        if (externalAuthenticationRecord is not null) {
             _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Plugins.ExternalAuth.Facebook.AuthenticationDataExist"));
+        }
         else
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.ExternalAuth.Facebook.AuthenticationDataDeletedSuccessfully"));
 
+		_logger.LogWarning("<<< Exiting DataDeletionStatusCheck(earId={EarId})", earId);
         return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -8,11 +9,16 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record ReturnRequestActionModel : BaseNopEntityModel, ILocalizedModel<ReturnRequestActionLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ReturnRequestActionModel()
     {
+		_logger.LogError(">>> Entering ReturnRequestActionModel()");
         Locales = new List<ReturnRequestActionLocalizedModel>();
+		_logger.LogDebug("ReturnRequestActionModel(): Locales → {Locales}", Locales);
+    _logger.LogError("ReturnRequestActionModel(): Locales → {Locales}", Locales);
+    _logger.LogWarning("<<< Exiting ReturnRequestActionModel()");
     }
 
     #endregion

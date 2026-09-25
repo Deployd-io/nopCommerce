@@ -6,6 +6,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Data;
 using Nop.Services.Helpers;
 using Nop.Services.Orders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Customers;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Customers;
 /// </summary>
 public partial class CustomerReportService : ICustomerReportService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -30,9 +32,14 @@ public partial class CustomerReportService : ICustomerReportService
         IRepository<Customer> customerRepository,
         IRepository<Order> orderRepository)
     {
+		_logger.LogError(">>> Entering CustomerReportService(customerService={CustomerService},dateTimeHelper={DateTimeHelper},customerRepository={CustomerRepository},orderRepository={OrderRepository})", customerService, dateTimeHelper, customerRepository, orderRepository);
         _customerService = customerService;
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("CustomerReportService(customerService={CustomerService},dateTimeHelper={DateTimeHelper},customerRepository={CustomerRepository},orderRepository={OrderRepository}): _dateTimeHelper → {_dateTimeHelper}", customerService, dateTimeHelper, customerRepository, orderRepository, _dateTimeHelper);
+		_logger.LogDebug("CustomerReportService(customerService={CustomerService},dateTimeHelper={DateTimeHelper},customerRepository={CustomerRepository},orderRepository={OrderRepository}): _customerService → {_customerService}", customerService, dateTimeHelper, customerRepository, orderRepository, _customerService);
+    _logger.LogWarning("<<< Exiting CustomerReportService(customerService={CustomerService},dateTimeHelper={DateTimeHelper},customerRepository={CustomerRepository},orderRepository={OrderRepository})", customerService, dateTimeHelper, customerRepository, orderRepository);
         _customerRepository = customerRepository;
+		_logger.LogDebug("CustomerReportService(customerService={CustomerService},dateTimeHelper={DateTimeHelper},customerRepository={CustomerRepository},orderRepository={OrderRepository}): _customerRepository → {_customerRepository}", customerService, dateTimeHelper, customerRepository, orderRepository, _customerRepository);
         _orderRepository = orderRepository;
     }
 
@@ -59,17 +66,23 @@ public partial class CustomerReportService : ICustomerReportService
         DateTime? createdToUtc, OrderStatus? os, PaymentStatus? ps, ShippingStatus? ss, OrderByEnum orderBy,
         int pageIndex = 0, int pageSize = 214748364)
     {
+		_logger.LogError(">>> Entering GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize})", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize);
         int? orderStatusId = null;
         if (os.HasValue)
             orderStatusId = (int)os.Value;
+			_logger.LogError("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): orderStatusId → {OrderStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, orderStatusId);
+			_logger.LogDebug("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): orderStatusId → {OrderStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, orderStatusId);
 
         int? paymentStatusId = null;
         if (ps.HasValue)
             paymentStatusId = (int)ps.Value;
+			_logger.LogError("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): paymentStatusId → {PaymentStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, paymentStatusId);
+			_logger.LogDebug("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): paymentStatusId → {PaymentStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, paymentStatusId);
 
         int? shippingStatusId = null;
         if (ss.HasValue)
             shippingStatusId = (int)ss.Value;
+			_logger.LogError("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): shippingStatusId → {ShippingStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, shippingStatusId);
         var query1 = from c in _customerRepository.Table
             join o in _orderRepository.Table on c.Id equals o.CustomerId
             where (!createdFromUtc.HasValue || createdFromUtc.Value <= o.CreatedOnUtc) &&
@@ -80,6 +93,7 @@ public partial class CustomerReportService : ICustomerReportService
                   !o.Deleted &&
                   !c.Deleted
             select new { c, o };
+			_logger.LogDebug("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): shippingStatusId → {ShippingStatusId}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, shippingStatusId);
 
         var query2 = from co in query1
             group co by co.c.Id into g
@@ -89,6 +103,7 @@ public partial class CustomerReportService : ICustomerReportService
                 OrderTotal = g.Sum(x => x.o.OrderTotal),
                 OrderCount = g.Count()
             };
+				_logger.LogDebug("GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize}): OrderCount → {OrderCount}", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize, OrderCount);
         query2 = orderBy switch
         {
             OrderByEnum.OrderByQuantity => query2.OrderByDescending(x => x.OrderCount),
@@ -96,6 +111,7 @@ public partial class CustomerReportService : ICustomerReportService
             _ => throw new ArgumentException("Wrong orderBy parameter", nameof(orderBy)),
         };
         var tmp = await query2.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogWarning("<<< Exiting GetBestCustomersReportAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize})", createdFromUtc, createdToUtc, os, ps, ss, orderBy, pageIndex, pageSize);
         return new PagedList<BestCustomerReportLine>(tmp.Select(x => new BestCustomerReportLine
             {
                 CustomerId = x.CustomerId,
@@ -115,11 +131,16 @@ public partial class CustomerReportService : ICustomerReportService
     /// </returns>
     public virtual async Task<int> GetRegisteredCustomersReportAsync(int days)
     {
+		_logger.LogError(">>> Entering GetRegisteredCustomersReportAsync(days={Days})", days);
         var date = (await _dateTimeHelper.ConvertToUserTimeAsync(DateTime.Now)).AddDays(-days);
 
+		_logger.LogError("GetRegisteredCustomersReportAsync(days={Days}): date → {Date}", days, date);
         var registeredCustomerRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
-        if (registeredCustomerRole == null)
+		_logger.LogError("GetRegisteredCustomersReportAsync(days={Days}): registeredCustomerRole → {RegisteredCustomerRole}", days, registeredCustomerRole);
+		_logger.LogWarning("<<< Exiting GetRegisteredCustomersReportAsync(days={Days})", days);
+        if (registeredCustomerRole == null) {
             return 0;
+        }
 
         return (await _customerService.GetAllCustomersAsync(
             date,

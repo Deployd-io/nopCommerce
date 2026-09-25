@@ -11,6 +11,7 @@ using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Components;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.Omnisend.Components;
 /// </summary>
 public class WidgetsOmnisendViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICustomerService _customerService;
@@ -41,12 +43,20 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
         OmnisendService omnisendService,
         OmnisendSettings omnisendSettings)
     {
+		_logger.LogError(">>> Entering WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings})", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings);
         _customerService = customerService;
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _genericAttributeService → {_genericAttributeService}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _genericAttributeService);
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _customerService → {_customerService}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _customerService);
+    _logger.LogWarning("<<< Exiting WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings})", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _nopUrlHelper → {_nopUrlHelper}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _nopUrlHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _webHelper → {_webHelper}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _webHelper);
         _workContext = workContext;
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _workContext → {_workContext}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _workContext);
         _omnisendService = omnisendService;
+		_logger.LogDebug("WidgetsOmnisendViewComponent(customerService={CustomerService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},workContext={WorkContext},omnisendService={OmnisendService},omnisendSettings={OmnisendSettings}): _omnisendService → {_omnisendService}", customerService, genericAttributeService, nopUrlHelper, webHelper, workContext, omnisendService, omnisendSettings, _omnisendService);
         _omnisendSettings = omnisendSettings;
     }
 
@@ -56,8 +66,10 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
 
     private async Task<string> AddIdentifyContactScriptAsync(string script)
     {
+		_logger.LogError(">>> Entering AddIdentifyContactScriptAsync(script={Script})", script);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogError("AddIdentifyContactScriptAsync(script={Script}): customer → {Customer}", script, customer);
         if (await _customerService.IsGuestAsync(customer))
             await GenerateGuestScriptAsync(customer);
 
@@ -72,11 +84,13 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
         await _genericAttributeService.SaveAttributeAsync<string>(customer,
             OmnisendDefaults.IdentifyContactAttribute, null);
 
+		_logger.LogWarning("<<< Exiting AddIdentifyContactScriptAsync(script={Script})", script);
         return script;
     }
 
     private async Task GenerateGuestScriptAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering GenerateGuestScriptAsync(customer={Customer})", customer);
         var customerEmail = await _genericAttributeService.GetAttributeAsync<string>(customer,
             OmnisendDefaults.CustomerEmailAttribute);
 
@@ -85,6 +99,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
 
         //try to get the ContactId from query parameters
         var omnisendContactId = _webHelper.QueryString<string>(OmnisendDefaults.ContactIdQueryParamName);
+		_logger.LogError("GenerateGuestScriptAsync(customer={Customer}): omnisendContactId → {OmnisendContactId}", customer, omnisendContactId);
         if (string.IsNullOrEmpty(omnisendContactId))
             //try to get the ContactId from cookies
             Request.Cookies.TryGetValue($"{OmnisendDefaults.ContactIdQueryParamName}", out omnisendContactId);
@@ -93,8 +108,10 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
             return;
 
         var contact = await _omnisendService.GetContactInfoAsync(omnisendContactId);
+		_logger.LogError("GenerateGuestScriptAsync(customer={Customer}): contact → {Contact}", customer, contact);
 
         var email = contact?.Identifiers.FirstOrDefault(p => !string.IsNullOrEmpty(p.Id))?.Id;
+		_logger.LogError("GenerateGuestScriptAsync(customer={Customer}): email → {Email}", customer, email);
 
         if (string.IsNullOrEmpty(email))
             return;
@@ -110,6 +127,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
 
         await _genericAttributeService.SaveAttributeAsync(customer,
             OmnisendDefaults.IdentifyContactAttribute, identifyScript);
+			_logger.LogWarning("<<< Exiting GenerateGuestScriptAsync(customer={Customer})", customer);
     }
 
     #endregion
@@ -127,6 +145,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogError(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure tracking is enabled
         if (!_omnisendSettings.UseTracking || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return Content(string.Empty);
@@ -154,6 +173,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
                 .Replace(OmnisendDefaults.ProductUrl,
                     await _nopUrlHelper.RouteGenericUrlAsync<Product>(new { productDetails.SeName }, _webHelper.GetCurrentRequestProtocol()));
 
+		_logger.LogWarning("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return string.IsNullOrEmpty(script)
             ? Content(string.Empty)
             : new HtmlContentViewComponentResult(new HtmlString(script));

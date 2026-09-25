@@ -1,5 +1,6 @@
 ﻿using FluentMigrator;
 using FluentMigrator.Runner.Generators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -8,11 +9,14 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public class NopGeneratorAccessor : IGeneratorAccessor
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NopGeneratorAccessor(IEnumerable<IMigrationGenerator> generators)
     {
+		_logger.LogError(">>> Entering NopGeneratorAccessor(generators={Generators})", generators);
         ConfigureGenerator(generators.ToList());
+		_logger.LogWarning("<<< Exiting NopGeneratorAccessor(generators={Generators})", generators);
     }
 
     #endregion
@@ -25,10 +29,15 @@ public class NopGeneratorAccessor : IGeneratorAccessor
     /// <param name="generators">Collection of migration generators</param>
     protected virtual void ConfigureGenerator(IList<IMigrationGenerator> generators)
     {
+		_logger.LogError(">>> Entering ConfigureGenerator(generators={Generators})", generators);
         var dataSettings = DataSettingsManager.LoadSettings();
 
-        if (!generators.Any())
+		_logger.LogError("ConfigureGenerator(generators={Generators}): dataSettings → {DataSettings}", generators, dataSettings);
+			_logger.LogWarning("<<< Exiting ConfigureGenerator(generators={Generators})", generators);
+			_logger.LogError("Throwing InvalidOperationException from ConfigureGenerator(generators={Generators})", generators);
+        if (!generators.Any()) {
             throw new InvalidOperationException("No migration generator registered.");
+        }
 
         Generator = dataSettings is null ? generators.FirstOrDefault() : dataSettings.DataProvider switch
         {
@@ -49,11 +58,14 @@ public class NopGeneratorAccessor : IGeneratorAccessor
     protected IMigrationGenerator FindGenerator(IList<IMigrationGenerator> generators,
         string generatorId)
     {
+		_logger.LogError(">>> Entering FindGenerator(generators={Generators},generatorId={GeneratorId})", generators, generatorId);
         if (generators.FirstOrDefault(p =>
                 p.GeneratorId.Equals(generatorId, StringComparison.OrdinalIgnoreCase) ||
                 p.GeneratorIdAliases.Any(a => a.Equals(generatorId, StringComparison.OrdinalIgnoreCase))) is
             IMigrationGenerator processor)
         {
+			_logger.LogWarning("<<< Exiting FindGenerator(generators={Generators},generatorId={GeneratorId})", generators, generatorId);
+			_logger.LogError("Throwing InvalidOperationException from FindGenerator(generators={Generators},generatorId={GeneratorId})", generators, generatorId);
             return processor;
         }
 

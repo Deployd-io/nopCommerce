@@ -14,6 +14,7 @@ using Nop.Web.Areas.Admin.Models.News;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -22,6 +23,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsModelFactory : INewsModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -52,16 +54,28 @@ public partial class NewsModelFactory : INewsModelFactory
         IStoreService storeService,
         IUrlRecordService urlRecordService)
     {
+		_logger.LogError(">>> Entering NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService})", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService);
         _catalogSettings = catalogSettings;
         _customerService = customerService;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _customerService → {_customerService}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _customerService);
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _catalogSettings → {_catalogSettings}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _catalogSettings);
+    _logger.LogWarning("<<< Exiting NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService})", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _baseAdminModelFactory);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _dateTimeHelper → {_dateTimeHelper}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _dateTimeHelper);
         _htmlFormatter = htmlFormatter;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _htmlFormatter → {_htmlFormatter}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _htmlFormatter);
         _languageService = languageService;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _languageService → {_languageService}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _localizationService → {_localizationService}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _localizationService);
         _newsService = newsService;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _newsService → {_newsService}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _newsService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _storeMappingSupportedModelFactory);
         _storeService = storeService;
+		_logger.LogDebug("NewsModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},languageService={LanguageService},localizationService={LocalizationService},newsService={NewsService},storeMappingSupportedModelFactory=<redacted>,storeService={StoreService},urlRecordService={UrlRecordService}): _storeService → {_storeService}", catalogSettings, baseAdminModelFactory, customerService, dateTimeHelper, htmlFormatter, languageService, localizationService, newsService, storeService, urlRecordService, _storeService);
         _urlRecordService = urlRecordService;
     }
 
@@ -80,13 +94,16 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsContentModel> PrepareNewsContentModelAsync(NewsContentModel newsContentModel, int? filterByNewsItemId)
     {
+		_logger.LogError(">>> Entering PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId})", newsContentModel, filterByNewsItemId);
         ArgumentNullException.ThrowIfNull(newsContentModel);
 
         //prepare nested search models
         await PrepareNewsItemSearchModelAsync(newsContentModel.NewsItems);
         var newsItem = await _newsService.GetNewsByIdAsync(filterByNewsItemId ?? 0);
+		_logger.LogError("PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId}): newsItem → {NewsItem}", newsContentModel, filterByNewsItemId, newsItem);
         await PrepareNewsCommentSearchModelAsync(newsContentModel.NewsComments, newsItem);
 
+		_logger.LogWarning("<<< Exiting PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId})", newsContentModel, filterByNewsItemId);
         return newsContentModel;
     }
 
@@ -100,6 +117,7 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsItemListModel> PrepareNewsItemListModelAsync(NewsItemSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNewsItemListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get news items
@@ -115,9 +133,11 @@ public partial class NewsModelFactory : INewsModelFactory
             {
                 //fill in model values from the entity
                 var newsItemModel = newsItem.ToModel<NewsItemModel>();
+				_logger.LogError("PrepareNewsItemListModelAsync(searchModel={SearchModel}): newsItemModel → {NewsItemModel}", searchModel, newsItemModel);
 
                 //little performance optimization: ensure that "Full" is not returned
                 newsItemModel.Full = string.Empty;
+				_logger.LogDebug("PrepareNewsItemListModelAsync(searchModel={SearchModel}): newsItemModel.Full → {Arg1}", searchModel, newsItemModel.Full);
 
                 //convert dates to the user time
                 if (newsItem.StartDateUtc.HasValue)
@@ -136,6 +156,9 @@ public partial class NewsModelFactory : INewsModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareNewsItemListModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogError(">>> Entering PrepareNewsItemSearchModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogWarning("<<< Exiting PrepareNewsItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -151,24 +174,30 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsItemModel> PrepareNewsItemModelAsync(NewsItemModel model, NewsItem newsItem, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties})", model, newsItem, excludeProperties);
         //fill in model values from the entity
         if (newsItem != null)
         {
             if (model == null)
             {
                 model = newsItem.ToModel<NewsItemModel>();
+				_logger.LogError("PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties}): model → {Model1}", model, newsItem, excludeProperties, model);
                 model.SeName = await _urlRecordService.GetSeNameAsync(newsItem, newsItem.LanguageId, true, false);
             }
 
             model.StartDateUtc = newsItem.StartDateUtc;
+			_logger.LogDebug("PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties}): model.StartDateUtc → {Arg3}", model, newsItem, excludeProperties, model.StartDateUtc);
             model.EndDateUtc = newsItem.EndDateUtc;
+			_logger.LogDebug("PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties}): model.EndDateUtc → {Arg3}", model, newsItem, excludeProperties, model.EndDateUtc);
         }
 
         //set default values for the new model
         if (newsItem == null)
         {
             model.Published = true;
+			_logger.LogDebug("PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, newsItem, excludeProperties, model.Published);
             model.AllowComments = true;
+			_logger.LogDebug("PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties}): model.AllowComments → {Arg3}", model, newsItem, excludeProperties, model.AllowComments);
         }
 
         //prepare available languages
@@ -177,6 +206,7 @@ public partial class NewsModelFactory : INewsModelFactory
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, newsItem, excludeProperties);
 
+		_logger.LogWarning("<<< Exiting PrepareNewsItemModelAsync(model={Model},newsItem={NewsItem},excludeProperties={ExcludeProperties})", model, newsItem, excludeProperties);
         return model;
     }
 
@@ -191,6 +221,7 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsCommentSearchModel> PrepareNewsCommentSearchModelAsync(NewsCommentSearchModel searchModel, NewsItem newsItem)
     {
+		_logger.LogError(">>> Entering PrepareNewsCommentSearchModelAsync(searchModel={SearchModel},newsItem={NewsItem})", searchModel, newsItem);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare "approved" property (0 - all; 1 - approved only; 2 - disapproved only)
@@ -198,6 +229,7 @@ public partial class NewsModelFactory : INewsModelFactory
         {
             Text = await _localizationService.GetResourceAsync("Admin.ContentManagement.News.Comments.List.SearchApproved.All"),
             Value = "0"
+			_logger.LogDebug("PrepareNewsCommentSearchModelAsync(searchModel={SearchModel},newsItem={NewsItem}): Value → {Value}", searchModel, newsItem, Value);
         });
         searchModel.AvailableApprovedOptions.Add(new SelectListItem
         {
@@ -211,10 +243,12 @@ public partial class NewsModelFactory : INewsModelFactory
         });
 
         searchModel.NewsItemId = newsItem?.Id;
+		_logger.LogDebug("PrepareNewsCommentSearchModelAsync(searchModel={SearchModel},newsItem={NewsItem}): searchModel.NewsItemId → {Arg2}", searchModel, newsItem, searchModel.NewsItemId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareNewsCommentSearchModelAsync(searchModel={SearchModel},newsItem={NewsItem})", searchModel, newsItem);
         return searchModel;
     }
 
@@ -229,6 +263,7 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsCommentListModel> PrepareNewsCommentListModelAsync(NewsCommentSearchModel searchModel, int? newsItemId)
     {
+		_logger.LogError(">>> Entering PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId})", searchModel, newsItemId);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter comments
@@ -237,6 +272,7 @@ public partial class NewsModelFactory : INewsModelFactory
         var createdOnToValue = searchModel.CreatedOnTo == null ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var isApprovedOnly = searchModel.SearchApprovedId == 0 ? null : searchModel.SearchApprovedId == 1 ? true : (bool?)false;
+		_logger.LogError("PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId}): isApprovedOnly → {IsApprovedOnly}", searchModel, newsItemId, isApprovedOnly);
 
         //get comments
         var comments = (await _newsService.GetAllCommentsAsync(newsItemId: newsItemId,
@@ -256,6 +292,7 @@ public partial class NewsModelFactory : INewsModelFactory
             {
                 //fill in model values from the entity
                 var commentModel = newsComment.ToModel<NewsCommentModel>();
+				_logger.LogError("PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId}): commentModel → {CommentModel}", searchModel, newsItemId, commentModel);
 
                 //convert dates to the user time
                 commentModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(newsComment.CreatedOnUtc, DateTimeKind.Utc);
@@ -277,6 +314,7 @@ public partial class NewsModelFactory : INewsModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId})", searchModel, newsItemId);
         return model;
     }
 

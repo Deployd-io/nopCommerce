@@ -2,6 +2,7 @@
 using Nop.Core;
 using Nop.Core.Domain.Media;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Media;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Media;
 /// </summary>
 public partial class ThumbService : IThumbService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IHttpContextAccessor _httpContextAccessor;
@@ -26,9 +28,14 @@ public partial class ThumbService : IThumbService
         IWebHelper webHelper,
         MediaSettings mediaSettings)
     {
+		_logger.LogError(">>> Entering ThumbService(httpContextAccessor={HttpContextAccessor},fileProvider={FileProvider},webHelper={WebHelper},mediaSettings={MediaSettings})", httpContextAccessor, fileProvider, webHelper, mediaSettings);
         _httpContextAccessor = httpContextAccessor;
         _fileProvider = fileProvider;
+		_logger.LogDebug("ThumbService(httpContextAccessor={HttpContextAccessor},fileProvider={FileProvider},webHelper={WebHelper},mediaSettings={MediaSettings}): _fileProvider → {_fileProvider}", httpContextAccessor, fileProvider, webHelper, mediaSettings, _fileProvider);
+		_logger.LogDebug("ThumbService(httpContextAccessor={HttpContextAccessor},fileProvider={FileProvider},webHelper={WebHelper},mediaSettings={MediaSettings}): _httpContextAccessor → {_httpContextAccessor}", httpContextAccessor, fileProvider, webHelper, mediaSettings, _httpContextAccessor);
+    _logger.LogWarning("<<< Exiting ThumbService(httpContextAccessor={HttpContextAccessor},fileProvider={FileProvider},webHelper={WebHelper},mediaSettings={MediaSettings})", httpContextAccessor, fileProvider, webHelper, mediaSettings);
         _webHelper = webHelper;
+		_logger.LogDebug("ThumbService(httpContextAccessor={HttpContextAccessor},fileProvider={FileProvider},webHelper={WebHelper},mediaSettings={MediaSettings}): _webHelper → {_webHelper}", httpContextAccessor, fileProvider, webHelper, mediaSettings, _webHelper);
         _mediaSettings = mediaSettings;
     }
 
@@ -43,13 +50,18 @@ public partial class ThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePictureThumbsAsync(Picture picture)
     {
+		_logger.LogError(">>> Entering DeletePictureThumbsAsync(picture={Picture})", picture);
         var filter = $"{picture.Id:0000000}*.*";
         var currentFiles = _fileProvider.GetFiles(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), NopMediaDefaults.ImageThumbsPath), filter, false);
+		_logger.LogError("DeletePictureThumbsAsync(picture={Picture}): filter → {Filter}", picture, filter);
         foreach (var currentFileName in currentFiles)
         {
+			_logger.LogError("DeletePictureThumbsAsync(picture={Picture}): currentFiles → {CurrentFiles}", picture, currentFiles);
             var thumbFilePath = await GetThumbLocalPathByFileNameAsync(currentFileName);
+			_logger.LogError("DeletePictureThumbsAsync(picture={Picture}): thumbFilePath → {ThumbFilePath}", picture, thumbFilePath);
             _fileProvider.DeleteFile(thumbFilePath);
         }
+		_logger.LogWarning("<<< Exiting DeletePictureThumbsAsync(picture={Picture})", picture);
     }
 
     /// <summary>
@@ -62,12 +74,15 @@ public partial class ThumbService : IThumbService
     /// </returns>
     public virtual Task<string> GetThumbLocalPathByFileNameAsync(string thumbFileName)
     {
+		_logger.LogError(">>> Entering GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName})", thumbFileName);
         var thumbsDirectoryPath = _fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), NopMediaDefaults.ImageThumbsPath);
 
+		_logger.LogError("GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName}): thumbsDirectoryPath → {ThumbsDirectoryPath}", thumbFileName, thumbsDirectoryPath);
         if (_mediaSettings.MultipleThumbDirectories)
         {
             //get the first two letters of the file name
             var fileNameWithoutExtension = _fileProvider.GetFileNameWithoutExtension(thumbFileName);
+			_logger.LogError("GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName}): fileNameWithoutExtension → {FileNameWithoutExtension}", thumbFileName, fileNameWithoutExtension);
             if (fileNameWithoutExtension != null && fileNameWithoutExtension.Length > NopMediaDefaults.MultipleThumbDirectoriesLength)
             {
                 var subDirectoryName = fileNameWithoutExtension[..NopMediaDefaults.MultipleThumbDirectoriesLength];
@@ -77,6 +92,8 @@ public partial class ThumbService : IThumbService
         }
 
         var thumbFilePath = _fileProvider.Combine(thumbsDirectoryPath, thumbFileName);
+		_logger.LogError("GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName}): thumbFilePath → {ThumbFilePath}", thumbFileName, thumbFilePath);
+		_logger.LogWarning("<<< Exiting GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName})", thumbFileName);
         return Task.FromResult(thumbFilePath);
     }
 
@@ -91,6 +108,8 @@ public partial class ThumbService : IThumbService
     /// </returns>
     public virtual Task<bool> GeneratedThumbExistsAsync(string thumbFilePath, string thumbFileName)
     {
+		_logger.LogError(">>> Entering GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
+        _logger.LogWarning("<<< Exiting GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
         return Task.FromResult(_fileProvider.FileExists(thumbFilePath));
     }
 
@@ -104,8 +123,11 @@ public partial class ThumbService : IThumbService
     /// </returns>
     public virtual async Task<string> GetThumbLocalPathAsync(string pictureUrl)
     {
-        if (string.IsNullOrEmpty(pictureUrl))
+		_logger.LogError(">>> Entering GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
+		_logger.LogWarning("<<< Exiting GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
+        if (string.IsNullOrEmpty(pictureUrl)) {
             return string.Empty;
+        }
 
         return await GetThumbLocalPathByFileNameAsync(_fileProvider.GetFileName(pictureUrl));
     }
@@ -120,12 +142,15 @@ public partial class ThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveThumbAsync(string thumbFilePath, string thumbFileName, string mimeType, byte[] binary)
     {
+		_logger.LogError(">>> Entering SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
         //ensure \thumb directory exists
         var thumbsDirectoryPath = _fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), NopMediaDefaults.ImageThumbsPath);
+		_logger.LogError("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): thumbsDirectoryPath → {ThumbsDirectoryPath}", thumbFilePath, thumbFileName, mimeType, binary, thumbsDirectoryPath);
         _fileProvider.CreateDirectory(thumbsDirectoryPath);
 
         //save
         await _fileProvider.WriteAllBytesAsync(thumbFilePath, binary);
+		_logger.LogWarning("<<< Exiting SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
     }
 
     /// <summary>
@@ -139,15 +164,18 @@ public partial class ThumbService : IThumbService
     /// </returns>
     public virtual Task<string> GetThumbUrlAsync(string thumbFileName, string storeLocation = null)
     {
+		_logger.LogError(">>> Entering GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
         var pathBase = _httpContextAccessor.HttpContext?.Request.PathBase.Value ?? string.Empty;
         var imagesPathUrl = _mediaSettings.UseAbsoluteImagePath ? storeLocation : $"{pathBase}/";
         imagesPathUrl = string.IsNullOrEmpty(imagesPathUrl) ? _webHelper.GetStoreLocation() : imagesPathUrl;
+		_logger.LogError("GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation}): imagesPathUrl → {ImagesPathUrl}", thumbFileName, storeLocation, imagesPathUrl);
         imagesPathUrl += "images/thumbs/";
 
         if (_mediaSettings.MultipleThumbDirectories)
         {
             //get the first two letters of the file name
             var fileNameWithoutExtension = _fileProvider.GetFileNameWithoutExtension(thumbFileName);
+			_logger.LogError("GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation}): fileNameWithoutExtension → {FileNameWithoutExtension}", thumbFileName, storeLocation, fileNameWithoutExtension);
             if (fileNameWithoutExtension != null && fileNameWithoutExtension.Length > NopMediaDefaults.MultipleThumbDirectoriesLength)
             {
                 var subDirectoryName = fileNameWithoutExtension[..NopMediaDefaults.MultipleThumbDirectoriesLength];
@@ -156,6 +184,7 @@ public partial class ThumbService : IThumbService
         }
 
         imagesPathUrl += thumbFileName;
+		_logger.LogWarning("<<< Exiting GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
         return Task.FromResult(imagesPathUrl);
     }
 
@@ -192,19 +221,23 @@ public partial class ThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAllThumbsAsync()
     {
+		_logger.LogError(">>> Entering DeleteAllThumbsAsync()");
         var currentFiles = _fileProvider.GetFiles(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), NopMediaDefaults.ImageThumbsPath), topDirectoryOnly: false);
 
+		_logger.LogError("DeleteAllThumbsAsync(): currentFiles → {CurrentFiles}", currentFiles);
         foreach (var currentFileName in currentFiles)
         {
             if (currentFileName.EndsWith("placeholder.txt"))
                 continue;
 
             var thumbFilePath = await GetThumbLocalPathByFileNameAsync(currentFileName);
+			_logger.LogError("DeleteAllThumbsAsync(): thumbFilePath → {ThumbFilePath}", thumbFilePath);
             _fileProvider.DeleteFile(thumbFilePath);
         }
 
         foreach (var directory in _fileProvider.GetDirectories(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), NopMediaDefaults.ImageThumbsPath)))
             _fileProvider.DeleteDirectory(directory);
+			_logger.LogWarning("<<< Exiting DeleteAllThumbsAsync()");
     }
 
     #endregion

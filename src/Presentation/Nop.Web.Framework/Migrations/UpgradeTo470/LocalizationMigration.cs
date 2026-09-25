@@ -4,20 +4,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo470;
 
 [NopUpdateMigration("2023-01-01 00:00:03", "4.70", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogError("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, languages) = this.GetLanguageData();
 
@@ -75,6 +79,7 @@ public class LocalizationMigration : MigrationBase
 
         #region Add or update locales
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         localizationService.AddOrUpdateLocaleResource(new Dictionary<string, string>
         {
             //#4834
@@ -272,13 +277,17 @@ public class LocalizationMigration : MigrationBase
             ["Admin.Configuration.Plugins.SearchProvider.Configure"] = "Configure",
 
         }, languageId);
+		_logger.LogError("Up(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         #endregion
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 }

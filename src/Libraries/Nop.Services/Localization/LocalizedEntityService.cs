@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Localization;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 
 namespace Nop.Services.Localization;
@@ -13,6 +14,7 @@ namespace Nop.Services.Localization;
 /// </summary>
 public partial class LocalizedEntityService : ILocalizedEntityService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<LocalizedProperty> _localizedPropertyRepository;
@@ -27,9 +29,12 @@ public partial class LocalizedEntityService : ILocalizedEntityService
         IStaticCacheManager staticCacheManager,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogError(">>> Entering LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings})", localizedPropertyRepository, staticCacheManager, localizationSettings);
         _localizedPropertyRepository = localizedPropertyRepository;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings}): _staticCacheManager → {_staticCacheManager}", localizedPropertyRepository, staticCacheManager, localizationSettings, _staticCacheManager);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", localizedPropertyRepository, staticCacheManager, localizationSettings, _localizationSettings);
     }
 
     #endregion
@@ -47,6 +52,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetLocalizedPropertiesAsync(int entityId, string localeKeyGroup)
     {
+		_logger.LogError(">>> Entering GetLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup})", entityId, localeKeyGroup);
         if (entityId == 0 || string.IsNullOrEmpty(localeKeyGroup))
             return new List<LocalizedProperty>();
 
@@ -56,8 +62,12 @@ public partial class LocalizedEntityService : ILocalizedEntityService
                   lp.LocaleKeyGroup == localeKeyGroup
             select lp;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var props = await query.ToListAsync();
 
+		_logger.LogError("GetLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup}): props → {Props}", entityId, localeKeyGroup, props);
+		_logger.LogError("GetLocalizedPropertiesAsync(entityId,localeKeyGroup)={EntityId},{LocaleKeyGroup}: database query executed in {Arg2} ms", entityId, localeKeyGroup, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup})", entityId, localeKeyGroup);
         return props;
     }
 
@@ -70,11 +80,14 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync()
     {
+		_logger.LogError(">>> Entering GetAllLocalizedPropertiesAsync()");
         return await _localizedPropertyRepository.GetAllAsync(query =>
         {
             return from lp in query
                 select lp;
+				_logger.LogError("GetAllLocalizedPropertiesAsync(): find query executing");
         }, cache => default);
+		_logger.LogWarning("<<< Exiting GetAllLocalizedPropertiesAsync()");
     }
 
     /// <summary>
@@ -86,6 +99,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync(int languageId)
     {
+		_logger.LogError(">>> Entering GetAllLocalizedPropertiesAsync(languageId={LanguageId})", languageId);
         // do not cache here
         return await _localizedPropertyRepository.GetAllAsync(query => query.Where(lp => lp.LanguageId == languageId));
     }
@@ -97,7 +111,11 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task DeleteLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogError(">>> Entering DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _localizedPropertyRepository.DeleteAsync(localizedProperty);
+		_logger.LogError("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: external service call took {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
     }
 
     /// <summary>
@@ -107,7 +125,9 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogError(">>> Entering InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
         await _localizedPropertyRepository.InsertAsync(localizedProperty);
+		_logger.LogWarning("<<< Exiting InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
     }
 
     /// <summary>
@@ -117,7 +137,9 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogError(">>> Entering UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
         await _localizedPropertyRepository.UpdateAsync(localizedProperty);
+		_logger.LogWarning("<<< Exiting UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
     }
 
     #endregion
@@ -136,6 +158,8 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     public virtual async Task<IList<LocalizedProperty>> GetEntityLocalizedPropertiesAsync(int entityId, string localeKeyGroup, string localeKey)
     {
+		_logger.LogError(">>> Entering GetEntityLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", entityId, localeKeyGroup, localeKey);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LocalizedPropertiesCacheKey,
             entityId, localeKeyGroup, localeKey);
 
@@ -153,8 +177,11 @@ public partial class LocalizedEntityService : ILocalizedEntityService
                       lp.LocaleKey == localeKey
                 select lp;
 
+			_logger.LogError("GetEntityLocalizedPropertiesAsync(entityId,localeKeyGroup,localeKey)={EntityId},{LocaleKeyGroup},{LocaleKey}: database query executing", entityId, localeKeyGroup, localeKey);
             return await query.ToListAsync();
         });
+		_logger.LogError("GetEntityLocalizedPropertiesAsync(entityId,localeKeyGroup,localeKey)={EntityId},{LocaleKeyGroup},{LocaleKey}: external service call took {Arg3} ms", entityId, localeKeyGroup, localeKey, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetEntityLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
@@ -170,6 +197,8 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     public virtual async Task<string> GetLocalizedValueAsync(int languageId, int entityId, string localeKeyGroup, string localeKey)
     {
+		_logger.LogError(">>> Entering GetLocalizedValueAsync(languageId={LanguageId},entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", languageId, entityId, localeKeyGroup, localeKey);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (_localizationSettings.LoadAllLocalizedPropertiesOnStartup)
         {
             //value tuples aren't json-serializable by default, so we use a string key
@@ -200,8 +229,12 @@ public partial class LocalizedEntityService : ILocalizedEntityService
                 select lp.LocaleValue;
 
             //little hack here. nulls aren't cacheable so set it to ""
+			_logger.LogError("GetLocalizedValueAsync(languageId,entityId,localeKeyGroup,localeKey)={LanguageId},{EntityId},{LocaleKeyGroup},{LocaleKey}: database query executing", languageId, entityId, localeKeyGroup, localeKey);
+			_logger.LogError("GetLocalizedValueAsync(languageId,entityId,localeKeyGroup,localeKey)={LanguageId},{EntityId},{LocaleKeyGroup},{LocaleKey}: external service call took {Arg4} ms", languageId, entityId, localeKeyGroup, localeKey, __logStart.ElapsedMilliseconds);
             return await query.FirstOrDefaultAsync() ?? string.Empty;
         });
+		_logger.LogError("GetLocalizedValueAsync(languageId,entityId,localeKeyGroup,localeKey)={LanguageId},{EntityId},{LocaleKeyGroup},{LocaleKey}: external service call took {Arg4} ms", languageId, entityId, localeKeyGroup, localeKey, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetLocalizedValueAsync(languageId={LanguageId},entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", languageId, entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
@@ -236,13 +269,18 @@ public partial class LocalizedEntityService : ILocalizedEntityService
         TPropType localeValue,
         int languageId) where T : BaseEntity, ILocalizedEntity
     {
+		_logger.LogError(">>> Entering SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId})", entity, keySelector, localeValue, languageId);
         ArgumentNullException.ThrowIfNull(entity);
 
-        if (languageId == 0)
+			_logger.LogWarning("<<< Exiting SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId})", entity, keySelector, localeValue, languageId);
+			_logger.LogError("Throwing ArgumentOutOfRangeException from SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId})", entity, keySelector, localeValue, languageId);
+        if (languageId == 0) {
             throw new ArgumentOutOfRangeException(nameof(languageId), "Language ID should not be 0");
+        }
 
         if (keySelector.Body is not MemberExpression member)
         {
+			_logger.LogError("Throwing ArgumentException from SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId})", entity, keySelector, localeValue, languageId);
             throw new ArgumentException(string.Format(
                 "Expression '{0}' refers to a method, not a property.",
                 keySelector));
@@ -254,13 +292,16 @@ public partial class LocalizedEntityService : ILocalizedEntityService
 
         //load localized value (check whether it's a cacheable entity. In such cases we load its original entity type)
         var localeKeyGroup = entity.GetType().Name;
+		_logger.LogError("SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId}): localeKeyGroup → {LocaleKeyGroup}", entity, keySelector, localeValue, languageId, localeKeyGroup);
         var localeKey = propInfo.Name;
 
         var props = await GetLocalizedPropertiesAsync(entity.Id, localeKeyGroup);
+		_logger.LogError("SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId}): props → {Props}", entity, keySelector, localeValue, languageId, props);
         var prop = props.FirstOrDefault(lp => lp.LanguageId == languageId &&
                                               lp.LocaleKey.Equals(localeKey, StringComparison.InvariantCultureIgnoreCase)); //should be culture invariant
 
         var localeValueStr = CommonHelper.To<string>(localeValue);
+		_logger.LogError("SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId}): localeValueStr → {LocaleValueStr}", entity, keySelector, localeValue, languageId, localeValueStr);
 
         if (prop != null)
         {
@@ -273,6 +314,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
             {
                 //update
                 prop.LocaleValue = localeValueStr;
+				_logger.LogDebug("SaveLocalizedValueAsync(entity={Entity},keySelector={KeySelector},localeValue={LocaleValue},languageId={LanguageId}): prop.LocaleValue → {Arg4}", entity, keySelector, localeValue, languageId, prop.LocaleValue);
                 await UpdateLocalizedPropertyAsync(prop);
             }
         }

@@ -3,6 +3,7 @@ using Nop.Services.Security;
 using Nop.Services.Tax;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Components;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Tax.Avalara.Components;
 /// </summary>
 public class ExportItemsViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPermissionService _permissionService;
@@ -23,8 +25,10 @@ public class ExportItemsViewComponent : NopViewComponent
     public ExportItemsViewComponent(IPermissionService permissionService,
         ITaxPluginManager taxPluginManager)
     {
+		_logger.LogError(">>> Entering ExportItemsViewComponent(permissionService={PermissionService},taxPluginManager={TaxPluginManager})", permissionService, taxPluginManager);
         _permissionService = permissionService;
         _taxPluginManager = taxPluginManager;
+		_logger.LogDebug("ExportItemsViewComponent(permissionService={PermissionService},taxPluginManager={TaxPluginManager}): _taxPluginManager → {_taxPluginManager}", permissionService, taxPluginManager, _taxPluginManager);
     }
 
     #endregion
@@ -42,6 +46,7 @@ public class ExportItemsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogError(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return Content(string.Empty);
@@ -50,8 +55,10 @@ public class ExportItemsViewComponent : NopViewComponent
             return Content(string.Empty);
 
         //ensure that it's a proper widget zone
-        if (!widgetZone.Equals(AdminWidgetZones.ProductListButtons))
+		_logger.LogWarning("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
+        if (!widgetZone.Equals(AdminWidgetZones.ProductListButtons)) {
             return Content(string.Empty);
+        }
 
         return View("~/Plugins/Tax.Avalara/Views/Product/ExportItems.cshtml");
     }

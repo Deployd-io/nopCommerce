@@ -5,6 +5,7 @@ using Nop.Core.Domain.Attributes;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Html;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Attributes;
 
@@ -16,6 +17,7 @@ public partial class
     where TAttribute : BaseAttribute
     where TAttributeValue : BaseAttributeValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeParser<TAttribute, TAttributeValue> _attributeParser;
@@ -34,11 +36,16 @@ public partial class
         ILocalizationService localizationService,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering AttributeFormatter(attributeParser={AttributeParser},attributeService={AttributeService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},workContext={WorkContext})", attributeParser, attributeService, htmlFormatter, localizationService, workContext);
         _attributeParser = attributeParser;
         _attributeService = attributeService;
+		_logger.LogDebug("AttributeFormatter(attributeParser={AttributeParser},attributeService={AttributeService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},workContext={WorkContext}): _attributeService → {_attributeService}", attributeParser, attributeService, htmlFormatter, localizationService, workContext, _attributeService);
         _htmlFormatter = htmlFormatter;
+		_logger.LogDebug("AttributeFormatter(attributeParser={AttributeParser},attributeService={AttributeService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},workContext={WorkContext}): _htmlFormatter → {_htmlFormatter}", attributeParser, attributeService, htmlFormatter, localizationService, workContext, _htmlFormatter);
         _localizationService = localizationService;
+		_logger.LogDebug("AttributeFormatter(attributeParser={AttributeParser},attributeService={AttributeService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},workContext={WorkContext}): _localizationService → {_localizationService}", attributeParser, attributeService, htmlFormatter, localizationService, workContext, _localizationService);
         _workContext = workContext;
+		_logger.LogDebug("AttributeFormatter(attributeParser={AttributeParser},attributeService={AttributeService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},workContext={WorkContext}): _workContext → {_workContext}", attributeParser, attributeService, htmlFormatter, localizationService, workContext, _workContext);
     }
 
     #endregion
@@ -59,19 +66,25 @@ public partial class
         string separator = "<br />",
         bool htmlEncode = true)
     {
+		_logger.LogError(">>> Entering FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode})", attributesXml, separator, htmlEncode);
         var result = new StringBuilder();
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): currentLanguage → {CurrentLanguage}", attributesXml, separator, htmlEncode, currentLanguage);
         var attributes = await _attributeParser.ParseAttributesAsync(attributesXml);
+		_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): attributes → {Attributes}", attributesXml, separator, htmlEncode, attributes);
+		_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): result → {Result}", attributesXml, separator, htmlEncode, result);
 
         for (var i = 0; i < attributes.Count; i++)
         {
             var attribute = attributes[i];
             var valuesStr = _attributeParser.ParseValues(attributesXml, attribute.Id);
+			_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): valuesStr → {ValuesStr}", attributesXml, separator, htmlEncode, valuesStr);
 
             for (var j = 0; j < valuesStr.Count; j++)
             {
                 var valueStr = valuesStr[j];
                 var formattedAttribute = string.Empty;
+				_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): formattedAttribute → {FormattedAttribute}", attributesXml, separator, htmlEncode, formattedAttribute);
 
                 if (!attribute.ShouldHaveValues)
                 {
@@ -86,6 +99,7 @@ public partial class
                         //encode (if required)
                         if (htmlEncode)
                             attributeName = WebUtility.HtmlEncode(attributeName);
+							_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): attributeName → {AttributeName}", attributesXml, separator, htmlEncode, attributeName);
 
                         formattedAttribute =
                             $"{attributeName}: {_htmlFormatter.FormatText(valueStr, false, true, false, false, false, false)}";
@@ -112,6 +126,7 @@ public partial class
                     if (int.TryParse(valueStr, out var attributeValueId))
                     {
                         var attributeValue = await _attributeService.GetAttributeValueByIdAsync(attributeValueId);
+						_logger.LogError("FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode}): attributeValue → {AttributeValue}", attributesXml, separator, htmlEncode, attributeValue);
 
                         if (attributeValue != null)
                             formattedAttribute =
@@ -133,6 +148,7 @@ public partial class
             }
         }
 
+		_logger.LogWarning("<<< Exiting FormatAttributesAsync(attributesXml={AttributesXml},separator={Separator},htmlEncode={HtmlEncode})", attributesXml, separator, htmlEncode);
         return result.ToString();
     }
 

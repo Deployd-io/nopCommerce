@@ -4,9 +4,14 @@ namespace Nop.Web.Models.Customer;
 
 public partial record CustomerNavigationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerNavigationModel()
     {
+		_logger.LogError(">>> Entering CustomerNavigationModel()");
         CustomerNavigationItems = new List<CustomerNavigationItemModel>();
+		_logger.LogDebug("CustomerNavigationModel(): CustomerNavigationItems → {CustomerNavigationItems}", CustomerNavigationItems);
+    _logger.LogError("CustomerNavigationModel(): CustomerNavigationItems → {CustomerNavigationItems}", CustomerNavigationItems);
+    _logger.LogWarning("<<< Exiting CustomerNavigationModel()");
     }
 
     public IList<CustomerNavigationItemModel> CustomerNavigationItems { get; set; }

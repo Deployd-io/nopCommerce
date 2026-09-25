@@ -9,6 +9,7 @@ using Nop.Services.Customers;
 using Nop.Services.Html;
 using Nop.Services.Messages;
 using Nop.Services.Seo;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Forums;
 
@@ -17,6 +18,7 @@ namespace Nop.Services.Forums;
 /// </summary>
 public partial class ForumService : IForumService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ForumSettings _forumSettings;
@@ -59,22 +61,40 @@ public partial class ForumService : IForumService
         IWorkflowMessageService workflowMessageService,
         SeoSettings seoSettings)
     {
+		_logger.LogError(">>> Entering ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings})", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings);
         _forumSettings = forumSettings;
         _customerService = customerService;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _customerService → {_customerService}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _customerService);
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumSettings → {_forumSettings}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumSettings);
+    _logger.LogWarning("<<< Exiting ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings})", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _genericAttributeService → {_genericAttributeService}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _genericAttributeService);
         _htmlFormatter = htmlFormatter;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _htmlFormatter → {_htmlFormatter}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _htmlFormatter);
         _customerRepository = customerRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _customerRepository → {_customerRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _customerRepository);
         _forumRepository = forumRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumRepository → {_forumRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumRepository);
         _forumGroupRepository = forumGroupRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumGroupRepository → {_forumGroupRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumGroupRepository);
         _forumPostRepository = forumPostRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumPostRepository → {_forumPostRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumPostRepository);
         _forumPostVoteRepository = forumPostVoteRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumPostVoteRepository → {_forumPostVoteRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumPostVoteRepository);
         _forumSubscriptionRepository = forumSubscriptionRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumSubscriptionRepository → {_forumSubscriptionRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumSubscriptionRepository);
         _forumTopicRepository = forumTopicRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumTopicRepository → {_forumTopicRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumTopicRepository);
         _forumPrivateMessageRepository = forumPrivateMessageRepository;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _forumPrivateMessageRepository → {_forumPrivateMessageRepository}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _forumPrivateMessageRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _staticCacheManager → {_staticCacheManager}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _staticCacheManager);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _urlRecordService → {_urlRecordService}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _workContext → {_workContext}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _workContext);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("ForumService(forumSettings={ForumSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},htmlFormatter={HtmlFormatter},customerRepository={CustomerRepository},forumRepository={ForumRepository},forumGroupRepository={ForumGroupRepository},forumPostRepository={ForumPostRepository},forumPostVoteRepository={ForumPostVoteRepository},forumSubscriptionRepository={ForumSubscriptionRepository},forumTopicRepository={ForumTopicRepository},forumPrivateMessageRepository={ForumPrivateMessageRepository},staticCacheManager={StaticCacheManager},urlRecordService={UrlRecordService},workContext={WorkContext},workflowMessageService={WorkflowMessageService},seoSettings={SeoSettings}): _workflowMessageService → {_workflowMessageService}", forumSettings, customerService, genericAttributeService, htmlFormatter, customerRepository, forumRepository, forumGroupRepository, forumPostRepository, forumPostVoteRepository, forumSubscriptionRepository, forumTopicRepository, forumPrivateMessageRepository, staticCacheManager, urlRecordService, workContext, workflowMessageService, seoSettings, _workflowMessageService);
         _seoSettings = seoSettings;
     }
 
@@ -89,10 +109,12 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateForumStatsAsync(int forumId)
     {
+		_logger.LogError(">>> Entering UpdateForumStatsAsync(forumId={ForumId})", forumId);
         if (forumId == 0)
             return;
 
         var forum = await GetForumByIdAsync(forumId);
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): forum → {Forum}", forumId, forum);
         if (forum == null)
             return;
 
@@ -100,19 +122,26 @@ public partial class ForumService : IForumService
         var queryNumTopics = from ft in _forumTopicRepository.Table
             where ft.ForumId == forumId
             select ft.Id;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var numTopics = await queryNumTopics.CountAsync();
 
+		_logger.LogError("UpdateForumStatsAsync(forumId)={ForumId}: count query executed in {Arg1} ms", forumId, __logStart.ElapsedMilliseconds);
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): numTopics → {NumTopics}", forumId, numTopics);
         //number of posts
         var queryNumPosts = from ft in _forumTopicRepository.Table
             join fp in _forumPostRepository.Table on ft.Id equals fp.TopicId
             where ft.ForumId == forumId
             select fp.Id;
         var numPosts = await queryNumPosts.CountAsync();
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): numPosts → {NumPosts}", forumId, numPosts);
 
         //last values
         var lastTopicId = 0;
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): lastTopicId → {LastTopicId}", forumId, lastTopicId);
         var lastPostId = 0;
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): lastPostId → {LastPostId}", forumId, lastPostId);
         var lastPostCustomerId = 0;
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): lastPostCustomerId → {LastPostCustomerId}", forumId, lastPostCustomerId);
         DateTime? lastPostTime = null;
         var queryLastValues = from ft in _forumTopicRepository.Table
             join fp in _forumPostRepository.Table on ft.Id equals fp.TopicId
@@ -125,23 +154,33 @@ public partial class ForumService : IForumService
                 LastPostCustomerId = fp.CustomerId,
                 LastPostTime = fp.CreatedOnUtc
             };
+			_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): LastPostTime → {LastPostTime}", forumId, LastPostTime);
         var lastValues = await queryLastValues.FirstOrDefaultAsync();
+		_logger.LogError("UpdateForumStatsAsync(forumId={ForumId}): lastValues → {LastValues}", forumId, lastValues);
         if (lastValues != null)
         {
             lastTopicId = lastValues.LastTopicId;
             lastPostId = lastValues.LastPostId;
             lastPostCustomerId = lastValues.LastPostCustomerId;
             lastPostTime = lastValues.LastPostTime;
+			_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastPostTime → {LastPostTime}", forumId, lastPostTime);
         }
 
         //update forum
         forum.NumTopics = numTopics;
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.NumTopics → {Arg1}", forumId, forum.NumTopics);
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastTopicId → {Arg1}", forumId, forum.LastTopicId);
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostId → {Arg1}", forumId, forum.LastPostId);
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostCustomerId → {Arg1}", forumId, forum.LastPostCustomerId);
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostTime → {Arg1}", forumId, forum.LastPostTime);
         forum.NumPosts = numPosts;
+		_logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.NumPosts → {Arg1}", forumId, forum.NumPosts);
         forum.LastTopicId = lastTopicId;
         forum.LastPostId = lastPostId;
         forum.LastPostCustomerId = lastPostCustomerId;
         forum.LastPostTime = lastPostTime;
         await UpdateForumAsync(forum);
+		_logger.LogWarning("<<< Exiting UpdateForumStatsAsync(forumId={ForumId})", forumId);
     }
 
     /// <summary>
@@ -151,10 +190,12 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateForumTopicStatsAsync(int forumTopicId)
     {
+		_logger.LogError(">>> Entering UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId})", forumTopicId);
         if (forumTopicId == 0)
             return;
 
         var forumTopic = await GetTopicByIdAsync(forumTopicId);
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic → {ForumTopic}", forumTopicId, forumTopic);
         if (forumTopic == null)
             return;
 
@@ -162,11 +203,16 @@ public partial class ForumService : IForumService
         var queryNumPosts = from fp in _forumPostRepository.Table
             where fp.TopicId == forumTopicId
             select fp.Id;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var numPosts = await queryNumPosts.CountAsync();
 
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId)={ForumTopicId}: count query executed in {Arg1} ms", forumTopicId, __logStart.ElapsedMilliseconds);
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): numPosts → {NumPosts}", forumTopicId, numPosts);
         //last values
         var lastPostId = 0;
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostId → {LastPostId}", forumTopicId, lastPostId);
         var lastPostCustomerId = 0;
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostCustomerId → {LastPostCustomerId}", forumTopicId, lastPostCustomerId);
         DateTime? lastPostTime = null;
         var queryLastValues = from fp in _forumPostRepository.Table
             where fp.TopicId == forumTopicId
@@ -178,20 +224,27 @@ public partial class ForumService : IForumService
                 LastPostTime = fp.CreatedOnUtc
             };
         var lastValues = await queryLastValues.FirstOrDefaultAsync();
+		_logger.LogError("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastValues → {LastValues}", forumTopicId, lastValues);
         if (lastValues != null)
         {
             lastPostId = lastValues.LastPostId;
             lastPostCustomerId = lastValues.LastPostCustomerId;
             lastPostTime = lastValues.LastPostTime;
+			_logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostTime → {LastPostTime}", forumTopicId, lastPostTime);
         }
 
         //update topic
         forumTopic.NumPosts = numPosts;
+		_logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.NumPosts → {Arg1}", forumTopicId, forumTopic.NumPosts);
+		_logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostCustomerId → {Arg1}", forumTopicId, forumTopic.LastPostCustomerId);
+		_logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostTime → {Arg1}", forumTopicId, forumTopic.LastPostTime);
         forumTopic.LastPostId = lastPostId;
+		_logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostId → {Arg1}", forumTopicId, forumTopic.LastPostId);
         forumTopic.LastPostCustomerId = lastPostCustomerId;
         forumTopic.LastPostTime = lastPostTime;
 
         await UpdateTopicAsync(forumTopic);
+		_logger.LogWarning("<<< Exiting UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId})", forumTopicId);
     }
 
     /// <summary>
@@ -201,10 +254,12 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateCustomerStatsAsync(int customerId)
     {
+		_logger.LogError(">>> Entering UpdateCustomerStatsAsync(customerId={CustomerId})", customerId);
         if (customerId == 0)
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
+		_logger.LogError("UpdateCustomerStatsAsync(customerId={CustomerId}): customer → {Customer}", customerId, customer);
 
         if (customer == null)
             return;
@@ -212,8 +267,11 @@ public partial class ForumService : IForumService
         var query = from fp in _forumPostRepository.Table
             where fp.CustomerId == customerId
             select fp.Id;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var numPosts = await query.CountAsync();
 
+		_logger.LogError("UpdateCustomerStatsAsync(customerId)={CustomerId}: count query executed in {Arg1} ms", customerId, __logStart.ElapsedMilliseconds);
+		_logger.LogError("UpdateCustomerStatsAsync(customerId={CustomerId}): numPosts → {NumPosts}", customerId, numPosts);
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ForumPostCountAttribute, numPosts);
     }
 
@@ -228,17 +286,24 @@ public partial class ForumService : IForumService
     /// </returns>
     protected virtual async Task<ForumTopic> GetTopicByIdAsync(int forumTopicId, bool increaseViews)
     {
+		_logger.LogError(">>> Entering GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews})", forumTopicId, increaseViews);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forumTopic = await _forumTopicRepository.GetByIdAsync(forumTopicId, cache => default);
 
-        if (forumTopic == null)
+			_logger.LogError("GetTopicByIdAsync(forumTopicId,increaseViews)={ForumTopicId},{IncreaseViews}: find query executed in {Arg2} ms", forumTopicId, increaseViews, __logStart.ElapsedMilliseconds);
+			_logger.LogError("GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews}): forumTopic → {ForumTopic}", forumTopicId, increaseViews, forumTopic);
+        if (forumTopic == null) {
             return null;
+        }
 
         if (!increaseViews)
             return forumTopic;
 
         forumTopic.Views = ++forumTopic.Views;
+		_logger.LogDebug("GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews}): forumTopic.Views → {Arg2}", forumTopicId, increaseViews, forumTopic.Views);
         await UpdateTopicAsync(forumTopic);
 
+		_logger.LogWarning("<<< Exiting GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews})", forumTopicId, increaseViews);
         return forumTopic;
     }
 
@@ -253,7 +318,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteForumGroupAsync(ForumGroup forumGroup)
     {
+		_logger.LogError(">>> Entering DeleteForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumGroupRepository.DeleteAsync(forumGroup);
+		_logger.LogError("DeleteForumGroupAsync(forumGroup)={ForumGroup}: external service call took {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
     }
 
     /// <summary>
@@ -266,6 +335,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumGroup> GetForumGroupByIdAsync(int forumGroupId)
     {
+		_logger.LogError(">>> Entering GetForumGroupByIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
+		_logger.LogError("GetForumGroupByIdAsync(forumGroupId)={ForumGroupId}: find query executing", forumGroupId);
+    _logger.LogWarning("<<< Exiting GetForumGroupByIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
         return await _forumGroupRepository.GetByIdAsync(forumGroupId, cache => default);
     }
 
@@ -278,12 +350,15 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<IList<ForumGroup>> GetAllForumGroupsAsync()
     {
+		_logger.LogError(">>> Entering GetAllForumGroupsAsync()");
         return await _forumGroupRepository.GetAllAsync(query =>
         {
             return from fg in query
                 orderby fg.DisplayOrder, fg.Id
                 select fg;
+				_logger.LogError("GetAllForumGroupsAsync(): find query executing");
         }, cache => default);
+		_logger.LogWarning("<<< Exiting GetAllForumGroupsAsync()");
     }
 
     /// <summary>
@@ -293,7 +368,9 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertForumGroupAsync(ForumGroup forumGroup)
     {
+		_logger.LogError(">>> Entering InsertForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
         await _forumGroupRepository.InsertAsync(forumGroup);
+		_logger.LogWarning("<<< Exiting InsertForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
     }
 
     /// <summary>
@@ -303,7 +380,9 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateForumGroupAsync(ForumGroup forumGroup)
     {
+		_logger.LogError(">>> Entering UpdateForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
         await _forumGroupRepository.UpdateAsync(forumGroup);
+		_logger.LogWarning("<<< Exiting UpdateForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
     }
 
     /// <summary>
@@ -313,6 +392,8 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteForumAsync(Forum forum)
     {
+		_logger.LogError(">>> Entering DeleteForumAsync(forum={Forum})", forum);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forum);
 
         //delete forum subscriptions (topics)
@@ -323,6 +404,8 @@ public partial class ForumService : IForumService
             where queryTopicIds.Contains(fs.TopicId)
             select fs;
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("DeleteForumAsync(forum)={Forum}: delete query executed in {Arg1} ms", forum, __logStartDb.ElapsedMilliseconds);
         await _forumSubscriptionRepository.DeleteAsync(await queryFs1.ToListAsync());
 
         //delete forum subscriptions (forum)
@@ -334,6 +417,8 @@ public partial class ForumService : IForumService
 
         //delete forum
         await _forumRepository.DeleteAsync(forum);
+		_logger.LogError("DeleteForumAsync(forum)={Forum}: external service call took {Arg1} ms", forum, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteForumAsync(forum={Forum})", forum);
     }
 
     /// <summary>
@@ -346,6 +431,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<Forum> GetForumByIdAsync(int forumId)
     {
+		_logger.LogError(">>> Entering GetForumByIdAsync(forumId={ForumId})", forumId);
+		_logger.LogError("GetForumByIdAsync(forumId)={ForumId}: find query executing", forumId);
+    _logger.LogWarning("<<< Exiting GetForumByIdAsync(forumId={ForumId})", forumId);
         return await _forumRepository.GetByIdAsync(forumId, cache => default);
     }
 
@@ -359,6 +447,8 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<IList<Forum>> GetAllForumsByGroupIdAsync(int forumGroupId)
     {
+		_logger.LogError(">>> Entering GetAllForumsByGroupIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forums = await _forumRepository.GetAllAsync(query =>
         {
             return from f in query
@@ -366,7 +456,9 @@ public partial class ForumService : IForumService
                 where f.ForumGroupId == forumGroupId
                 select f;
         }, cache => cache.PrepareKeyForDefaultCache(NopForumDefaults.ForumByForumGroupCacheKey, forumGroupId));
+		_logger.LogError("GetAllForumsByGroupIdAsync(forumGroupId)={ForumGroupId}: find query executed in {Arg1} ms", forumGroupId, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllForumsByGroupIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
         return forums;
     }
 
@@ -377,7 +469,9 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertForumAsync(Forum forum)
     {
+		_logger.LogError(">>> Entering InsertForumAsync(forum={Forum})", forum);
         await _forumRepository.InsertAsync(forum);
+		_logger.LogWarning("<<< Exiting InsertForumAsync(forum={Forum})", forum);
     }
 
     /// <summary>
@@ -387,13 +481,20 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateForumAsync(Forum forum)
     {
+		_logger.LogError(">>> Entering UpdateForumAsync(forum={Forum})", forum);
         // if the forum group is changed then clear cache for the previous group 
         // (we can't use the event consumer because it will work after saving the changes in DB)
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forumToUpdate = await _forumRepository.LoadOriginalCopyAsync(forum);
-        if (forumToUpdate.ForumGroupId != forum.ForumGroupId)
+			_logger.LogError("UpdateForumAsync(forum)={Forum}: find query executed in {Arg1} ms", forum, __logStart.ElapsedMilliseconds);
+			_logger.LogError("UpdateForumAsync(forum={Forum}): forumToUpdate → {ForumToUpdate}", forum, forumToUpdate);
+        if (forumToUpdate.ForumGroupId != forum.ForumGroupId) {
             await _staticCacheManager.RemoveAsync(NopForumDefaults.ForumByForumGroupCacheKey, forumToUpdate.ForumGroupId);
+        }
 
         await _forumRepository.UpdateAsync(forum);
+		_logger.LogError("UpdateForumAsync(forum)={Forum}: update query executed in {Arg1} ms", forum, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting UpdateForumAsync(forum={Forum})", forum);
     }
 
     /// <summary>
@@ -403,12 +504,17 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTopicAsync(ForumTopic forumTopic)
     {
+		_logger.LogError(">>> Entering DeleteTopicAsync(forumTopic={ForumTopic})", forumTopic);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forumTopic);
 
         var customerId = forumTopic.CustomerId;
+		_logger.LogError("DeleteTopicAsync(forumTopic={ForumTopic}): customerId → {CustomerId}", forumTopic, customerId);
         var forumId = forumTopic.ForumId;
 
         //delete topic
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("DeleteTopicAsync(forumTopic)={ForumTopic}: delete query executed in {Arg1} ms", forumTopic, __logStartDb.ElapsedMilliseconds);
         await _forumTopicRepository.DeleteAsync(forumTopic);
 
         //delete forum subscriptions
@@ -417,11 +523,15 @@ public partial class ForumService : IForumService
             select ft;
         var forumSubscriptions = await queryFs.ToListAsync();
 
+		_logger.LogError("DeleteTopicAsync(forumTopic)={ForumTopic}: database query executed in {Arg1} ms", forumTopic, __logStartDb.ElapsedMilliseconds);
+		_logger.LogError("DeleteTopicAsync(forumTopic={ForumTopic}): forumSubscriptions → {ForumSubscriptions}", forumTopic, forumSubscriptions);
         await _forumSubscriptionRepository.DeleteAsync(forumSubscriptions);
 
         //update stats
         await UpdateForumStatsAsync(forumId);
         await UpdateCustomerStatsAsync(customerId);
+		_logger.LogError("DeleteTopicAsync(forumTopic)={ForumTopic}: external service call took {Arg1} ms", forumTopic, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteTopicAsync(forumTopic={ForumTopic})", forumTopic);
     }
 
     /// <summary>
@@ -455,14 +565,19 @@ public partial class ForumService : IForumService
         int customerId = 0, string keywords = "", ForumSearchType searchType = ForumSearchType.All,
         int limitDays = 0, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllTopicsAsync(forumId={ForumId},customerId={CustomerId},keywords={Keywords},searchType={SearchType},limitDays={LimitDays},pageIndex={PageIndex},pageSize={PageSize})", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize);
         DateTime? limitDate = null;
         if (limitDays > 0)
             limitDate = DateTime.UtcNow.AddDays(-limitDays);
+			_logger.LogError("GetAllTopicsAsync(forumId={ForumId},customerId={CustomerId},keywords={Keywords},searchType={SearchType},limitDays={LimitDays},pageIndex={PageIndex},pageSize={PageSize}): limitDate → {LimitDate}", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize, limitDate);
+			_logger.LogDebug("GetAllTopicsAsync(forumId={ForumId},customerId={CustomerId},keywords={Keywords},searchType={SearchType},limitDays={LimitDays},pageIndex={PageIndex},pageSize={PageSize}): limitDate → {LimitDate}", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize, limitDate);
 
         var searchKeywords = !string.IsNullOrEmpty(keywords);
+		_logger.LogError("GetAllTopicsAsync(forumId={ForumId},customerId={CustomerId},keywords={Keywords},searchType={SearchType},limitDays={LimitDays},pageIndex={PageIndex},pageSize={PageSize}): searchKeywords → {SearchKeywords}", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize, searchKeywords);
         var searchTopicTitles = searchType == ForumSearchType.All || searchType == ForumSearchType.TopicTitlesOnly;
         var searchPostText = searchType == ForumSearchType.All || searchType == ForumSearchType.PostTextOnly;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var topics = await _forumTopicRepository.GetAllPagedAsync(query =>
         {
             var query1 = from ft in query
@@ -483,7 +598,9 @@ public partial class ForumService : IForumService
 
             return query2;
         }, pageIndex, pageSize);
+		_logger.LogError("GetAllTopicsAsync(forumId,customerId,keywords,searchType,limitDays,pageIndex,pageSize)={ForumId},{CustomerId},{Keywords},{SearchType},{LimitDays},{PageIndex},{PageSize}: find query executed in {Arg7} ms", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllTopicsAsync(forumId={ForumId},customerId={CustomerId},keywords={Keywords},searchType={SearchType},limitDays={LimitDays},pageIndex={PageIndex},pageSize={PageSize})", forumId, customerId, keywords, searchType, limitDays, pageIndex, pageSize);
         return topics;
     }
 
@@ -500,6 +617,7 @@ public partial class ForumService : IForumService
     public virtual async Task<IPagedList<ForumTopic>> GetActiveTopicsAsync(int forumId = 0,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetActiveTopicsAsync(forumId={ForumId},pageIndex={PageIndex},pageSize={PageSize})", forumId, pageIndex, pageSize);
         var query1 = from ft in _forumTopicRepository.Table
             where
                 (forumId == 0 || ft.ForumId == forumId) &&
@@ -512,6 +630,7 @@ public partial class ForumService : IForumService
             select ft;
 
         var topics = await query2.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogError("GetActiveTopicsAsync(forumId={ForumId},pageIndex={PageIndex},pageSize={PageSize}): topics → {Topics}", forumId, pageIndex, pageSize, topics);
 
         return topics;
     }
@@ -524,8 +643,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTopicAsync(ForumTopic forumTopic, bool sendNotifications)
     {
+		_logger.LogError(">>> Entering InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications})", forumTopic, sendNotifications);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumTopicRepository.InsertAsync(forumTopic);
 
+		_logger.LogError("InsertTopicAsync(forumTopic,sendNotifications)={ForumTopic},{SendNotifications}: save query executed in {Arg2} ms", forumTopic, sendNotifications, __logStart.ElapsedMilliseconds);
         //update stats
         await UpdateForumStatsAsync(forumTopic.ForumId);
 
@@ -534,8 +656,11 @@ public partial class ForumService : IForumService
 
         //send notifications
         var forum = await GetForumByIdAsync(forumTopic.ForumId);
+		_logger.LogError("InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications}): forum → {Forum}", forumTopic, sendNotifications, forum);
         var subscriptions = await GetAllSubscriptionsAsync(forumId: forum.Id);
+		_logger.LogError("InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications}): subscriptions → {Subscriptions}", forumTopic, sendNotifications, subscriptions);
         var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogError("InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications}): languageId → {LanguageId}", forumTopic, sendNotifications, languageId);
 
         foreach (var subscription in subscriptions)
         {
@@ -543,10 +668,12 @@ public partial class ForumService : IForumService
                 continue;
 
             var customer = await _customerService.GetCustomerByIdAsync(subscription.CustomerId);
+			_logger.LogError("InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications}): customer → {Customer}", forumTopic, sendNotifications, customer);
 
             if (!string.IsNullOrEmpty(customer?.Email))
                 await _workflowMessageService.SendNewForumTopicMessageAsync(customer, forumTopic, forum, languageId);
         }
+		_logger.LogWarning("<<< Exiting InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications})", forumTopic, sendNotifications);
     }
 
     /// <summary>
@@ -556,6 +683,8 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTopicAsync(ForumTopic forumTopic)
     {
+		_logger.LogError(">>> Entering UpdateTopicAsync(forumTopic={ForumTopic})", forumTopic);
+		_logger.LogWarning("<<< Exiting UpdateTopicAsync(forumTopic={ForumTopic})", forumTopic);
         await _forumTopicRepository.UpdateAsync(forumTopic);
     }
 
@@ -570,15 +699,19 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumTopic> MoveTopicAsync(int forumTopicId, int newForumId)
     {
+		_logger.LogError(">>> Entering MoveTopicAsync(forumTopicId={ForumTopicId},newForumId={NewForumId})", forumTopicId, newForumId);
         var forumTopic = await GetTopicByIdAsync(forumTopicId);
-        if (forumTopic == null)
+			_logger.LogError("MoveTopicAsync(forumTopicId={ForumTopicId},newForumId={NewForumId}): forumTopic → {ForumTopic}", forumTopicId, newForumId, forumTopic);
+        if (forumTopic == null) {
             return null;
+        }
 
         if (!await IsCustomerAllowedToMoveTopicAsync(await _workContext.GetCurrentCustomerAsync(), forumTopic))
             return forumTopic;
 
         var previousForumId = forumTopic.ForumId;
         var newForum = await GetForumByIdAsync(newForumId);
+		_logger.LogError("MoveTopicAsync(forumTopicId={ForumTopicId},newForumId={NewForumId}): newForum → {NewForum}", forumTopicId, newForumId, newForum);
 
         if (newForum == null)
             return forumTopic;
@@ -593,6 +726,7 @@ public partial class ForumService : IForumService
         //update forum stats
         await UpdateForumStatsAsync(previousForumId);
         await UpdateForumStatsAsync(newForumId);
+		_logger.LogWarning("<<< Exiting MoveTopicAsync(forumTopicId={ForumTopicId},newForumId={NewForumId})", forumTopicId, newForumId);
         return forumTopic;
     }
 
@@ -603,20 +737,28 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePostAsync(ForumPost forumPost)
     {
+		_logger.LogError(">>> Entering DeletePostAsync(forumPost={ForumPost})", forumPost);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forumPost);
 
         var forumTopicId = forumPost.TopicId;
         var customerId = forumPost.CustomerId;
+		_logger.LogError("DeletePostAsync(forumPost={ForumPost}): customerId → {CustomerId}", forumPost, customerId);
         var forumTopic = await GetTopicByIdAsync(forumTopicId);
+		_logger.LogError("DeletePostAsync(forumPost={ForumPost}): forumTopic → {ForumTopic}", forumPost, forumTopic);
         var forumId = forumTopic.ForumId;
 
         //delete topic if it was the first post
         var deleteTopic = false;
+		_logger.LogError("DeletePostAsync(forumPost={ForumPost}): deleteTopic → {DeleteTopic}", forumPost, deleteTopic);
         var firstPost = await GetFirstPostAsync(forumTopic);
+		_logger.LogError("DeletePostAsync(forumPost={ForumPost}): firstPost → {FirstPost}", forumPost, firstPost);
         if (firstPost != null && firstPost.Id == forumPost.Id)
             deleteTopic = true;
 
         //delete forum post
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("DeletePostAsync(forumPost)={ForumPost}: delete query executed in {Arg1} ms", forumPost, __logStartDb.ElapsedMilliseconds);
         await _forumPostRepository.DeleteAsync(forumPost);
 
         //delete topic
@@ -629,6 +771,8 @@ public partial class ForumService : IForumService
 
         await UpdateForumStatsAsync(forumId);
         await UpdateCustomerStatsAsync(customerId);
+		_logger.LogError("DeletePostAsync(forumPost)={ForumPost}: external service call took {Arg1} ms", forumPost, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeletePostAsync(forumPost={ForumPost})", forumPost);
     }
 
     /// <summary>
@@ -641,6 +785,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumPost> GetPostByIdAsync(int forumPostId)
     {
+		_logger.LogError(">>> Entering GetPostByIdAsync(forumPostId={ForumPostId})", forumPostId);
+		_logger.LogError("GetPostByIdAsync(forumPostId)={ForumPostId}: find query executing", forumPostId);
+    _logger.LogWarning("<<< Exiting GetPostByIdAsync(forumPostId={ForumPostId})", forumPostId);
         return await _forumPostRepository.GetByIdAsync(forumPostId, cache => default, useShortTermCache: true);
     }
 
@@ -660,6 +807,8 @@ public partial class ForumService : IForumService
         int customerId = 0, string keywords = "",
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllPostsAsync(forumTopicId={ForumTopicId},customerId={CustomerId},keywords={Keywords},pageIndex={PageIndex},pageSize={PageSize})", forumTopicId, customerId, keywords, pageIndex, pageSize);
+        _logger.LogWarning("<<< Exiting GetAllPostsAsync(forumTopicId={ForumTopicId},customerId={CustomerId},keywords={Keywords},pageIndex={PageIndex},pageSize={PageSize})", forumTopicId, customerId, keywords, pageIndex, pageSize);
         return await GetAllPostsAsync(forumTopicId, customerId, keywords, true,
             pageIndex, pageSize);
     }
@@ -681,11 +830,13 @@ public partial class ForumService : IForumService
         string keywords = "", bool ascSort = false,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllPostsAsync(forumTopicId={ForumTopicId},customerId={CustomerId},keywords={Keywords},ascSort={AscSort},pageIndex={PageIndex},pageSize={PageSize})", forumTopicId, customerId, keywords, ascSort, pageIndex, pageSize);
         var forumPosts = await _forumPostRepository.GetAllPagedAsync(query =>
         {
             if (forumTopicId > 0)
                 query = query.Where(fp => forumTopicId == fp.TopicId);
 
+			_logger.LogError("GetAllPostsAsync(forumTopicId={ForumTopicId},customerId={CustomerId},keywords={Keywords},ascSort={AscSort},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", forumTopicId, customerId, keywords, ascSort, pageIndex, pageSize, query);
             if (customerId > 0)
                 query = query.Where(fp => customerId == fp.CustomerId);
 
@@ -699,6 +850,7 @@ public partial class ForumService : IForumService
             return query;
         }, pageIndex, pageSize);
 
+		_logger.LogWarning("<<< Exiting GetAllPostsAsync(forumTopicId={ForumTopicId},customerId={CustomerId},keywords={Keywords},ascSort={AscSort},pageIndex={PageIndex},pageSize={PageSize})", forumTopicId, customerId, keywords, ascSort, pageIndex, pageSize);
         return forumPosts;
     }
 
@@ -710,11 +862,16 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPostAsync(ForumPost forumPost, bool sendNotifications)
     {
+		_logger.LogError(">>> Entering InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications})", forumPost, sendNotifications);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPostRepository.InsertAsync(forumPost);
 
+		_logger.LogError("InsertPostAsync(forumPost,sendNotifications)={ForumPost},{SendNotifications}: save query executed in {Arg2} ms", forumPost, sendNotifications, __logStart.ElapsedMilliseconds);
         //update stats
         var customerId = forumPost.CustomerId;
+		_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): customerId → {CustomerId}", forumPost, sendNotifications, customerId);
         var forumTopic = await GetTopicByIdAsync(forumPost.TopicId);
+		_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): forumTopic → {ForumTopic}", forumPost, sendNotifications, forumTopic);
         var forumId = forumTopic.ForumId;
 
         await UpdateForumTopicStatsAsync(forumPost.TopicId);
@@ -726,9 +883,12 @@ public partial class ForumService : IForumService
             return;
 
         var forum = await GetForumByIdAsync(forumTopic.ForumId);
+		_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): forum → {Forum}", forumPost, sendNotifications, forum);
         var subscriptions = await GetAllSubscriptionsAsync(topicId: forumTopic.Id);
+		_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): subscriptions → {Subscriptions}", forumPost, sendNotifications, subscriptions);
 
         var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): languageId → {LanguageId}", forumPost, sendNotifications, languageId);
 
         var friendlyTopicPageIndex = await CalculateTopicPageIndexAsync(forumPost.TopicId,
             _forumSettings.PostsPageSize > 0 ? _forumSettings.PostsPageSize : 10,
@@ -740,10 +900,12 @@ public partial class ForumService : IForumService
                 continue;
 
             var customer = await _customerService.GetCustomerByIdAsync(subscription.CustomerId);
+			_logger.LogError("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): customer → {Customer}", forumPost, sendNotifications, customer);
 
             if (!string.IsNullOrEmpty(customer?.Email))
                 await _workflowMessageService.SendNewForumPostMessageAsync(customer, forumPost, forumTopic, forum, friendlyTopicPageIndex, languageId);
         }
+		_logger.LogWarning("<<< Exiting InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications})", forumPost, sendNotifications);
     }
 
     /// <summary>
@@ -753,7 +915,9 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePostAsync(ForumPost forumPost)
     {
+		_logger.LogError(">>> Entering UpdatePostAsync(forumPost={ForumPost})", forumPost);
         await _forumPostRepository.UpdateAsync(forumPost);
+		_logger.LogWarning("<<< Exiting UpdatePostAsync(forumPost={ForumPost})", forumPost);
     }
 
     /// <summary>
@@ -763,7 +927,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePrivateMessageAsync(PrivateMessage privateMessage)
     {
+		_logger.LogError(">>> Entering DeletePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPrivateMessageRepository.DeleteAsync(privateMessage);
+		_logger.LogError("DeletePrivateMessageAsync(privateMessage)={PrivateMessage}: external service call took {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeletePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
     }
 
     /// <summary>
@@ -776,6 +944,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<PrivateMessage> GetPrivateMessageByIdAsync(int privateMessageId)
     {
+		_logger.LogError(">>> Entering GetPrivateMessageByIdAsync(privateMessageId={PrivateMessageId})", privateMessageId);
+		_logger.LogError("GetPrivateMessageByIdAsync(privateMessageId)={PrivateMessageId}: find query executing", privateMessageId);
+    _logger.LogWarning("<<< Exiting GetPrivateMessageByIdAsync(privateMessageId={PrivateMessageId})", privateMessageId);
         return await _forumPrivateMessageRepository.GetByIdAsync(privateMessageId, cache => default, useShortTermCache: true);
     }
 
@@ -799,12 +970,16 @@ public partial class ForumService : IForumService
         int toCustomerId, bool? isRead, bool? isDeletedByAuthor, bool? isDeletedByRecipient,
         string keywords, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllPrivateMessagesAsync(storeId={StoreId},fromCustomerId={FromCustomerId},toCustomerId={ToCustomerId},isRead={IsRead},isDeletedByAuthor={IsDeletedByAuthor},isDeletedByRecipient={IsDeletedByRecipient},keywords={Keywords},pageIndex={PageIndex},pageSize={PageSize})", storeId, fromCustomerId, toCustomerId, isRead, isDeletedByAuthor, isDeletedByRecipient, keywords, pageIndex, pageSize);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var privateMessages = await _forumPrivateMessageRepository.GetAllPagedAsync(query =>
         {
             if (storeId > 0)
                 query = query.Where(pm => storeId == pm.StoreId);
-            if (fromCustomerId > 0)
+				_logger.LogError("GetAllPrivateMessagesAsync(storeId={StoreId},fromCustomerId={FromCustomerId},toCustomerId={ToCustomerId},isRead={IsRead},isDeletedByAuthor={IsDeletedByAuthor},isDeletedByRecipient={IsDeletedByRecipient},keywords={Keywords},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", storeId, fromCustomerId, toCustomerId, isRead, isDeletedByAuthor, isDeletedByRecipient, keywords, pageIndex, pageSize, query);
+            if (fromCustomerId > 0) {
                 query = query.Where(pm => fromCustomerId == pm.FromCustomerId);
+            }
             if (toCustomerId > 0)
                 query = query.Where(pm => toCustomerId == pm.ToCustomerId);
             if (isRead.HasValue)
@@ -823,7 +998,9 @@ public partial class ForumService : IForumService
 
             return query;
         }, pageIndex, pageSize);
+		_logger.LogError("GetAllPrivateMessagesAsync(storeId,fromCustomerId,toCustomerId,isRead,isDeletedByAuthor,isDeletedByRecipient,keywords,pageIndex,pageSize)={StoreId},{FromCustomerId},{ToCustomerId},{IsRead},{IsDeletedByAuthor},{IsDeletedByRecipient},{Keywords},{PageIndex},{PageSize}: find query executed in {Arg9} ms", storeId, fromCustomerId, toCustomerId, isRead, isDeletedByAuthor, isDeletedByRecipient, keywords, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllPrivateMessagesAsync(storeId={StoreId},fromCustomerId={FromCustomerId},toCustomerId={ToCustomerId},isRead={IsRead},isDeletedByAuthor={IsDeletedByAuthor},isDeletedByRecipient={IsDeletedByRecipient},keywords={Keywords},pageIndex={PageIndex},pageSize={PageSize})", storeId, fromCustomerId, toCustomerId, isRead, isDeletedByAuthor, isDeletedByRecipient, keywords, pageIndex, pageSize);
         return privateMessages;
     }
 
@@ -834,8 +1011,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPrivateMessageAsync(PrivateMessage privateMessage)
     {
+		_logger.LogError(">>> Entering InsertPrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPrivateMessageRepository.InsertAsync(privateMessage);
 
+		_logger.LogError("InsertPrivateMessageAsync(privateMessage)={PrivateMessage}: save query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
         var customerTo = await _customerService.GetCustomerByIdAsync(privateMessage.ToCustomerId)
                          ?? throw new NopException("Recipient could not be loaded");
 
@@ -845,6 +1025,7 @@ public partial class ForumService : IForumService
         //Email notification
         if (_forumSettings.NotifyAboutPrivateMessages)
             await _workflowMessageService.SendPrivateMessageNotificationAsync(privateMessage, (await _workContext.GetWorkingLanguageAsync()).Id);
+			_logger.LogWarning("<<< Exiting InsertPrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
     }
 
     /// <summary>
@@ -854,12 +1035,18 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePrivateMessageAsync(PrivateMessage privateMessage)
     {
+		_logger.LogError(">>> Entering UpdatePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(privateMessage);
 
+		_logger.LogError("UpdatePrivateMessageAsync(privateMessage)={PrivateMessage}: external service call took {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         if (privateMessage.IsDeletedByAuthor && privateMessage.IsDeletedByRecipient)
             await _forumPrivateMessageRepository.DeleteAsync(privateMessage);
         else
             await _forumPrivateMessageRepository.UpdateAsync(privateMessage);
+			_logger.LogError("UpdatePrivateMessageAsync(privateMessage)={PrivateMessage}: delete query executed in {Arg1} ms", privateMessage, __logStartDb.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting UpdatePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
     }
 
     /// <summary>
@@ -869,7 +1056,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSubscriptionAsync(ForumSubscription forumSubscription)
     {
+		_logger.LogError(">>> Entering DeleteSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumSubscriptionRepository.DeleteAsync(forumSubscription);
+		_logger.LogError("DeleteSubscriptionAsync(forumSubscription)={ForumSubscription}: external service call took {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
     }
 
     /// <summary>
@@ -882,6 +1073,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumSubscription> GetSubscriptionByIdAsync(int forumSubscriptionId)
     {
+		_logger.LogError(">>> Entering GetSubscriptionByIdAsync(forumSubscriptionId={ForumSubscriptionId})", forumSubscriptionId);
+		_logger.LogError("GetSubscriptionByIdAsync(forumSubscriptionId)={ForumSubscriptionId}: find query executing", forumSubscriptionId);
+    _logger.LogWarning("<<< Exiting GetSubscriptionByIdAsync(forumSubscriptionId={ForumSubscriptionId})", forumSubscriptionId);
         return await _forumSubscriptionRepository.GetByIdAsync(forumSubscriptionId, cache => default, useShortTermCache: true);
     }
 
@@ -900,6 +1094,8 @@ public partial class ForumService : IForumService
     public virtual async Task<IPagedList<ForumSubscription>> GetAllSubscriptionsAsync(int customerId = 0, int forumId = 0,
         int topicId = 0, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllSubscriptionsAsync(customerId={CustomerId},forumId={ForumId},topicId={TopicId},pageIndex={PageIndex},pageSize={PageSize})", customerId, forumId, topicId, pageIndex, pageSize);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forumSubscriptions = await _forumSubscriptionRepository.GetAllPagedAsync(query =>
         {
             var fsQuery = from fs in query
@@ -919,6 +1115,7 @@ public partial class ForumService : IForumService
 
             return rez;
         }, pageIndex, pageSize);
+		_logger.LogError("GetAllSubscriptionsAsync(customerId,forumId,topicId,pageIndex,pageSize)={CustomerId},{ForumId},{TopicId},{PageIndex},{PageSize}: find query executed in {Arg5} ms", customerId, forumId, topicId, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
         return forumSubscriptions;
     }
@@ -930,7 +1127,9 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSubscriptionAsync(ForumSubscription forumSubscription)
     {
+		_logger.LogError(">>> Entering InsertSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
         await _forumSubscriptionRepository.InsertAsync(forumSubscription);
+		_logger.LogWarning("<<< Exiting InsertSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
     }
 
     /// <summary>
@@ -944,14 +1143,17 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToCreateTopicAsync(Customer customer, Forum forum)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToCreateTopicAsync(customer={Customer},forum={Forum})", customer, forum);
         if (forum == null)
             return false;
 
         if (customer == null)
             return false;
 
-        if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreateTopics)
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToCreateTopicAsync(customer={Customer},forum={Forum})", customer, forum);
+        if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreateTopics) {
             return false;
+        }
 
         return true;
     }
@@ -967,6 +1169,7 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToEditTopicAsync(Customer customer, ForumTopic topic)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToEditTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         if (topic == null)
             return false;
 
@@ -984,6 +1187,7 @@ public partial class ForumService : IForumService
 
         var ownTopic = customer.Id == topic.CustomerId;
 
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToEditTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         return ownTopic;
     }
 
@@ -998,14 +1202,17 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToMoveTopicAsync(Customer customer, ForumTopic topic)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToMoveTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         if (topic == null)
             return false;
 
         if (customer == null)
             return false;
 
-        if (await _customerService.IsGuestAsync(customer))
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToMoveTopicAsync(customer={Customer},topic={Topic})", customer, topic);
+        if (await _customerService.IsGuestAsync(customer)) {
             return false;
+        }
 
         return await _customerService.IsForumModeratorAsync(customer);
     }
@@ -1021,6 +1228,7 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToDeleteTopicAsync(Customer customer, ForumTopic topic)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToDeleteTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         if (topic == null)
             return false;
 
@@ -1038,6 +1246,7 @@ public partial class ForumService : IForumService
 
         var ownTopic = customer.Id == topic.CustomerId;
 
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToDeleteTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         return ownTopic;
     }
 
@@ -1052,14 +1261,17 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToCreatePostAsync(Customer customer, ForumTopic topic)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToCreatePostAsync(customer={Customer},topic={Topic})", customer, topic);
         if (topic == null)
             return false;
 
         if (customer == null)
             return false;
 
-        if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreatePosts)
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToCreatePostAsync(customer={Customer},topic={Topic})", customer, topic);
+        if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreatePosts) {
             return false;
+        }
 
         return true;
     }
@@ -1075,6 +1287,7 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToEditPostAsync(Customer customer, ForumPost post)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToEditPostAsync(customer={Customer},post={Post})", customer, post);
         if (post == null)
             return false;
 
@@ -1092,6 +1305,7 @@ public partial class ForumService : IForumService
 
         var ownPost = customer.Id == post.CustomerId;
 
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToEditPostAsync(customer={Customer},post={Post})", customer, post);
         return ownPost;
     }
 
@@ -1106,6 +1320,7 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToDeletePostAsync(Customer customer, ForumPost post)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToDeletePostAsync(customer={Customer},post={Post})", customer, post);
         if (post == null)
             return false;
 
@@ -1123,6 +1338,7 @@ public partial class ForumService : IForumService
 
         var ownPost = customer.Id == post.CustomerId;
 
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToDeletePostAsync(customer={Customer},post={Post})", customer, post);
         return ownPost;
     }
 
@@ -1136,11 +1352,14 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToSetTopicPriorityAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToSetTopicPriorityAsync(customer={Customer})", customer);
         if (customer == null)
             return false;
 
-        if (await _customerService.IsGuestAsync(customer))
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToSetTopicPriorityAsync(customer={Customer})", customer);
+        if (await _customerService.IsGuestAsync(customer)) {
             return false;
+        }
 
         return await _customerService.IsForumModeratorAsync(customer);
     }
@@ -1155,11 +1374,14 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<bool> IsCustomerAllowedToSubscribeAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering IsCustomerAllowedToSubscribeAsync(customer={Customer})", customer);
         if (customer == null)
             return false;
 
-        if (customer.IsSearchEngineAccount() || await _customerService.IsGuestAsync(customer))
+		_logger.LogWarning("<<< Exiting IsCustomerAllowedToSubscribeAsync(customer={Customer})", customer);
+        if (customer.IsSearchEngineAccount() || await _customerService.IsGuestAsync(customer)) {
             return false;
+        }
 
         return true;
     }
@@ -1176,8 +1398,11 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<int> CalculateTopicPageIndexAsync(int forumTopicId, int pageSize, int postId)
     {
+		_logger.LogError(">>> Entering CalculateTopicPageIndexAsync(forumTopicId={ForumTopicId},pageSize={PageSize},postId={PostId})", forumTopicId, pageSize, postId);
         var pageIndex = 0;
         var forumPosts = await GetAllPostsAsync(forumTopicId, ascSort: true);
+		_logger.LogError("CalculateTopicPageIndexAsync(forumTopicId={ForumTopicId},pageSize={PageSize},postId={PostId}): forumPosts → {ForumPosts}", forumTopicId, pageSize, postId, forumPosts);
+		_logger.LogError("CalculateTopicPageIndexAsync(forumTopicId={ForumTopicId},pageSize={PageSize},postId={PostId}): pageIndex → {PageIndex}", forumTopicId, pageSize, postId, pageIndex);
 
         for (var i = 0; i < forumPosts.TotalCount; i++)
         {
@@ -1188,6 +1413,7 @@ public partial class ForumService : IForumService
                 pageIndex = i / pageSize;
         }
 
+		_logger.LogWarning("<<< Exiting CalculateTopicPageIndexAsync(forumTopicId={ForumTopicId},pageSize={PageSize},postId={PostId})", forumTopicId, pageSize, postId);
         return pageIndex;
     }
 
@@ -1202,8 +1428,11 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumPostVote> GetPostVoteAsync(int postId, Customer customer)
     {
-        if (customer == null)
+		_logger.LogError(">>> Entering GetPostVoteAsync(postId={PostId},customer={Customer})", postId, customer);
+		_logger.LogWarning("<<< Exiting GetPostVoteAsync(postId={PostId},customer={Customer})", postId, customer);
+        if (customer == null) {
             return null;
+        }
 
         return await _forumPostVoteRepository.Table
             .FirstOrDefaultAsync(pv => pv.ForumPostId == postId && pv.CustomerId == customer.Id);
@@ -1220,8 +1449,11 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<int> GetNumberOfPostVotesAsync(Customer customer, DateTime createdFromUtc)
     {
-        if (customer == null)
+		_logger.LogError(">>> Entering GetNumberOfPostVotesAsync(customer={Customer},createdFromUtc={CreatedFromUtc})", customer, createdFromUtc);
+		_logger.LogWarning("<<< Exiting GetNumberOfPostVotesAsync(customer={Customer},createdFromUtc={CreatedFromUtc})", customer, createdFromUtc);
+        if (customer == null) {
             return 0;
+        }
 
         return await _forumPostVoteRepository.Table
             .CountAsync(pv => pv.CustomerId == customer.Id && pv.CreatedOnUtc > createdFromUtc);
@@ -1234,13 +1466,19 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPostVoteAsync(ForumPostVote postVote)
     {
+		_logger.LogError(">>> Entering InsertPostVoteAsync(postVote={PostVote})", postVote);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPostVoteRepository.InsertAsync(postVote);
 
+		_logger.LogError("InsertPostVoteAsync(postVote)={PostVote}: save query executed in {Arg1} ms", postVote, __logStart.ElapsedMilliseconds);
         //update post
         var post = await GetPostByIdAsync(postVote.ForumPostId);
+		_logger.LogError("InsertPostVoteAsync(postVote={PostVote}): post → {Post}", postVote, post);
         post.VoteCount = postVote.IsUp ? ++post.VoteCount : --post.VoteCount;
+		_logger.LogDebug("InsertPostVoteAsync(postVote={PostVote}): post.VoteCount → {Arg1}", postVote, post.VoteCount);
 
         await UpdatePostAsync(post);
+		_logger.LogWarning("<<< Exiting InsertPostVoteAsync(postVote={PostVote})", postVote);
     }
 
     /// <summary>
@@ -1250,15 +1488,23 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePostVoteAsync(ForumPostVote postVote)
     {
+		_logger.LogError(">>> Entering DeletePostVoteAsync(postVote={PostVote})", postVote);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(postVote);
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("DeletePostVoteAsync(postVote)={PostVote}: delete query executed in {Arg1} ms", postVote, __logStartDb.ElapsedMilliseconds);
         await _forumPostVoteRepository.DeleteAsync(postVote);
 
         // update post
         var post = await GetPostByIdAsync(postVote.ForumPostId);
+		_logger.LogError("DeletePostVoteAsync(postVote={PostVote}): post → {Post}", postVote, post);
         post.VoteCount = postVote.IsUp ? --post.VoteCount : ++post.VoteCount;
+		_logger.LogDebug("DeletePostVoteAsync(postVote={PostVote}): post.VoteCount → {Arg1}", postVote, post.VoteCount);
 
         await UpdatePostAsync(post);
+		_logger.LogError("DeletePostVoteAsync(postVote)={PostVote}: external service call took {Arg1} ms", postVote, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeletePostVoteAsync(postVote={PostVote})", postVote);
     }
 
     /// <summary>
@@ -1268,8 +1514,10 @@ public partial class ForumService : IForumService
     /// <returns>Formatted text</returns>
     public virtual string FormatPostText(ForumPost forumPost)
     {
+		_logger.LogError(">>> Entering FormatPostText(forumPost={ForumPost})", forumPost);
         var text = forumPost.Text;
 
+		_logger.LogError("FormatPostText(forumPost={ForumPost}): text → {Text}", forumPost, text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -1291,6 +1539,7 @@ public partial class ForumService : IForumService
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting FormatPostText(forumPost={ForumPost})", forumPost);
         return text;
     }
 
@@ -1301,9 +1550,12 @@ public partial class ForumService : IForumService
     /// <returns>Formatted subject</returns>
     public virtual string StripTopicSubject(ForumTopic forumTopic)
     {
+		_logger.LogError(">>> Entering StripTopicSubject(forumTopic={ForumTopic})", forumTopic);
         var subject = forumTopic.Subject;
-        if (string.IsNullOrEmpty(subject))
+			_logger.LogError("StripTopicSubject(forumTopic={ForumTopic}): subject → {Subject}", forumTopic, subject);
+        if (string.IsNullOrEmpty(subject)) {
             return subject;
+        }
 
         var strippedTopicMaxLength = _forumSettings.StrippedTopicMaxLength;
         if (strippedTopicMaxLength <= 0)
@@ -1320,6 +1572,7 @@ public partial class ForumService : IForumService
         subject = subject[0..index];
         subject += "...";
 
+		_logger.LogWarning("<<< Exiting StripTopicSubject(forumTopic={ForumTopic})", forumTopic);
         return subject;
     }
 
@@ -1330,10 +1583,13 @@ public partial class ForumService : IForumService
     /// <returns>Formatted text</returns>
     public virtual string FormatForumSignatureText(string text)
     {
+		_logger.LogError(">>> Entering FormatForumSignatureText(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, false, false, false);
+		_logger.LogError("FormatForumSignatureText(text={Text}): text → {Text1}", text, text);
+		_logger.LogWarning("<<< Exiting FormatForumSignatureText(text={Text})", text);
         return text;
     }
 
@@ -1344,13 +1600,16 @@ public partial class ForumService : IForumService
     /// <returns>Formatted text</returns>
     public virtual string FormatPrivateMessageText(PrivateMessage pm)
     {
+		_logger.LogError(">>> Entering FormatPrivateMessageText(pm={Pm})", pm);
         var text = pm.Text;
 
+		_logger.LogError("FormatPrivateMessageText(pm={Pm}): text → {Text}", pm, text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, true, false, false);
 
+		_logger.LogWarning("<<< Exiting FormatPrivateMessageText(pm={Pm})", pm);
         return text;
     }
 
@@ -1364,11 +1623,15 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumPost> GetFirstPostAsync(ForumTopic forumTopic)
     {
+		_logger.LogError(">>> Entering GetFirstPostAsync(forumTopic={ForumTopic})", forumTopic);
         ArgumentNullException.ThrowIfNull(forumTopic);
 
         var forumPosts = await GetAllPostsAsync(forumTopic.Id, 0, string.Empty, 0, 1);
-        if (forumPosts.Any())
+		_logger.LogError("GetFirstPostAsync(forumTopic={ForumTopic}): forumPosts → {ForumPosts}", forumTopic, forumPosts);
+		_logger.LogWarning("<<< Exiting GetFirstPostAsync(forumTopic={ForumTopic})", forumTopic);
+        if (forumPosts.Any()) {
             return forumPosts[0];
+        }
 
         return null;
     }
@@ -1383,10 +1646,13 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<string> GetForumGroupSeNameAsync(ForumGroup forumGroup)
     {
+		_logger.LogError(">>> Entering GetForumGroupSeNameAsync(forumGroup={ForumGroup})", forumGroup);
         ArgumentNullException.ThrowIfNull(forumGroup);
 
         var seName = await _urlRecordService.GetSeNameAsync(forumGroup.Name, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls);
+		_logger.LogError("GetForumGroupSeNameAsync(forumGroup={ForumGroup}): seName → {SeName}", forumGroup, seName);
 
+		_logger.LogWarning("<<< Exiting GetForumGroupSeNameAsync(forumGroup={ForumGroup})", forumGroup);
         return seName;
     }
 
@@ -1400,10 +1666,13 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<string> GetForumSeNameAsync(Forum forum)
     {
+		_logger.LogError(">>> Entering GetForumSeNameAsync(forum={Forum})", forum);
         ArgumentNullException.ThrowIfNull(forum);
 
         var seName = await _urlRecordService.GetSeNameAsync(forum.Name, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls);
+		_logger.LogError("GetForumSeNameAsync(forum={Forum}): seName → {SeName}", forum, seName);
 
+		_logger.LogWarning("<<< Exiting GetForumSeNameAsync(forum={Forum})", forum);
         return seName;
     }
 
@@ -1417,15 +1686,18 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<string> GetTopicSeNameAsync(ForumTopic forumTopic)
     {
+		_logger.LogError(">>> Entering GetTopicSeNameAsync(forumTopic={ForumTopic})", forumTopic);
         ArgumentNullException.ThrowIfNull(forumTopic);
 
         var seName = await _urlRecordService.GetSeNameAsync(forumTopic.Subject, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls);
+		_logger.LogError("GetTopicSeNameAsync(forumTopic={ForumTopic}): seName → {SeName}", forumTopic, seName);
 
         // Trim SE name to avoid URLs that are too long
         var maxLength = NopSeoDefaults.ForumTopicLength;
         if (seName.Length > maxLength)
             seName = seName[0..maxLength];
 
+		_logger.LogWarning("<<< Exiting GetTopicSeNameAsync(forumTopic={ForumTopic})", forumTopic);
         return seName;
     }
 

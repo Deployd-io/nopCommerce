@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.Validators;
 /// </summary>
 public partial class EmailPropertyValidator<T> : PropertyValidator<T, string>, IRegularExpressionValidator, IPropertyValidator
 {
+private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
 
     #region Utilities
 
@@ -18,6 +20,8 @@ public partial class EmailPropertyValidator<T> : PropertyValidator<T, string>, I
     /// <param name="errorCode">The currently configured error code for the validator.</param>
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
+		_logger.LogError(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        _logger.LogWarning("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
         return Localized(errorCode, Name);
     }
 
@@ -34,6 +38,8 @@ public partial class EmailPropertyValidator<T> : PropertyValidator<T, string>, I
     /// <returns>True if valid, otherwise false.</returns>
     public override bool IsValid(ValidationContext<T> context, string value)
     {
+		_logger.LogError(">>> Entering IsValid(context={Context},value={Value})", context, value);
+        _logger.LogWarning("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return value == null || CommonHelper.GetEmailRegex().IsMatch(value);
     }
 

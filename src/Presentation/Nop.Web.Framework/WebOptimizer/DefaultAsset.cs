@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.WebOptimizer;
 
@@ -8,12 +9,15 @@ namespace Nop.Web.Framework.WebOptimizer;
 /// </summary>
 public partial class DefaultAsset : IAsset
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DefaultAsset(string route, string contentType)
     {
+		_logger.LogError(">>> Entering DefaultAsset(route={Route},contentType={ContentType})", route, contentType);
         Route = route;
         ContentType = contentType;
+		_logger.LogDebug("DefaultAsset(route={Route},contentType={ContentType}): ContentType → {ContentType1}", route, contentType, ContentType);
     }
 
     #endregion
@@ -27,6 +31,9 @@ public partial class DefaultAsset : IAsset
     /// <param name="options">Configuration options</param>
     public virtual Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
     {
+		_logger.LogError(">>> Entering ExecuteAsync(context={Context},options={Options})", context, options);
+		_logger.LogError("Throwing NotImplementedException from ExecuteAsync(context={Context},options={Options})", context, options);
+    _logger.LogWarning("<<< Exiting ExecuteAsync(context={Context},options={Options})", context, options);
         throw new NotImplementedException();
     }
 
@@ -38,6 +45,8 @@ public partial class DefaultAsset : IAsset
     /// <returns></returns>
     public virtual string GenerateCacheKey(HttpContext context, IWebOptimizerOptions options)
     {
+		_logger.LogError(">>> Entering GenerateCacheKey(context={Context},options={Options})", context, options);
+        _logger.LogWarning("<<< Exiting GenerateCacheKey(context={Context},options={Options})", context, options);
         return string.Empty;
     }
 
@@ -47,6 +56,9 @@ public partial class DefaultAsset : IAsset
     /// <param name="route">Relative path of a source file</param>
     public virtual void TryAddSourceFile(string route)
     {
+		_logger.LogError(">>> Entering TryAddSourceFile(route={Route})", route);
+		_logger.LogError("Throwing NotImplementedException from TryAddSourceFile(route={Route})", route);
+    _logger.LogWarning("<<< Exiting TryAddSourceFile(route={Route})", route);
         throw new NotImplementedException();
     }
     
